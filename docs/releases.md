@@ -33,6 +33,7 @@ Download and inspect the draft's bundles. On Linux, verify downloads with:
 
 ```sh
 sha256sum --check SHA256SUMS
+```
 
 On macOS, use `shasum -a 256 --check SHA256SUMS`. Keep all downloaded files in the
 same directory. Checksums detect changed bytes; they are not signed provenance.
