@@ -43,6 +43,8 @@ For an accepted Plan-to-Build request, use implement-plan as the coordinator;
 writing-clean-simple-code and domain skills support it rather than replacing its
 verification and final independent review gates. Jira intake supplies source intent,
 agent-planning supplies tasks, and implement-plan verifies execution against both.
+The generated plan must contain the execution handoff, not just a chat reminder,
+so native Build and separate-session execution can carry the coordinator instruction.
 
 When skills reference each other, reuse already-loaded guidance and evidence rather
 than recursively restarting workflows. In testing/debugging, retain the current

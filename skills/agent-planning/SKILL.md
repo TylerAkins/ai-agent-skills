@@ -66,6 +66,20 @@ supporting procedures, not mandatory stages; retain established intent and evide
 
 ### Task Template
 
+Include an execution handoff in the generated plan itself, including native Cursor
+plan artifacts. Do not leave it only in chat or these skill instructions. Use:
+
+> Once implementation is authorized, execute this plan using `implement-plan`,
+> including meaningful verification, final independent `code-review`, and affected
+> checks and independent re-review after material repairs. Commit and push only
+> when explicitly authorized. Report unavailable independent review as incomplete.
+
+Carry any explicit review skip or existing Git authorization into the handoff
+accurately. Include source requirement pointers and the final review/repair tasks
+in the plan so a Build or separate-session executor receives the same contract.
+The handoff is an instruction for later execution, not permission to start from
+a planning-only request.
+
 Use this structure when explicit tasks help. Adapt it to the project's native
 plan format rather than creating a duplicate checklist.
 

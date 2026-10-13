@@ -70,8 +70,9 @@ production actions need authorization; GitHub reviews and approvals are never di
 
 In the target project's Agent chat, use `jira-tickets` to read the issue in intake
 mode. Switch to Plan mode and use `agent-planning` to investigate the repository
-and define tasks. Review the plan, then request Build with `implement-plan` as the
-coordinator. Keep the issue context and accepted plan in the same chat, or provide
+and define tasks. The generated plan includes an explicit `implement-plan` execution
+handoff. Check that it is present when reviewing the plan, then request Build.
+Keep the issue context and accepted plan in the same chat, or provide
 them explicitly when starting a separate one.
 
 Implementation includes relevant coding/domain skills, meaningful verification,
@@ -80,7 +81,8 @@ are repaired and material changes re-reviewed. If independent review is unavaila
 the agent reports that gate incomplete. Build does not authorize commits or pushes.
 
 This describes the intended skill handoff; it is not an automated integration or
-a guarantee that every host invokes the coordinator without an explicit request.
+a guarantee that every host follows the embedded handoff. If the executor misses
+it, explicitly select `implement-plan` and supply the accepted plan.
 
 ### Clarify and Plan
 
