@@ -26,6 +26,21 @@ and how to find the relevant capabilities. Include actual prerequisites, command
 limits, and license when useful. Do not invent a development server, test runner,
 installer, roadmap date, support guarantee, or badge to fill a template.
 
+Identify the reader's first useful task explicitly: using the project, installing
+its assets elsewhere, or contributing to its source. Put that path first. Cloning
+the source is not sufficient onboarding when the product must be installed into
+another application. Give the supported destination, prerequisites, working directory,
+commands or concrete steps, and an observable success check. Distinguish first-time
+installation from updating or merging with existing files; do not silently overwrite
+local customizations. Label platform-specific commands and provide a practical
+alternative when needed.
+
+Show a few realistic usage examples when discovery or invocation is otherwise
+unclear. Group large capability lists by the reader's task. Keep necessary setup
+limitations near the affected step, but move internal test history and contributor
+procedures out of the main onboarding path. Avoid replacing accurate limits with
+promotional claims or hiding requirements merely to shorten the page.
+
 For task guides, state prerequisites, actions in execution order, expected results,
 and consequential recovery or troubleshooting. For reference, document exact names,
 types, defaults, constraints, errors, and supported versions without hiding facts
@@ -75,6 +90,10 @@ For a new documentation workflow, use a realistic artifact to check whether a re
 can find prerequisites, perform the task, and understand success and limitations.
 Keep behavioral evidence separate from formatting lint; one example is not proof of
 general effectiveness. Avoid tests that merely require particular headings or wording.
+Test the documented installation path in a fresh scratch destination, including
+required sibling resources and conflict handling where relevant. Separately verify
+host discovery when available; correct file placement alone does not establish that
+an agent loaded or used the skill. Report that distinction.
 
 Report the artifact, verified tasks, and material gaps. Creating local documentation
 does not authorize external posting or publication. Use authorized

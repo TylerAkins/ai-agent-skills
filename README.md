@@ -1,81 +1,122 @@
 # ai-agent-skills
 
-A shared collection of engineering skills for Cursor and Codex. The skills cover
-planning, implementation, testing, review, delivery, and operational work, with
-explicit authorization boundaries and concise technical writing.
+Version-controlled engineering workflows for AI coding agents, built for Cursor
+first and shared with Codex. Keep reusable skills for planning, implementation,
+testing, review, and delivery in one repository instead of rebuilding them per project.
 
-## Use with Cursor
+## Install in a Project
 
-Clone this repository and open it in Cursor:
+You need Git and a version of Cursor or Codex that supports Agent Skills.
+Clone this collection, then copy its skill folders into your project's
+`.agents/skills/` directory, which both hosts support.
+
+For macOS or Linux, run this from the directory where you want the collection checkout.
+Replace `/path/to/your-project` with your existing project directory:
 
 ```sh
 git clone https://github.com/TylerAkins/ai-agent-skills.git
 cd ai-agent-skills
+mkdir -p /path/to/your-project/.agents/skills
+cp -Ri skills/. /path/to/your-project/.agents/skills/
 ```
 
-The checked-in `.cursor/skills` symlink points to `skills/`. [AGENTS.md](AGENTS.md)
-provides instructions for work in this repository. Read
-[using-skills](skills/using-skills/SKILL.md) for the routing guidance.
+The interactive copy prompts before overwriting existing files. Compare conflicting
+skills before replacing them. On Windows, copy the folders inside `skills` into
+`<your-project>/.agents/skills` with your file manager, reviewing any conflicts.
 
-For another project, copy the complete `skills/` directory into that project's
-`.cursor/skills/`, or install the complete collection in your user-level skill
-location. Keep sibling skills together: relative links do not install dependencies.
-Preserve each skill's `references/` directory. Avoid overwriting existing skills
-without comparing them first.
+Copy the complete collection and each skill's supporting files. Skills reference
+siblings, so installing one folder alone may leave required guidance unavailable.
+For updates, compare and copy the updated folders again; copied files do not sync.
+Do not copy this repo's `AGENTS.md` into your project as an installation step.
 
-Cursor's documented discovery locations include `.cursor/skills/` and
-`~/.cursor/skills/`. See [Cursor's skill documentation](https://cursor.com/docs/skills).
-The repository symlink requires a checkout that preserves symlinks. On systems
-that do not, copy the collection into `.cursor/skills/` instead. Discovery and
-invocation in a live Cursor session have not yet been validated for this collection.
+### Cursor
 
-## Codex and Other Agents
+Open the target project in Cursor and start a new Agent chat. Open Customize, then
+Skills, and check for the installed names. Type `/` and select a skill to invoke it explicitly;
+Agent can also choose relevant skills from your request. See
+[Cursor's skill documentation](https://cursor.com/docs/skills).
 
-The canonical skills are in `skills/`, with a `SKILL.md` entry point and optional
-references in each folder. Install the complete collection into a skill location
-supported by your host. This repository currently has no automated installer or
-plugin package. OpenCode integration has not been validated.
+Cursor also supports `.cursor/skills/` for project installation and
+`~/.cursor/skills/` for local user-level installation. Project installation keeps
+the collection alongside the code and avoids relying on user-level files on another machine.
+
+### Codex
+
+Open the target project in Codex and start a new session. In the CLI or IDE extension, type `$`
+to select a skill explicitly. In the desktop app, use the available skill selector,
+or name the skill in your request. Codex can also select relevant guidance. For example, use
+`$agent-planning` with a feature request. See
+[Codex's skill documentation](https://developers.openai.com/codex/skills/)
+for discovery and user-level installation options.
+
+OpenCode integration is planned but unvalidated. There is no automated installer
+or plugin package yet.
+
+## Try It
+
+Select the named skill in your host, then provide a request such as:
+
+- `agent-planning`: “Plan this feature from the ticket. Identify dependencies and verification. Do not implement it yet.”
+- `code-review`: “Review this branch against main for regressions and missing requirements. Keep the candidate unchanged.”
+- `root-cause-debug`: “Reproduce this failure, establish its cause, and fix it with regression coverage.”
+
+[using-skills](skills/using-skills/SKILL.md) describes how the workflows fit together.
+Skills preserve the scope of your request. Commits, pushes, external replies, and
+production actions need authorization; GitHub reviews and approvals are never dismissed.
 
 ## Skills
 
+### Clarify and Plan
+
 | Skill | Purpose |
 | --- | --- |
-| [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
-| [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 | [decision-partner](skills/decision-partner/SKILL.md) | Clarify goals and challenge consequential assumptions. |
 | [agent-planning](skills/agent-planning/SKILL.md) | Investigate requirements and produce verifiable tasks. |
 | [api-design](skills/api-design/SKILL.md) | Define compatible interfaces, errors, authorization, and retries. |
+
+### Build and Verify
+
+| Skill | Purpose |
+| --- | --- |
 | [writing-clean-simple-code](skills/writing-clean-simple-code/SKILL.md) | Implement and refactor with clear ownership and justified abstractions. |
 | [frontend-engineering](skills/frontend-engineering/SKILL.md) | Build responsive, accessible interfaces and verify interactions. |
 | [root-cause-debug](skills/root-cause-debug/SKILL.md) | Diagnose supported causes and verify repairs. |
 | [test-authoring](skills/test-authoring/SKILL.md) | Write meaningful behavioral and regression coverage. |
+
+### Review and Collaborate
+
+| Skill | Purpose |
+| --- | --- |
 | [code-review](skills/code-review/SKILL.md) | Review local code, plans, and GitHub PRs against evidence. |
 | [address-feedback](skills/address-feedback/SKILL.md) | Verify PR feedback, repair supported issues, and draft replies. |
 | [review-lense](skills/review-lense/SKILL.md) | Predict reviewer preferences without substituting for correctness review. |
-| [git-delivery](skills/git-delivery/SKILL.md) | Prepare scoped commits, pushes, and concise PR descriptions. |
 | [jira-tickets](skills/jira-tickets/SKILL.md) | Read issues and preserve explicit ADF formatting for authorized writes. |
+
+### Deliver and Operate
+
+| Skill | Purpose |
+| --- | --- |
+| [git-delivery](skills/git-delivery/SKILL.md) | Prepare scoped commits, pushes, and concise PR descriptions. |
 | [ci-cd-workflows](skills/ci-cd-workflows/SKILL.md) | Build reliable checks and secure delivery pipelines. |
 | [safe-migrations](skills/safe-migrations/SKILL.md) | Transition consumers and data with verified recovery limits. |
 | [release-readiness](skills/release-readiness/SKILL.md) | Assess a specific release and coordinate authorized rollout. |
+
+### Write and Coordinate
+
+| Skill | Purpose |
+| --- | --- |
+| [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
+| [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 
-## Boundaries and Validation
+## Working on This Repository
 
-Skills guide work; they do not grant permission to commit, push, publish, deploy,
-or contact others. External review drafts require exact-text approval. GitHub
-reviews and approvals are preserved, including stale reviews; skills must never
-dismiss them or enable automatic dismissal. Re-review requests require authorization.
+Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.md). The checked-in
+`.cursor/skills` symlink exposes those files when maintaining this repository in Cursor;
+it is not needed for the copy-based installation described above.
 
-Structural validation and link checks do not establish behavioral reliability.
-Most skills have not yet been tested in live Cursor workflows. A focused Codex
-planning probe was performed; it does not establish performance across the collection.
-
-## Maintaining the Collection
-
-Edit canonical files under `skills/`, update affected relative links, and keep
-[using-skills](skills/using-skills/SKILL.md) aligned with available skills. Preserve
-the Jira writing reference's tested ADF instructions unless a formatting change is
-explicitly requested and validated. Follow [AGENTS.md](AGENTS.md) when changing this repo.
+Keep relative links and the skill list current. Structural checks do not establish
+behavioral reliability; validate changes on representative tasks in the target host.
 
 ## License
 
