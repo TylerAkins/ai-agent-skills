@@ -159,6 +159,7 @@ behavioral reliability; validate changes on representative tasks in the target h
 
 Run `go test -race ./...`, `go vet ./...`, and `go run ./cmd/skillpack` for collection
 checks. Build fresh host packages with the commands in [plugin setup](docs/plugins.md).
+See [release preparation](docs/releases.md) for draft bundles and dependency updates.
 
 ## License
 

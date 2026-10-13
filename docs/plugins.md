@@ -158,7 +158,8 @@ outside the package; repository rules can invoke it separately when appropriate.
 Build updated packages into new staging directories outside this checkout. Compare
 the contents, preserve any local customizations, and replace only the installation
 you own. Reload/refresh the host and verify the active version and components.
-There is no automatic installer, marketplace submission, or release publisher yet.
+There is no automatic installer or marketplace submission. The
+[release workflow](releases.md) can prepare draft release bundles once merged.
 
 Before distribution, test in each target host:
 
