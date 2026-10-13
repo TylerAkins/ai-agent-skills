@@ -17,6 +17,10 @@ apply to work in this repository; they are not automatically installed elsewhere
   a specific formatting change is requested and validated.
 - Check frontmatter, local links, and whitespace for changed packages. Distinguish
   structural validation from actual Cursor/Codex behavioral evidence.
+- For tooling changes, run `go test -race ./...`, `go vet ./...`, and
+  `go run ./cmd/skillpack`; build both host packages into new scratch directories.
+  Keep portable and Cursor manifest identities/versions aligned. Do not ship the
+  repository discovery symlink, repo instructions, or credentials in host packages.
 - Do not load every skill, force a lifecycle, or delegate solely because a skill
   mentions another skill. Avoid duplicate instructions and unnecessary approval rituals.
 - Commit, push, publish, contact others, or change live systems only within explicit

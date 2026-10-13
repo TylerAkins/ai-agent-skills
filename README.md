@@ -6,6 +6,11 @@ testing, review, and delivery in one repository instead of rebuilding them per p
 
 ## Install in a Project
 
+For the bundled Cursor plugin or portable Codex plugin, follow
+[local plugin setup](docs/plugins.md). Cursor's package adds a routing rule and
+independent reviewer; Codex's package contains the shared skills and references.
+The copy-based skill installation below remains available without Go.
+
 You need Git and a version of Cursor or Codex that supports Agent Skills.
 Clone this collection, then copy its skill folders into your project's
 `.agents/skills/` directory, which both hosts support.
@@ -49,8 +54,8 @@ or name the skill in your request. Codex can also select relevant guidance. For 
 [Codex's skill documentation](https://developers.openai.com/codex/skills/)
 for discovery and user-level installation options.
 
-OpenCode integration is planned but unvalidated. There is no automated installer
-or plugin package yet.
+OpenCode integration is planned but unvalidated. Plugin manifests and a Go packager
+are available; automated installation and marketplace publication are not yet provided.
 
 ## Try It
 
@@ -136,6 +141,9 @@ it is not needed for the copy-based installation described above.
 
 Keep relative links and the skill list current. Structural checks do not establish
 behavioral reliability; validate changes on representative tasks in the target host.
+
+Run `go test -race ./...`, `go vet ./...`, and `go run ./cmd/skillpack` for collection
+checks. Build fresh host packages with the commands in [plugin setup](docs/plugins.md).
 
 ## License
 
