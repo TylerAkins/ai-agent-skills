@@ -136,6 +136,17 @@ it, explicitly select `implement-plan` and supply the accepted plan.
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
 | [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 
+## Report a Problem or Suggest a Skill
+
+Use a bug report for broken behavior, installation, packaging, or documentation.
+Use a skill or workflow request for new capabilities or improvements. Include a
+small reproduction or concrete use case; remove private information from examples.
+Blank issues remain available for questions and reports that do not fit either form.
+
+The forms live in [issue templates](.github/ISSUE_TEMPLATE). GitHub shows them in
+the issue chooser after they reach the default branch; pushing this feature branch
+alone does not activate them.
+
 ## Working on This Repository
 
 Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.md). The checked-in
