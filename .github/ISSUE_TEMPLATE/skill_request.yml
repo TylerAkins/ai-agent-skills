@@ -1,0 +1,31 @@
+name: Skill or workflow request
+description: Suggest a new skill or an improvement to an existing workflow.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing requests first. Describe the task you need help with; a proposed implementation is optional.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Give a concrete example of the task and where the current collection falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe what a successful workflow would do.
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Relevant skills and hosts
+      placeholder: "code-review in Codex, or a new skill for all hosts"
+  - type: textarea
+    id: context
+    attributes:
+      label: Alternatives or references
+      description: Optional workarounds, related skills, or examples worth considering.

@@ -1,0 +1,10 @@
+{
+  "name": "ai-agent-skills",
+  "version": "0.1.0",
+  "description": "Engineering workflows for planning, implementation, verification, review, and delivery.",
+  "author": {
+    "name": "Tyler Akins"
+  },
+  "repository": "https://github.com/TylerAkins/ai-agent-skills",
+  "license": "MIT"
+}

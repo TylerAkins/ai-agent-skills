@@ -1,0 +1,41 @@
+name: Bug report
+description: Report broken skill behavior, installation, packaging, or documentation.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Include only the relevant prompt or output, with private information removed.
+  - type: input
+    id: affected
+    attributes:
+      label: Affected skill or component
+      placeholder: "agent-planning, Cursor installation, or a documentation path"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Host and versions
+      description: Include the app and version, collection version or commit, installation method, and OS. For tooling-only bugs, include the Go version.
+      placeholder: "Cursor <version>, collection <commit>, local plugin, macOS"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the relevant prompt, setup, and steps. If intermittent, say how often it occurs.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Explain what should happen and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Optional sanitized output, screenshots, errors, or last working version.

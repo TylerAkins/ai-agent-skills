@@ -1,0 +1,67 @@
+# Contributing
+
+Keep contributions focused on a concrete engineering task or an observed defect.
+For substantial new skills or workflow changes, open an issue to discuss the use
+case before investing in an implementation. Small fixes can go straight to a PR.
+
+## Make a Change
+
+Work on a branch in your clone or fork. Read [repository instructions](AGENTS.md)
+and nearby skills before editing.
+
+- Edit canonical content in `skills/<name>/SKILL.md`; keep references and resources
+  in that skill's folder. Do not edit installed copies or generated packages.
+- Give each skill a folder-matching `name` and a concise `description` explaining
+  when it applies. Prefer useful decision guidance over generic advice or rigid rituals.
+- Update sibling links, the [routing skill](skills/using-skills/SKILL.md), and the
+  [README](README.md) when adding, renaming, or removing a skill.
+- Preserve authorization boundaries and tested contracts, particularly Jira ADF.
+  Never introduce automatic dismissal of GitHub reviews or approvals.
+- Write original guidance. Attribute external material when used and respect its license.
+
+For packaging changes, keep manifest names and versions aligned and follow
+[host setup](docs/plugins.md). Keep contributor files and repository instructions
+out of installed host packages.
+
+## Validate
+
+Use the Go version declared in `go.mod`. From the repository root, run:
+
+```sh
+go run ./cmd/skillpack
+git diff --check
+```
+
+For Go tooling or packaging changes, also run:
+
+```sh
+gofmt -w cmd internal
+go test -race ./...
+go vet ./...
+```
+
+Build all five host targets into new scratch directories outside the checkout
+when packaging changes. Use the commands in [host setup](docs/plugins.md).
+For workflow changes, validate the GitHub Actions YAML with `actionlint`.
+
+For changed skill behavior, try a representative task in the affected host when
+available. Describe the prompt, observed result, and material limitations.
+Structural checks alone do not establish that an agent loaded or followed a skill.
+Do not claim live verification that was not performed.
+
+## Submit a Pull Request
+
+Use a clear title and the [PR template](.github/pull_request_template.md).
+Explain the problem and resulting behavior, link a related issue when one exists,
+and report meaningful verification and remaining limits. Screenshots or brief
+sanitized examples help when they show changed behavior. Avoid repeated summaries
+and generic checklists.
+
+AI-assisted contributions are welcome. Review the complete diff and verify its
+claims before submitting; you remain responsible for the contribution. At the
+bottom of the PR body, name the tool and model used when known, for example
+`AI assistance: Codex, model unknown`. Use `None` when no AI assistance was used.
+No transcript is required, and model names should not be guessed.
+
+Respond to review feedback with scoped changes. Preserve review history and
+approvals; request another review when needed rather than dismissing stale reviews.

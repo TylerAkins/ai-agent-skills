@@ -1,0 +1,36 @@
+name: Validate collection
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Check formatting
+        run: test -z "$(gofmt -l cmd internal)"
+      - name: Test
+        run: go test -race ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Validate source
+        run: go run ./cmd/skillpack
+      - name: Build and validate host packages
+        run: |
+          go run ./cmd/skillpack -target cursor -out "$RUNNER_TEMP/cursor-package"
+          go run ./cmd/skillpack -target codex -out "$RUNNER_TEMP/codex-package"
+          go run ./cmd/skillpack -target claude -out "$RUNNER_TEMP/claude-package"
+          go run ./cmd/skillpack -target copilot -out "$RUNNER_TEMP/copilot-package"
+          go run ./cmd/skillpack -target opencode -out "$RUNNER_TEMP/opencode-package"
