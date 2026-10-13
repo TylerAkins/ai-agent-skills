@@ -34,6 +34,12 @@ export HOME="$work/home"
 installer="$repo_root/scripts/install-ai-agent-skills.sh"
 mkdir -p "$HOME/.agents/plugins"
 printf '%s\n' '{"name":"existing","interface":{"displayName":"Existing"},"plugins":[{"name":"other-plugin","source":"./other"}]}' > "$HOME/.agents/plugins/marketplace.json"
+for option in --flavor --version --project --marketplace-root --ref; do
+  if bash "$installer" "$option" > "$work/missing-argument.log" 2>&1; then
+    printf 'Missing option value was accepted: %s\n' "$option" >&2; exit 1
+  fi
+  grep -q 'needs a value' "$work/missing-argument.log"
+done
 for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills codex-skills opencode-project opencode-global; do
   printf 'Testing %s.\n' "$flavor"
   args=(--flavor "$flavor" --version v1.0.0 --yes)
@@ -69,6 +75,19 @@ if INSTALLER_FIXTURES="$work/corrupt" bash "$installer" update --flavor cursor -
 fi
 test -f "$HOME/.cursor/plugins/local/ai-agent-skills/.cursor-plugin/plugin.json"
 
+for checksum_case in missing duplicate; do
+  mkdir "$work/$checksum_case"
+  cp "$fixtures/"* "$work/$checksum_case/"
+  if [ "$checksum_case" = missing ]; then
+    grep -v 'ai-agent-skills-cursor-v1.0.0.tar.gz' "$fixtures/SHA256SUMS" > "$work/$checksum_case/SHA256SUMS"
+  else
+    grep 'ai-agent-skills-cursor-v1.0.0.tar.gz' "$fixtures/SHA256SUMS" >> "$work/$checksum_case/SHA256SUMS"
+  fi
+  if INSTALLER_FIXTURES="$work/$checksum_case" bash "$installer" update --flavor cursor --version v1.0.0 --yes > "$work/$checksum_case.log" 2>&1; then
+    printf 'Invalid checksum list accepted: %s\n' "$checksum_case" >&2; exit 1
+  fi
+  grep -q 'Missing or duplicate checksum' "$work/$checksum_case.log"
+done
 printf 'Preserve old plugin\n' > "$HOME/.codex/plugins/ai-agent-skills/local-change.txt"
 cp "$HOME/.agents/plugins/marketplace.json" "$work/catalog-before"
 cat > "$work/bin/mv" <<'MV'

@@ -20,7 +20,8 @@ if [ "${1:-}" = install ] || [ "${1:-}" = update ]; then action=$1; shift; fi
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --flavor|--version|--project|--marketplace-root|--ref)
-      [ "$#" -ge 2 ] && [ -n "$2" ] || fail "$1 needs a value."
+      if [ "$#" -lt 2 ]; then fail "$1 needs a value."; fi
+      if [ -z "$2" ]; then fail "$1 needs a value."; fi
       case "$1" in
         --flavor) flavor=$2 ;; --version) version=$2 ;; --project) project=$2 ;;
         --marketplace-root) marketplace_root=$2 ;; --ref) ref=$2 ;;

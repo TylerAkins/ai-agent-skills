@@ -77,7 +77,9 @@ prepare_bundle() {
   : > "$work/selected-checksums"
   for expected in "$archive" SOURCE_COMMIT; do
     line=$(awk -v file="$expected" '$2 == file || $2 == "./" file {print}' "$work/SHA256SUMS")
-    [ "$(printf '%s\n' "$line" | wc -l | tr -d ' ')" = 1 ] && [ -n "$line" ] || fail "Missing or duplicate checksum for $expected."
+    if [ -z "$line" ] || [ "$(printf '%s\n' "$line" | wc -l | tr -d ' ')" != 1 ]; then
+      fail "Missing or duplicate checksum for $expected."
+    fi
     [[ "$line" =~ ^[a-fA-F0-9]{64}[[:space:]] ]] || fail "Invalid checksum entry."
     printf '%s\n' "$line" >> "$work/selected-checksums"
   done
