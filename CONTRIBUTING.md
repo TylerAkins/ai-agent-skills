@@ -42,7 +42,24 @@ go vet ./...
 
 Build all five host targets into new scratch directories outside the checkout
 when packaging changes. Use the commands in [host setup](docs/plugins.md).
+For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
+linting. It uses temporary HOME/project directories and generated release fixtures.
+CI runs these behavioral checks on macOS and Linux; Windows needs a native wrapper
+and its own test coverage when implemented.
+
+For shell scripts, install ShellCheck and run `bash scripts/ci/check-shell.sh`.
+It discovers tracked and non-ignored new `.sh` files, including scripts under future
+platform directories. Declare the interpreter in each script's shebang.
 For workflow changes, validate the GitHub Actions YAML with `actionlint`.
+
+CI streams verbose Go test results and groups package output by host. Open the
+running job in GitHub Actions to watch progress; the run summary records its
+revision and result. For CLI monitoring, use `gh run watch <run-id>`.
+
+Keep common installation/package logic in Go where practical and put OS-specific
+wrappers in clearly named platform directories. Add isolated behavioral tests and
+native runner coverage with each platform implementation. PowerShell needs its
+own syntax/lint checks; ShellCheck does not validate `.ps1` files.
 
 For changed skill behavior, try a representative task in the affected host when
 available. Describe the prompt, observed result, and material limitations.

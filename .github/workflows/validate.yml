@@ -9,8 +9,74 @@ permissions:
 
 jobs:
   validate:
+    needs: installer
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    steps:
+      - name: Require installer checks
+        env:
+          INSTALLER_RESULT: ${{ needs.installer.result }}
+        run: test "$INSTALLER_RESULT" = success
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Show validation environment
+        run: |
+          printf 'Revision: %s\nRunner: %s\n' "$GITHUB_SHA" "$RUNNER_OS"
+          go version
+          bash --version
+      - name: Ensure ShellCheck is available
+        run: |
+          if ! command -v shellcheck >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes shellcheck
+          fi
+      - name: Check shell scripts
+        run: bash scripts/ci/check-shell.sh
+      - name: Check formatting
+        run: |
+          files=$(gofmt -l cmd internal)
+          if [ -n "$files" ]; then
+            printf '%s\n' "$files"
+            exit 1
+          fi
+          printf 'Go formatting passed.\n'
+      - name: Test
+        run: go test -v -race ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Validate source
+        run: go run ./cmd/skillpack
+      - name: Build and validate host packages
+        run: |
+          for host in cursor codex claude copilot opencode; do
+            printf '::group::Build %s package\n' "$host"
+            go run ./cmd/skillpack -target "$host" -out "$RUNNER_TEMP/$host-package"
+            printf '::endgroup::\n'
+          done
+      - name: Write validation summary
+        if: always()
+        env:
+          RESULT: ${{ job.status }}
+        run: |
+          printf '## Collection validation\n\nRevision: %s\n\nResult: %s\n' "$GITHUB_SHA" "$RESULT" >> "$GITHUB_STEP_SUMMARY"
+
+
+  installer:
+    name: Installer (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -19,18 +85,17 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Check formatting
-        run: test -z "$(gofmt -l cmd internal)"
-      - name: Test
-        run: go test -race ./...
-      - name: Vet
-        run: go vet ./...
-      - name: Validate source
-        run: go run ./cmd/skillpack
-      - name: Build and validate host packages
+      - name: Ensure jq is available
+        shell: bash
         run: |
-          go run ./cmd/skillpack -target cursor -out "$RUNNER_TEMP/cursor-package"
-          go run ./cmd/skillpack -target codex -out "$RUNNER_TEMP/codex-package"
-          go run ./cmd/skillpack -target claude -out "$RUNNER_TEMP/claude-package"
-          go run ./cmd/skillpack -target copilot -out "$RUNNER_TEMP/copilot-package"
-          go run ./cmd/skillpack -target opencode -out "$RUNNER_TEMP/opencode-package"
+          if ! command -v jq >/dev/null; then
+            if [ "$RUNNER_OS" = macOS ]; then
+              brew install jq
+            else
+              sudo apt-get update
+              sudo apt-get install --yes jq
+            fi
+          fi
+      - name: Exercise installation and update behavior
+        shell: bash
+        run: bash scripts/tests/install-smoke.sh
