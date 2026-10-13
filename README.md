@@ -149,7 +149,8 @@ alone does not activate them.
 
 ## Working on This Repository
 
-Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.md). The checked-in
+See [CONTRIBUTING.md](CONTRIBUTING.md) for change guidelines, validation, and PR
+submission. Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.md). The checked-in
 `.cursor/skills` symlink exposes those files when maintaining this repository in Cursor;
 it is not needed for the copy-based installation described above.
 
