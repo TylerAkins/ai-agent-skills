@@ -45,6 +45,20 @@ matrix. Confirm tests are selected and failures propagate through scripts, pipes
 matrix jobs, and aggregate gates. Do not hide failures with ignored exit codes or
 continue-on-error on required paths.
 
+Make progress observable during execution: name steps for their purpose, stream
+meaningful test/build output, and identify the revision and runtime/platform.
+Group long output by task and report useful failure details and a concise run
+summary. Do not buffer all output until completion or enable shell tracing that
+could expose secrets. Preserve exit status when logging through pipes. Use bounded
+progress messages for otherwise silent long-running operations, not fabricated
+percentages or noisy command narration.
+
+Validate scripts with tools for their declared interpreter and exercise important
+behavior in isolated destinations. Use native OS runners where filesystem,
+permissions, shell, or path behavior differs. Keep shared logic separate from
+platform-specific entrypoints; Bash checks do not validate PowerShell or establish
+Windows compatibility. Add platform coverage when that implementation exists.
+
 Use isolated test data, bounded service readiness checks, timeouts, and deterministic
 cleanup. Retain useful reports on failure with suitable retention and access. Treat
 logs and artifacts as potentially sensitive and untrusted; do not print credentials.

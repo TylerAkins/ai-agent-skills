@@ -2,10 +2,14 @@
 
 Version-controlled engineering workflows for AI coding agents, built for Cursor
 first and shared with Codex, Claude Code, OpenCode, and the GitHub Copilot app.
-Keep reusable skills for planning, implementation,
-testing, review, and delivery in one repository instead of rebuilding them per project.
+Keep reusable skills for planning, implementation, testing, review, and delivery in one repository instead of rebuilding them per project.
 
-## Install in a Project
+## Install
+
+For guided Mac/Linux installation and updates from release bundles, see
+[install and update](docs/install.md). Go is only needed for source builds.
+
+### Install in a Project
 
 For host packages and installation paths, follow [host setup](docs/plugins.md).
 Cursor includes a routing rule and independent reviewer. Claude includes the
@@ -58,7 +62,7 @@ for discovery and user-level installation options.
 Claude Code, OpenCode, and the new GitHub Copilot app have dedicated preparation
 and installation guidance in [host setup](docs/plugins.md). All five package targets
 are structurally checked in CI. Live host behavior and marketplace distribution
-remain to be verified; automated installation is not provided.
+remain to be verified; the installer prepares local files and marketplace entries.
 
 ## Try It
 
@@ -143,9 +147,7 @@ Use a skill or workflow request for new capabilities or improvements. Include a
 small reproduction or concrete use case; remove private information from examples.
 Blank issues remain available for questions and reports that do not fit either form.
 
-The forms live in [issue templates](.github/ISSUE_TEMPLATE). GitHub shows them in
-the issue chooser after they reach the default branch; pushing this feature branch
-alone does not activate them.
+The forms live in [issue templates](.github/ISSUE_TEMPLATE).
 
 ## Working on This Repository
 
@@ -154,12 +156,11 @@ submission. Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.m
 `.cursor/skills` symlink exposes those files when maintaining this repository in Cursor;
 it is not needed for the copy-based installation described above.
 
-Keep relative links and the skill list current. Structural checks do not establish
-behavioral reliability; validate changes on representative tasks in the target host.
-
-Run `go test -race ./...`, `go vet ./...`, and `go run ./cmd/skillpack` for collection
-checks. Build fresh host packages with the commands in [plugin setup](docs/plugins.md).
-See [release preparation](docs/releases.md) for draft bundles and dependency updates.
+CI validates the collection, lints shell scripts, and builds all five host packages.
+Live host testing remains separate from those structural checks. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for local checks and watching CI progress,
+[host setup](docs/plugins.md) for installation, and
+[release preparation](docs/releases.md) for draft bundles.
 
 ## License
 

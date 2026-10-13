@@ -1,6 +1,7 @@
 # Host Setup
 
-Build packages from the feature branch until a release is approved. Git and the Go
+For normal release-based installation and updates, use [the installer](install.md).
+This page covers manual packaging and host details. Git and the Go
 version in `go.mod` are needed to build/validate packages, not to use installed skills.
 Run these commands from the collection checkout:
 
@@ -158,7 +159,8 @@ outside the package; repository rules can invoke it separately when appropriate.
 Build updated packages into new staging directories outside this checkout. Compare
 the contents, preserve any local customizations, and replace only the installation
 you own. Reload/refresh the host and verify the active version and components.
-There is no automatic installer or marketplace submission. The
+The [installer](install.md) handles local release installs and updates; marketplace
+submission remains separate. The
 [release workflow](releases.md) can prepare draft release bundles once merged.
 
 Before distribution, test in each target host:
