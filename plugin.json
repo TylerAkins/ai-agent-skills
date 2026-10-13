@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ai-agent-skills",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Engineering workflows for planning, implementation, verification, review, and delivery.",
   "author": { "name": "Tyler Akins" },
   "repository": "https://github.com/TylerAkins/ai-agent-skills",

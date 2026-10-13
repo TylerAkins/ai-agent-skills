@@ -9,18 +9,25 @@ release or submit marketplace listings.
 Merge the intended changes through the repository's normal review process.
 Complete the live host checks in [host setup](plugins.md), or disclose the missing
 checks in the release notes. Update the version in `plugin.json`,
-`.cursor-plugin/plugin.json`, and `.claude-plugin/plugin.json` together.
+`.cursor-plugin/plugin.json`, and `.claude-plugin/plugin.json` together to the
+same `MAJOR.MINOR.PATCH` value. The workflow derives the release tag as
+`v` plus that version (for example `1.0.0` in the manifests becomes tag `v1.0.0`).
 
-Create and push an explicitly authorized tag such as `v0.1.0` on the intended
-main commit. The workflow accepts only existing stable `vMAJOR.MINOR.PATCH` tags,
-requires the tag's commit to be on main's history, and checks the manifest version.
+Do not create or push a release tag yourself; the workflow creates the tag when
+it creates the draft release, unless an identical tag already points at the
+current `main` commit (for example when retrying after a failed draft job).
 
 ## Build a Draft
 
-Once the workflow is on main, open Actions, select **Prepare release**, and run it
-from **main** with the existing tag. The read-only build job checks the candidate,
-runs tests and vet, and packages the five hosts. A separate job receives only
-those artifacts and uses `contents: write` to create the draft release.
+On `main`, open Actions, select **Prepare release**, and run the workflow with
+no inputs. The read-only build job reads the manifest version on `main`, runs
+tests and vet, validates the collection, and packages the five hosts. A separate
+job uploads artifacts and uses `contents: write` to create tag `v{version}` at
+that commit (if needed) and a draft GitHub release.
+
+If a draft for that tag already exists, or a published release already exists,
+the workflow fails instead of overwriting assets. Delete the draft or publish it
+before preparing another run for the same version.
 
 Download and inspect the draft's bundles. On Linux, verify downloads with:
 

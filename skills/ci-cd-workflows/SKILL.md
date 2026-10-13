@@ -17,7 +17,9 @@ Inspect existing workflows, repository instructions, package scripts, lockfiles,
 runtime versions, runner configuration, and actual failed runs before proposing changes.
 Use the project's provider and tools; verify unfamiliar syntax and APIs against
 current official documentation and supported versions. Do not copy example versions
-or adopt a new provider without a requirement.
+or adopt a new provider without a requirement. For GitHub Actions, pin actions to
+commit SHAs on current supported majors and keep those pins updated; see
+[GitHub Actions guidance](references/github-actions.md).
 
 ## Establish Pipeline Contracts
 

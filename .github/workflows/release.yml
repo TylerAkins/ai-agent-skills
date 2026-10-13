@@ -2,17 +2,12 @@ name: Prepare release
 
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Existing release tag on main matching the manifest version (v0.1.0)
-        required: true
-        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ inputs.tag }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -22,23 +17,30 @@ jobs:
     timeout-minutes: 10
     outputs:
       sha: ${{ steps.candidate.outputs.sha }}
+      release_tag: ${{ steps.candidate.outputs.release_tag }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Verify and select release candidate
+      - name: Resolve release from manifest
         id: candidate
-        env:
-          RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          candidate=$(git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}")
-          git merge-base --is-ancestor "$candidate" origin/main
-          git checkout --detach "$candidate"
-          test "$RELEASE_TAG" = "v$(jq -r .version plugin.json)"
-          echo "sha=$candidate" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+          set -euo pipefail
+          version=$(jq -r .version plugin.json)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          RELEASE_TAG="v${version}"
+          candidate=$(git rev-parse HEAD)
+          if git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}" >/dev/null 2>&1; then
+            existing=$(git rev-parse "refs/tags/${RELEASE_TAG}^{commit}")
+            if [ "$existing" != "$candidate" ]; then
+              echo "::error::Tag ${RELEASE_TAG} points to ${existing}, but main is ${candidate}. Delete or move the tag, or bump the manifest."
+              exit 1
+            fi
+          fi
+          echo "sha=${candidate}" >> "$GITHUB_OUTPUT"
+          echo "release_tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -50,7 +52,7 @@ jobs:
           go run ./cmd/skillpack
       - name: Build release bundles
         env:
-          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ steps.candidate.outputs.release_tag }}
           CANDIDATE_SHA: ${{ steps.candidate.outputs.sha }}
         run: |
           mkdir "$RUNNER_TEMP/bundles"
@@ -62,7 +64,7 @@ jobs:
           cd "$RUNNER_TEMP/bundles"
           printf '%s\n' "$CANDIDATE_SHA" > SOURCE_COMMIT
           sha256sum ./*.tar.gz SOURCE_COMMIT > SHA256SUMS
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-bundles
           path: ${{ runner.temp }}/bundles/
@@ -76,22 +78,31 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundles
           path: bundles
       - name: Create draft release
         env:
           GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
           CANDIDATE_SHA: ${{ needs.build.outputs.sha }}
         run: |
+          set -euo pipefail
           cd bundles
           sha256sum --check SHA256SUMS
           test "$(cat SOURCE_COMMIT)" = "$CANDIDATE_SHA"
-          current=$(gh api "repos/$GH_REPO/commits/$RELEASE_TAG" --jq .sha)
-          test "$current" = "$CANDIDATE_SHA"
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            draft=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft)
+            if [ "$draft" != "true" ]; then
+              echo "::error::Release ${RELEASE_TAG} already exists and is not a draft."
+              exit 1
+            fi
+            echo "::error::Draft release ${RELEASE_TAG} already exists. Delete it or publish before re-running."
+            exit 1
+          fi
           gh release create "$RELEASE_TAG" ./*.tar.gz SHA256SUMS SOURCE_COMMIT \
-            --verify-tag --draft --title "$RELEASE_TAG" \
-            --notes "Host skill bundles built from commit $CANDIDATE_SHA. Review host behavior and release notes before publishing."
+            --target "$CANDIDATE_SHA" \
+            --draft \
+            --title "$RELEASE_TAG" \
+            --notes "Host skill bundles built from commit ${CANDIDATE_SHA}. Review host behavior and release notes before publishing."

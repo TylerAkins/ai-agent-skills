@@ -18,7 +18,29 @@ expressions into shell source. Never assume secret masking prevents all disclosu
 Use verified immutable action references or supported workflow dependency lockfiles
 under repository policy. Inspect upstream sources and release notes when updating;
 confirm SHAs belong to the intended repository. Avoid mutable image tags for
-release-critical builds when digest pinning is supported. Keep dependencies maintained.
+release-critical builds when digest pinning is supported.
+
+## Keep actions on supported majors
+
+When adding or editing workflows, prefer the current stable major release of
+first-party actions and other maintained marketplace actions (`actions/checkout`,
+`actions/setup-go`, `actions/upload-artifact`, and similar) from each action's
+latest release tag, then pin the full commit SHA for that tag. Do not copy SHAs
+from old examples, starter templates, or unrelated repos without checking the
+action's current release; stale pins are a common source of deprecation warnings
+and runner incompatibilities (for example JavaScript actions built for a Node
+version the hosted runner no longer provides).
+
+Treat action versions like application dependencies: immutable SHA pins for
+integrity, with regular updates through Dependabot, Renovate, or an intentional
+bump in the same change that touches the workflow. When upgrading, read the action
+release notes for breaking input or behavior changes; re-run affected workflows
+on a branch before merging.
+
+If the repository configures Dependabot for `package-ecosystem: github-actions`,
+merge or replicate those updates instead of letting action pins age across majors.
+
+## Triggers and required checks
 
 Check pull_request, push, dispatch, tag, reusable-workflow, and merge_group events
 only as relevant. Verify checkout/ref behavior, fork token restrictions, available
