@@ -24,6 +24,11 @@ separately.
 
 ## Investigate Before Planning
 
+For Jira requirements, use [jira-tickets](../jira-tickets/SKILL.md) in intake mode.
+For consequential unresolved intent, use [decision-partner](../decision-partner/SKILL.md).
+For shared interface decisions, use [api-design](../api-design/SKILL.md). These are
+supporting procedures, not mandatory stages; retain established intent and evidence.
+
 1. Establish the intended behavior, scope, exclusions, and acceptance criteria from
    the user's requirements and accepted decisions. Cite their sources. Separate
    requirements from assumptions and unresolved decisions.

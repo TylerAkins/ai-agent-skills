@@ -82,8 +82,9 @@ producers, consumers, alternate profiles, and tenant boundaries for the same fai
 Do not expand into unrelated refactors or apply fallbacks that silently change
 required behavior. Pause only tasks dependent on unresolved decisions or added scope.
 
-Keep a regression test at the level that captures the failure. Derive expected
-outcomes from requirements, not the proposed fix. Observe failure against the
+Keep a regression test at the level that captures the failure. Use
+[test-authoring](../test-authoring/SKILL.md) without restarting diagnosis. Derive
+expected outcomes from requirements, not the proposed fix. Observe failure against the
 defective version and success against the corrected version when feasible, using
 isolated copies or precisely restored agent-owned edits. Never discard or stash
 unrelated work for this experiment. Disclose when either side could not be tested.

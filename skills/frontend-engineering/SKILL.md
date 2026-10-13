@@ -39,6 +39,9 @@ clearly identified as unavailable; never disguise a placeholder as a working fea
 
 ## Implement Clear Components and State
 
+For changed frontend/backend contracts, use [api-design](../api-design/SKILL.md)
+and preserve supported consumers. Do not infer a backend contract from UI fixtures.
+
 Use [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md) for focused
 responsibilities and justified abstractions. Prefer composition and established
 component APIs over a large matrix of unrelated flags. Split by responsibility,

@@ -9,6 +9,9 @@ description: >-
 
 # CI/CD Workflows
 
+Never dismiss reviews or approvals, or enable automatic stale-review dismissal in
+repository settings or workflows. Preserve history and use authorized re-review requests.
+
 Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting comments or reports.
 Inspect existing workflows, repository instructions, package scripts, lockfiles,
 runtime versions, runner configuration, and actual failed runs before proposing changes.

@@ -30,6 +30,9 @@ when the current code and contracts do not explain the constraint.
 For simplification, preserve observable behavior and public contracts. A discovered
 bug or desired behavior change is a separate decision; do not hide it inside cleanup.
 For new behavior, implement the accepted requirement without speculative features.
+For new or changed shared boundaries, use [api-design](../api-design/SKILL.md).
+Use [safe-migrations](../safe-migrations/SKILL.md) when supported consumers or
+persisted state require a staged transition rather than a local refactor.
 
 ## Choose the Simplest Adequate Design
 

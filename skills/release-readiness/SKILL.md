@@ -9,6 +9,9 @@ description: >-
 
 # Release Readiness
 
+Never dismiss reviews or approvals or configure automatic stale-review dismissal
+to clear a release gate. Preserve history; request re-review only when authorized.
+
 Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting plans or reports.
 Coordinate the release using existing project procedures. Keep checks proportional
 to the product and risk; do not impose web-only checks on libraries or fixed rollout

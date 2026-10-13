@@ -8,6 +8,10 @@ description: >-
 
 # Git Delivery
 
+Never dismiss any GitHub review or approval, including stale, bot, or addressed
+reviews. Never enable automatic dismissal of stale reviews or approvals in repository
+settings or automation. Preserve review history; request re-review only when authorized.
+
 Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting messages or
 descriptions. Follow repository instructions and templates directly; do not infer
 PR requirements from commit or branch naming. Do not require a ticket for fully
