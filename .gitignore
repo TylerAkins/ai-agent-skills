@@ -1,0 +1,6 @@
+.DS_Store
+.env
+*.log
+.claude/.simplify-ignore-cache/
+.claude/sdd-cache/
+/state/
