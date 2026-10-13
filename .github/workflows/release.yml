@@ -78,6 +78,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          fetch-depth: 0
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundles
@@ -89,9 +93,8 @@ jobs:
           CANDIDATE_SHA: ${{ needs.build.outputs.sha }}
         run: |
           set -euo pipefail
-          cd bundles
-          sha256sum --check SHA256SUMS
-          test "$(cat SOURCE_COMMIT)" = "$CANDIDATE_SHA"
+          sha256sum --check bundles/SHA256SUMS
+          test "$(cat bundles/SOURCE_COMMIT)" = "$CANDIDATE_SHA"
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             draft=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft)
             if [ "$draft" != "true" ]; then
@@ -101,7 +104,7 @@ jobs:
             echo "::error::Draft release ${RELEASE_TAG} already exists. Delete it or publish before re-running."
             exit 1
           fi
-          gh release create "$RELEASE_TAG" ./*.tar.gz SHA256SUMS SOURCE_COMMIT \
+          gh release create "$RELEASE_TAG" bundles/*.tar.gz bundles/SHA256SUMS bundles/SOURCE_COMMIT \
             --target "$CANDIDATE_SHA" \
             --draft \
             --title "$RELEASE_TAG" \
