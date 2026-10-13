@@ -1,0 +1,15 @@
+---
+description: Select this plugin's engineering workflows and preserve review history.
+alwaysApply: true
+---
+
+Use the installed ai-agent-skills collection when relevant. Read anti-ai-writing
+before drafting human-facing text. For workflow selection, read using-skills;
+load the applicable procedure rather than every skill. For an accepted Plan-to-Build
+request, use implement-plan, including verification and final independent code-review.
+Use the plan's source requirements and preserve authorization already given.
+
+Respect repository instructions and task scope. A skill does not authorize new
+external actions. Never dismiss GitHub reviews or approvals or enable automatic
+stale-review dismissal. Request re-review only when authorized. If required skills
+or independent review are unavailable, disclose that limit instead of claiming completion.
