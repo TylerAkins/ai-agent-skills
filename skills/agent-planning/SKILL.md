@@ -58,8 +58,11 @@ supporting procedures, not mandatory stages; retain established intent and evide
 8. Include integration checks and review checkpoints proportional to the risk.
    For changed authorization, cover applicable allow/deny, wrong-user or tenant,
    missing-identity, and preserved behavior. Plan regression sensitivity for bug
-   fixes where feasible. Identify independent review needs without claiming review
-   occurred or automatically spawning agents.
+   fixes where feasible. Include final independent whole-candidate review and
+   affected verification/re-review after material repairs in the plan and executable
+   todos, unless the user explicitly skips review. Identify unavailable review as
+   a limit, not a completed step. Planning does not claim review occurred or spawn
+   reviewers merely to schedule this later implementation gate.
 
 ### Task Template
 
@@ -92,7 +95,9 @@ Needs decision: [Unresolved choice and what it blocks, or none]
     performed during investigation from checks proposed for implementation.
 11. Deliver the plan with its current decisions and verification limits. For a
     planning-only request, stop without implementation. If implementation is
-    already authorized, hand the plan back to the calling delivery workflow and
-    continue authorized work there without asking for approval again. An unresolved
+    already authorized, hand the accepted plan and source requirements to
+    [implement-plan](../implement-plan/SKILL.md), which coordinates implementation,
+    verification, and required final independent review without asking for approval
+    again. This skill remains planning-only. An unresolved
     decision blocks only dependent work. Creating a plan does not itself authorize
     implementation, commits, pushes, or publication.

@@ -10,6 +10,9 @@ apply to work in this repository; they are not automatically installed elsewhere
   Read the selected skill; do not treat its description as the complete procedure.
 - Keep changes scoped and preserve unrelated work. Update affected relative links
   when names or responsibilities change. Do not add personal-only dependencies.
+- For accepted plan implementation, use `skills/implement-plan/SKILL.md` to coordinate
+  verification and final independent review. Planning remains planning-only; unavailable
+  independent review must be reported incomplete rather than replaced by self-review.
 - Preserve the Jira writing reference's tested ADF contracts and examples unless
   a specific formatting change is requested and validated.
 - Check frontmatter, local links, and whitespace for changed packages. Distinguish

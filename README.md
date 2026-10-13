@@ -66,12 +66,29 @@ production actions need authorization; GitHub reviews and approvals are never di
 
 ## Skills
 
+### From Jira to Build
+
+In the target project's Agent chat, use `jira-tickets` to read the issue in intake
+mode. Switch to Plan mode and use `agent-planning` to investigate the repository
+and define tasks. Review the plan, then request Build with `implement-plan` as the
+coordinator. Keep the issue context and accepted plan in the same chat, or provide
+them explicitly when starting a separate one.
+
+Implementation includes relevant coding/domain skills, meaningful verification,
+and final independent `code-review` unless you explicitly skip it. Supported findings
+are repaired and material changes re-reviewed. If independent review is unavailable,
+the agent reports that gate incomplete. Build does not authorize commits or pushes.
+
+This describes the intended skill handoff; it is not an automated integration or
+a guarantee that every host invokes the coordinator without an explicit request.
+
 ### Clarify and Plan
 
 | Skill | Purpose |
 | --- | --- |
 | [decision-partner](skills/decision-partner/SKILL.md) | Clarify goals and challenge consequential assumptions. |
 | [agent-planning](skills/agent-planning/SKILL.md) | Investigate requirements and produce verifiable tasks. |
+| [implement-plan](skills/implement-plan/SKILL.md) | Build an accepted plan, verify behavior, and obtain final independent review. |
 | [api-design](skills/api-design/SKILL.md) | Define compatible interfaces, errors, authorization, and retries. |
 
 ### Build and Verify

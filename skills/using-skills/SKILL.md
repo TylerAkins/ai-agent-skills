@@ -18,6 +18,7 @@ they do not install dependencies, authorize new actions, or spawn agents.
 | --- | --- |
 | Clarify goals or challenge assumptions | [decision-partner](../decision-partner/SKILL.md) |
 | Investigate and produce a plan | [agent-planning](../agent-planning/SKILL.md) |
+| Build an accepted plan through verification and final review | [implement-plan](../implement-plan/SKILL.md) |
 | Implement or simplify code | [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md) |
 | Diagnose and repair unexpected behavior | [root-cause-debug](../root-cause-debug/SKILL.md) |
 | Write behavioral tests | [test-authoring](../test-authoring/SKILL.md) |
@@ -37,6 +38,11 @@ Keep each skill's boundary: planning does not implement; review does not repair;
 preference prediction does not establish correctness; CI configuration does not
 establish release readiness; a draft does not authorize publication. The calling
 workflow resumes already-authorized work after a supporting skill finishes.
+
+For an accepted Plan-to-Build request, use implement-plan as the coordinator;
+writing-clean-simple-code and domain skills support it rather than replacing its
+verification and final independent review gates. Jira intake supplies source intent,
+agent-planning supplies tasks, and implement-plan verifies execution against both.
 
 When skills reference each other, reuse already-loaded guidance and evidence rather
 than recursively restarting workflows. In testing/debugging, retain the current
