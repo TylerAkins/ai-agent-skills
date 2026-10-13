@@ -34,7 +34,7 @@ description: >-
 ## Edit the Exact Draft
 
 5. Remove filler, corporate pleasantries, performative agreement, engagement bait,
-   em dashes, unnecessary praise, repeated summaries, redundant headings, generic
+   unnecessary praise, repeated summaries, redundant headings, generic
    reminders, and investigation narration used only to demonstrate effort.
 6. Verify factual claims, status, and cited locations. Distinguish planned, locally
    changed, checked, pushed, and published states. Claim completed work only when
@@ -42,8 +42,36 @@ description: >-
    inspection, remove comments and headers that repeat nearby code or names;
    retain useful reasons and required documentation.
 7. Read the exact final text before showing it and again after any revision.
+   Apply the strict style rules below to the exact output, including headings,
+   bullets, comments, and publication drafts.
    Delete sentences that add no needed fact, evidence, decision, or context.
    Retain blockers and verification limits in the destination allowed by the workflow.
+
+## Strict Style Rules
+
+- Never use em dash punctuation in authored prose. Rewrite with a period, comma,
+  colon, or parentheses. Do not substitute double hyphens or spaced en dashes to
+  recreate the same construction. Use ordinary hyphens for compound words and
+  minus signs or range notation where technically appropriate.
+- Use ordinary punctuation. Avoid decorative arrows, Unicode bullets, ornamental
+  separators, emoji, repeated exclamation marks, and ellipses used for dramatic
+  effect. Use standard Markdown lists when a list helps.
+- Prefer direct sentences over rhetorical questions, sentence fragments used for
+  emphasis, and formulaic contrasts such as "This isn't about X. It's about Y."
+- Remove stock openers and closers such as "Great question," "Absolutely," "Let's
+  dive in," "It's worth noting," "In today's fast-paced world," "In conclusion,"
+  and "Let me know if you need anything else." Start with the needed information.
+- Replace inflated wording such as "delve," "leverage," "foster," "seamless,"
+  "robust," "game-changing," and "unlock" with the concrete action or property.
+  Retain terms when they have a precise technical meaning in context.
+- Avoid bold labels on every bullet, one-sentence sections, repetitive three-part
+  lists, unnecessary title-case headings, and a closing summary that repeats the
+  answer. Use headings, lists, and emphasis only when they improve navigation or
+  comparison. Do not force every response into a template.
+- Preserve exact quotations, code, identifiers, URLs, machine payloads, required
+  destination formats, and explicitly requested notation or style. These rules
+  govern authored prose, not evidence or technical syntax. Do not alter a quote
+  or break an API/schema contract to satisfy a writing preference.
 
 ## Preserve Publication Approval
 
