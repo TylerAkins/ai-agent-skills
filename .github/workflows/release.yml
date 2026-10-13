@@ -93,8 +93,11 @@ jobs:
           CANDIDATE_SHA: ${{ needs.build.outputs.sha }}
         run: |
           set -euo pipefail
-          sha256sum --check bundles/SHA256SUMS
-          test "$(cat bundles/SOURCE_COMMIT)" = "$CANDIDATE_SHA"
+          (
+            cd bundles
+            sha256sum --check SHA256SUMS
+            test "$(cat SOURCE_COMMIT)" = "$CANDIDATE_SHA"
+          )
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             draft=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft)
             if [ "$draft" != "true" ]; then
