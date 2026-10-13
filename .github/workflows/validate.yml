@@ -31,3 +31,6 @@ jobs:
         run: |
           go run ./cmd/skillpack -target cursor -out "$RUNNER_TEMP/cursor-package"
           go run ./cmd/skillpack -target codex -out "$RUNNER_TEMP/codex-package"
+          go run ./cmd/skillpack -target claude -out "$RUNNER_TEMP/claude-package"
+          go run ./cmd/skillpack -target copilot -out "$RUNNER_TEMP/copilot-package"
+          go run ./cmd/skillpack -target opencode -out "$RUNNER_TEMP/opencode-package"

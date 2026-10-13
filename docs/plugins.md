@@ -1,4 +1,4 @@
-# Local Plugin Setup
+# Host Setup
 
 Build packages from the feature branch until a release is approved. Git and the Go
 version in `go.mod` are needed to build/validate packages, not to use installed skills.
@@ -11,8 +11,8 @@ go run ./cmd/skillpack
 ```
 
 The validator checks this collection's metadata, links, inventories, and manifest
-contracts. It is not a complete implementation of either host's JSON Schema, nor
-does it prove skill behavior. CI runs these checks and builds both host packages
+contracts. It is not a complete implementation of every host's JSON Schema, nor
+does it prove skill behavior. CI runs these checks and builds all five host packages
 with read-only GitHub permissions. It never publishes or changes review settings.
 
 ## Cursor
@@ -86,6 +86,62 @@ Codex uses its native delegation capability for independent review when availabl
 Explicitly invoke `using-skills` for routing or `implement-plan` for an accepted plan.
 No unsupported Codex agent configuration is shipped.
 
+## Claude Code
+
+Build the native Claude plugin into a new directory outside the checkout:
+
+```sh
+go run ./cmd/skillpack -target claude -out /tmp/ai-agent-skills-claude
+claude --plugin-dir /tmp/ai-agent-skills-claude
+```
+
+The package contains `.claude-plugin/plugin.json`, shared skills, the independent
+reviewer agent, and the license. It excludes Cursor rules and repository instructions.
+Invoke a plugin skill using its namespace, for example
+`/ai-agent-skills:agent-planning`. Start with `using-skills` when routing is needed.
+The reviewer instructions request read-only work; they do not impose a tool sandbox.
+See [Claude plugin reference](https://code.claude.com/docs/en/plugins-reference)
+and [plugin usage](https://code.claude.com/docs/en/plugins).
+
+## GitHub Copilot App
+
+Build the portable plugin, which uses the same shared format as Codex:
+
+```sh
+go run ./cmd/skillpack -target copilot -out /tmp/ai-agent-skills-copilot
+```
+
+This package contains skills and references, without host-specific agents or hooks.
+The new desktop app exposes plugin marketplaces under **Customize > Plugins**.
+A marketplace entry is still needed to distribute this bundle through that view.
+
+For immediate project preparation without a marketplace, copy the complete
+`skills/` contents into your project's `.github/skills/`, reviewing conflicts
+before overwriting. Repository and Copilot CLI skills are available in the app;
+inspect **Customize > Skills**, then request the named skill. Do not copy the
+repository's `AGENTS.md` as installation instructions.
+See [app customization](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app),
+[skill locations](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills),
+and [portable plugin format](https://docs.github.com/en/copilot/concepts/agents/about-plugins).
+
+## OpenCode
+
+OpenCode discovers skills directly rather than requiring a JavaScript plugin.
+Build a skills-only staging bundle:
+
+```sh
+go run ./cmd/skillpack -target opencode -out /tmp/ai-agent-skills-opencode
+mkdir -p /path/to/your-project/.opencode/skills
+cp -Ri /tmp/ai-agent-skills-opencode/skills/. /path/to/your-project/.opencode/skills/
+```
+
+Replace the project path and review copy conflicts. Global installation uses
+`~/.config/opencode/skills/`. Keep every sibling skill and its resources together.
+Start a new session and ask OpenCode to use `using-skills` or a specific skill.
+Default skills are loaded through OpenCode's skill tool; this bundle does not add
+slash-command metadata or an OpenCode runtime plugin.
+See [OpenCode skill discovery](https://opencode.ai/docs/skills/).
+
 ## Avoid Duplicate Skill Versions
 
 Before enabling the plugin, inspect existing personal/project skill folders and
@@ -104,7 +160,7 @@ the contents, preserve any local customizations, and replace only the installati
 you own. Reload/refresh the host and verify the active version and components.
 There is no automatic installer, marketplace submission, or release publisher yet.
 
-Before distribution, test in both hosts:
+Before distribution, test in each target host:
 
 1. Verify discovery and explicit invocation, including sibling reference loading.
 2. Read a Jira issue in intake mode without Jira writes.
@@ -116,3 +172,15 @@ Before distribution, test in both hosts:
 
 File validation and package tests have been run; these live host checks are still
 pending. Do not treat successful installation as evidence that the complete workflow works.
+
+## Distribution Next
+
+Packaging produces the files a host can load. Distribution makes a tested version
+easy to install and update. Next, run the live checks above, choose a release
+version, publish reproducible host bundles, and add the appropriate marketplace
+entries for Cursor, Codex, Claude, and Copilot. OpenCode can use the versioned
+skills bundle directly. Host catalogs have different formats and review processes;
+a manifest alone does not publish a listing.
+
+No marketplace registration, release upload, host installation, or live behavioral
+test is performed by the packager or validation workflow.

@@ -11,6 +11,7 @@ func fixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	files := map[string]string{
+		".claude-plugin/plugin.json":        `{"name":"demo","version":"0.1.0","description":"Demo"}`,
 		"plugin.json":                       `{"$schema":"` + Schema + `","name":"demo","version":"0.1.0","description":"Demo"}`,
 		".cursor-plugin/plugin.json":        `{"name":"demo","version":"0.1.0","description":"Demo","skills":"./skills/","rules":"./rules/","agents":"./agents/"}`,
 		"skills/demo/SKILL.md":              "---\nname: demo\ndescription: Demonstrate a contract.\n---\nRead [details](references/details.md).\n",
@@ -36,7 +37,7 @@ func fixture(t *testing.T) string {
 
 func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 	root := fixture(t)
-	for _, target := range []string{"cursor", "codex"} {
+	for _, target := range []string{"cursor", "codex", "claude", "copilot", "opencode"} {
 		t.Run(target, func(t *testing.T) {
 			out := filepath.Join(t.TempDir(), "package")
 			if err := Build(root, out, target); err != nil {
@@ -53,11 +54,32 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 				t.Fatal("repo instructions shipped")
 			}
 			absent := "plugin.json"
-			if target == "codex" {
+			if target != "cursor" {
 				absent = ".cursor-plugin"
+			}
+			if target == "claude" || target == "opencode" {
+				absent = "plugin.json"
 			}
 			if _, err := os.Stat(filepath.Join(out, absent)); !os.IsNotExist(err) {
 				t.Fatal("mixed host formats")
+			}
+			expected := map[string][]string{
+				"cursor":   {".cursor-plugin", "LICENSE", "agents", "rules", "skills"},
+				"codex":    {"LICENSE", "plugin.json", "skills"},
+				"copilot":  {"LICENSE", "plugin.json", "skills"},
+				"claude":   {".claude-plugin", "LICENSE", "agents", "skills"},
+				"opencode": {"LICENSE", "skills"},
+			}
+			entries, err := os.ReadDir(out)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var got []string
+			for _, entry := range entries {
+				got = append(got, entry.Name())
+			}
+			if strings.Join(got, ",") != strings.Join(expected[target], ",") {
+				t.Fatalf("wrong host components: %v", got)
 			}
 			if err := Build(root, out, target); err == nil {
 				t.Fatal("overwrote existing output")
@@ -80,6 +102,12 @@ func TestRejectInvalidCollection(t *testing.T) {
 			p := filepath.Join(r, "plugin.json")
 			b, _ := os.ReadFile(p)
 			os.WriteFile(p, []byte(strings.ReplaceAll(string(b), "0.1.0", "0.2.0")), 0644)
+		},
+		"Claude drift": func(r string) {
+			os.WriteFile(filepath.Join(r, ".claude-plugin/plugin.json"), []byte(`{"name":"demo","version":"9.0.0","description":"Demo"}`), 0644)
+		},
+		"long description": func(r string) {
+			os.WriteFile(filepath.Join(r, "skills/demo/SKILL.md"), []byte("---\nname: demo\ndescription: "+strings.Repeat("x", 1025)+"\n---\nBody\n"), 0644)
 		},
 		"inventory omission": func(r string) { os.WriteFile(filepath.Join(r, "README.md"), []byte("# Empty\n"), 0644) },
 		"escaping link": func(r string) {

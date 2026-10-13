@@ -148,16 +148,22 @@ func Validate(root, target string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if target != "source" && target != "cursor" && target != "codex" {
+	if target != "source" && !packageTarget(target) {
 		return nil, fmt.Errorf("unknown target %q", target)
 	}
 	mpath := "plugin.json"
 	if target == "cursor" {
 		mpath = ".cursor-plugin/plugin.json"
 	}
-	m, err := manifest(root, mpath)
-	if err != nil {
-		return nil, err
+	if target == "claude" {
+		mpath = ".claude-plugin/plugin.json"
+	}
+	var m Manifest
+	if target != "opencode" {
+		m, err = manifest(root, mpath)
+		if err != nil {
+			return nil, err
+		}
 	}
 	components := []string{"skills"}
 	if target == "source" || target == "cursor" {
@@ -173,8 +179,24 @@ func Validate(root, target string) ([]string, error) {
 		}
 		components = append(components, "rules", "agents", ".cursor-plugin")
 	}
-	if target != "cursor" && m.Schema != Schema {
+	if (target == "source" || target == "codex" || target == "copilot") && m.Schema != Schema {
 		return nil, fmt.Errorf("portable manifest schema missing or unsupported")
+	}
+	if target == "source" || target == "claude" {
+		c, err := manifest(root, ".claude-plugin/plugin.json")
+		if err != nil {
+			return nil, err
+		}
+		if c.Name != m.Name || c.Version != m.Version {
+			return nil, fmt.Errorf("Claude manifest identity/version drift")
+		}
+		if c.Schema != "" || c.Skills != "" || c.Agents != "" || c.Rules != "" {
+			return nil, fmt.Errorf("Claude manifest must use default component discovery")
+		}
+		components = append(components, ".claude-plugin")
+		if target == "claude" {
+			components = append(components, "agents")
+		}
 	}
 	for _, component := range components {
 		if err = safeFiles(filepath.Join(root, component)); err != nil {
@@ -196,12 +218,12 @@ func Validate(root, target string) ([]string, error) {
 			return nil, err
 		}
 		name, ok := fields["name"].(string)
-		if !ok || name != entry.Name() || !nameRE.MatchString(name) {
+		if !ok || name != entry.Name() || !nameRE.MatchString(name) || len(name) > 64 {
 			return nil, fmt.Errorf("%s: name must match folder", path)
 		}
 		desc, ok := fields["description"].(string)
-		if !ok || strings.TrimSpace(desc) == "" {
-			return nil, fmt.Errorf("%s: missing description", path)
+		if !ok || strings.TrimSpace(desc) == "" || len([]rune(desc)) > 1024 {
+			return nil, fmt.Errorf("%s: description must contain 1–1024 characters", path)
 		}
 		names = append(names, name)
 	}
@@ -275,7 +297,7 @@ func Validate(root, target string) ([]string, error) {
 
 // Build writes a new directory only, excluding repository instructions and tooling.
 func Build(root, out, target string) error {
-	if target != "cursor" && target != "codex" {
+	if !packageTarget(target) {
 		return fmt.Errorf("unknown package target %q", target)
 	}
 	if _, err := Validate(root, "source"); err != nil {
@@ -318,6 +340,12 @@ func Build(root, out, target string) error {
 	if target == "cursor" {
 		components = []string{"skills", "LICENSE", ".cursor-plugin", "rules", "agents"}
 	}
+	if target == "claude" {
+		components = []string{"skills", "LICENSE", ".claude-plugin", "agents"}
+	}
+	if target == "opencode" {
+		components = []string{"skills", "LICENSE"}
+	}
 	for _, component := range components {
 		base := filepath.Join(absRoot, component)
 		if err = safeFiles(base); err != nil {
@@ -350,4 +378,12 @@ func Build(root, out, target string) error {
 	}
 	success = true
 	return nil
+}
+
+func packageTarget(target string) bool {
+	switch target {
+	case "cursor", "codex", "claude", "copilot", "opencode":
+		return true
+	}
+	return false
 }

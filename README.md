@@ -1,15 +1,16 @@
 # ai-agent-skills
 
 Version-controlled engineering workflows for AI coding agents, built for Cursor
-first and shared with Codex. Keep reusable skills for planning, implementation,
+first and shared with Codex, Claude Code, OpenCode, and the GitHub Copilot app.
+Keep reusable skills for planning, implementation,
 testing, review, and delivery in one repository instead of rebuilding them per project.
 
 ## Install in a Project
 
-For the bundled Cursor plugin or portable Codex plugin, follow
-[local plugin setup](docs/plugins.md). Cursor's package adds a routing rule and
-independent reviewer; Codex's package contains the shared skills and references.
-The copy-based skill installation below remains available without Go.
+For host packages and installation paths, follow [host setup](docs/plugins.md).
+Cursor includes a routing rule and independent reviewer. Claude includes the
+reviewer; Codex and Copilot use portable skills plugins. OpenCode uses a skills
+bundle. The copy-based installation below remains available without Go.
 
 You need Git and a version of Cursor or Codex that supports Agent Skills.
 Clone this collection, then copy its skill folders into your project's
@@ -54,8 +55,10 @@ or name the skill in your request. Codex can also select relevant guidance. For 
 [Codex's skill documentation](https://developers.openai.com/codex/skills/)
 for discovery and user-level installation options.
 
-OpenCode integration is planned but unvalidated. Plugin manifests and a Go packager
-are available; automated installation and marketplace publication are not yet provided.
+Claude Code, OpenCode, and the new GitHub Copilot app have dedicated preparation
+and installation guidance in [host setup](docs/plugins.md). All five package targets
+are structurally checked in CI. Live host behavior and marketplace distribution
+remain to be verified; automated installation is not provided.
 
 ## Try It
 

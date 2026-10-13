@@ -1,7 +1,7 @@
 # Repository Instructions
 
-This repository maintains shared skills for Cursor and Codex. These instructions
-apply to work in this repository; they are not automatically installed elsewhere.
+This repository maintains shared skills for Cursor, Codex, Claude Code, OpenCode,
+and Copilot. These instructions apply to work in this repository; they are not automatically installed elsewhere.
 
 - Keep canonical content in `skills/<name>/SKILL.md` and supporting resources in
   that skill's folder. Cursor's `.cursor/skills` points to this shared source.
@@ -16,11 +16,11 @@ apply to work in this repository; they are not automatically installed elsewhere
 - Preserve the Jira writing reference's tested ADF contracts and examples unless
   a specific formatting change is requested and validated.
 - Check frontmatter, local links, and whitespace for changed packages. Distinguish
-  structural validation from actual Cursor/Codex behavioral evidence.
+  structural validation from actual host behavioral evidence.
 - For tooling changes, run `go test -race ./...`, `go vet ./...`, and
-  `go run ./cmd/skillpack`; build both host packages into new scratch directories.
-  Keep portable and Cursor manifest identities/versions aligned. Do not ship the
-  repository discovery symlink, repo instructions, or credentials in host packages.
+  `go run ./cmd/skillpack`; build all five host packages into new scratch directories.
+  Keep portable, Cursor, and Claude manifest identities/versions aligned.
+  Do not ship the repository discovery symlink, repo instructions, or credentials in host packages.
 - Do not load every skill, force a lifecycle, or delegate solely because a skill
   mentions another skill. Avoid duplicate instructions and unnecessary approval rituals.
 - Commit, push, publish, contact others, or change live systems only within explicit
