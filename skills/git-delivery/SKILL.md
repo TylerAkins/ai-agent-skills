@@ -112,6 +112,13 @@ Prepare the complete draft before asking for any missing approval. After creatio
 attach the PR when the host provides an attachment tool. Verify and report actual
 remote state; check for a successful write before retrying an ambiguous failure.
 
+Create new PRs as drafts unless the user explicitly requests a ready-for-review
+PR. Set the creation tool's draft flag explicitly (`gh pr create --draft` or
+`draft: true`); a locally drafted description does not set GitHub's PR state.
+Verify the created PR's draft state. Preserve an existing PR's state when editing
+it, and mark a draft ready for review only when explicitly authorized. Passing
+checks or a request to open or publish a PR does not imply ready-for-review state.
+
 Do not change Git configuration, discard unrelated changes, skip checks or hooks,
 or perform destructive operations to finish delivery. These require specific user
 authorization. Never force-push a protected branch without a specific request.
@@ -123,3 +130,4 @@ authorization. Never force-push a protected branch without a specific request.
 | The PR already exists, so the validation gate no longer applies. | Validate each commit and push, including updates to existing PRs. |
 | Ruff lint passed, so formatting is covered. | Run the configured formatter check separately when the repository requires it. |
 | The commit hook fixed files, so I can retry immediately. | Inspect hook changes and rerun affected checks before retrying. |
+| The user asked to open a PR, so it should be ready for review. | Create it as a draft unless the user explicitly requests otherwise; verify remote state. |

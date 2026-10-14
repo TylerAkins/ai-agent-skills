@@ -18,11 +18,47 @@ After each write, verify the resulting text and destination. If submission fails
 ambiguously, check whether it succeeded before retrying. Report unknown state
 instead of claiming success.
 
-Resolve only separately approved threads after confirming the remote head contains
-the fix or evidence establishes the concern was already addressed. Keep unresolved
-questions and disagreements open. Use the retrieved thread ID and verify the
-resulting resolution state. A local fix, posted reply, or passing suite does not
-authorize resolution or demonstrate that the remote issue is fixed.
+Resolve only separately approved threads with an evidence-supported reason:
+
+| Reason | Required basis |
+| --- | --- |
+| `ADDRESSED` | The remote head contains the fix, or evidence establishes the concern was already addressed. |
+| `INVALID` | Code and contract evidence disprove the concern, and closure on that basis is approved. |
+| `WONT_FIX` | An approved scope or design decision declines the change; retain its rationale and any agreed follow-up. |
+
+Keep unresolved questions and unsettled disagreements open. A local triage state
+or posted reply is not a GitHub resolution. Do not label a declined change as fixed.
+Approval must cover the thread and reason; preserve authorization already given.
+
+GitHub's [GraphQL reference](https://docs.github.com/en/graphql/reference/pulls#resolvereviewthreadinput)
+documents `resolutionReason` on `ResolveReviewThreadInput` for Copilot code review
+threads, with the three enum values above. Verify support on the target GitHub host
+and inspect the available connector's schema. A resolver accepting only `thread_id`
+cannot explicitly select a reason. For an approved reason-specific resolution,
+use a supported GraphQL client with variables rather than inventing connector
+arguments. The mutation shape is:
+
+```graphql
+mutation ResolveThread($threadId: ID!, $reason: PullRequestReviewThreadResolutionReason!) {
+  resolveReviewThread(input: {threadId: $threadId, resolutionReason: $reason}) {
+    thread { id isResolved }
+  }
+}
+```
+
+Pass the retrieved GraphQL thread node ID and exact approved enum as serialized
+variables. For ordinary threads, use the host's supported resolution operation;
+do not assume Copilot-specific reason metadata applies. If the requested reason
+is unsupported, report the limitation and leave that action pending rather than
+silently resolving with a different reason.
+
+Check GraphQL errors even when HTTP succeeds. Require the returned thread ID to
+match and `isResolved` to be true, then re-read the thread. Verify the selected
+reason where the host exposes it through its API or UI; report reason verification
+as unavailable if it cannot be read back. If the thread remains open, report the
+failed resolution rather than counting the reply as completion. After ambiguous
+failures, read current state before retrying. A local fix, posted reply, or passing
+suite does not authorize resolution or demonstrate that the remote issue is fixed.
 
 Re-request review only with separate authorization after verifying the relevant
 changes are available remotely and requested blockers were addressed. Do not assume
