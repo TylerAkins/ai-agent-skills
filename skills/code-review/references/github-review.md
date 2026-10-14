@@ -24,10 +24,10 @@ publication pending until the user approves a visible explanation and destinatio
 
 ## Fixed Review Body
 
-Resolve the author and authenticated poster from live metadata. For `TylerAkins`,
-prefix the body with `@[author-handle]`. For another poster, use
-`@[author-handle]; review on behalf of @TylerAkins using a private review skill:`.
-Append one space and exactly one matching sentence:
+Resolve the PR author and authenticated poster from live metadata. Prefix the
+body with `@[author-handle]`, then append one space and exactly one matching
+sentence. Do not claim to act on behalf of another person or describe the skill
+as private unless explicitly requested and factually supported:
 
 | Event | Sentence |
 | --- | --- |

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # macOS/Linux installer: release bundles by default; Go is needed only with --from-source.
-# Windows will use a native wrapper around the same release and packaging contracts.
+# Windows uses install-ai-agent-skills.ps1 with the same release contracts.
 set -euo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=scripts/lib/install.sh
