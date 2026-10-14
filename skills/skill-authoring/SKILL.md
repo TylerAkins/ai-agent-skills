@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: Design, author, evaluate, and package new engineering skills or refactor existing skills within this collection's architectural standards.
+description: Design, author, evaluate, and package new engineering skills or refactor existing skills using the destination's conventions and validation requirements.
 ---
 
 # Skill Authoring
@@ -9,7 +9,7 @@ description: Design, author, evaluate, and package new engineering skills or ref
 
 Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting. Distinguish
 skill design, local authoring, evaluation, and repository registration. Deliver a
-scoped skill package with verified references and synchronized inventories.
+scoped skill package with verified references and any required destination inventories.
 Drafting or packaging does not authorize commits, installation into live hosts,
 remote publication, or changes to repository policy.
 
@@ -17,7 +17,7 @@ remote publication, or changes to repository policy.
 
 Define one responsibility, its observable output, activating requests, exclusions,
 and acceptance criteria before drafting. Inspect neighboring skills and actual
-collection tooling to avoid duplicating an existing workflow.
+destination tooling to avoid duplicating an existing workflow.
 
 Use this skill for new or revised agent instructions and their supporting resources.
 Use [agent-planning](../agent-planning/SKILL.md) for engineering implementation plans,
@@ -34,7 +34,7 @@ Link each reference at its point of use and state when to load it. Do not duplic
 its contents in the entrypoint or load all references automatically.
 
 Use relative paths for internal links. Resolve them from the containing file and
-confirm they exist without escaping the collection boundary. Keep references owned
+confirm they exist without escaping the permitted destination boundary. Keep references owned
 by the skill inside its folder so individual extraction preserves them. Identify
 sibling-skill dependencies explicitly; links do not install those dependencies.
 
@@ -44,7 +44,8 @@ Follow anti-ai-writing: no em dashes, filler, conversational openers, or corpora
 fluff. Write concrete actions and required evidence rather than confidence claims.
 Preserve existing user authorization and unrelated work.
 
-Require YAML frontmatter with a name matching its directory and the regex
+Use the destination's supported frontmatter contract. For this collection, require
+YAML frontmatter with a name matching its directory and the regex
 `^[a-z0-9]+(?:-[a-z0-9]+)*$`, at most 64 characters. Require a nonempty description
 of at most 1,024 characters that identifies the activation boundary.
 
@@ -54,9 +55,11 @@ work must specify deterministic acceptance criteria or validation read-backs.
 Include domain-specific anti-rationalization rules in every skill authored here.
 Do not retrofit unrelated skills merely because this workflow is loaded.
 
-Register additions or renames in the README browse table and the
-[using-skills](../using-skills/SKILL.md) routing table in the same change. Update
-counts and affected links; do not declare registration complete with deferred edits.
+Identify the destination's registration requirements before authoring. In this
+collection, register additions or renames in the README browse table and the
+[using-skills](../using-skills/SKILL.md) routing table in the same change, including
+counts and affected links. Elsewhere, update existing required inventories; do not
+create a README, router, or collection tooling solely to imitate this repository.
 
 ## Anti-Rationalization Guardrails
 
@@ -65,24 +68,38 @@ counts and affected links; do not declare registration complete with deferred ed
 | The skill is simple, so reference files are unnecessary. | If technical detail exceeds operational steps, isolate it into `references/` and link it at the relevant step. |
 | I can skip the Anti-Rationalization table for this domain. | Every authored skill must pre-empt its concrete evasion paths with enforced rules. |
 | A verification gate is not applicable to a non-code skill. | Define deterministic acceptance criteria or validation read-backs before declaring completion. |
-| I will register the skill in the README later. | README and using-skills registry updates are atomic requirements of the skill change. |
+| I will register the skill in the README later. | Required destination registry updates are atomic with the skill change; this collection requires README and using-skills updates. |
 
 ## Verification Exit Gate
 
 Read [skill evaluation](references/skill-evaluation.md) before evaluating the candidate.
 Record its trigger cases, acceptance results, and any missing host evidence.
-From the collection root, execute:
+Choose the validation path from the actual destination:
 
-```sh
-go run ./cmd/skillpack
-go test ./...
-```
+- **This repository:** When editing the source checkout of `ai-agent-skills`, run
+  the following from its root using the Go version declared in `go.mod`:
 
-Display both commands, actual output, and exit codes. Completion requires exit code
-0 from both, the expected skill count, resolved references, synchronized registries,
-and all evaluation acceptance criteria satisfied. Run additional repository-required
-checks for the changed scope. If a command fails or cannot run, repair within scope
-or report the gate blocked; do not substitute inspection for execution.
+  ```sh
+  go run ./cmd/skillpack
+  go test ./...
+  ```
+
+  Display the commands, actual output, and exit codes. Both must exit 0, with the
+  expected skill count, resolved references, and synchronized registries. Missing
+  Go blocks this repository's gate; do not waive required checks.
+- **Other repositories or standalone skills:** Run the destination's configured
+  skill validator and applicable checks. Do not require Go, `cmd/skillpack`, or
+  this repository's test suite, and do not install them solely to satisfy this skill.
+  If no validator exists, record a file read-back checking frontmatter fields
+  against the destination contract, relative-link resolution, packaged resources,
+  and required registration. Include the paths and observed results for each
+  criterion; a declaration that the skill looks correct is insufficient.
+
+Completion requires all applicable structural and evaluation criteria to pass.
+Run additional destination-required checks for the changed scope. Failed or
+unavailable required checks block completion; repair within scope or report the
+missing prerequisite. A standalone validation read-back cannot replace a validator
+or test suite explicitly required by the destination.
 
 Structural validation does not prove host discovery or agent behavior. Report those
 separately, including untested hosts and scenarios. Deliver the changed paths,

@@ -14,14 +14,14 @@ leaves the affected evaluation incomplete.
 
 ## Candidate Checklist
 
-- Verify the name, directory, description length, and YAML parse against collection tooling.
+- Verify the name, directory, description length, and YAML parse against the destination's schema and available validator.
 - Resolve every relative link, including links within references. Confirm owned resources survive extraction of the skill folder and identify sibling dependencies.
 - Verify references have a stated load condition and no duplicated procedure competes with the entrypoint.
 - Check scope and authority against the intended request, including commits, live changes, and publication.
 - Verify the guardrail table addresses plausible shortcuts with concrete enforced rules.
 - Trace one successful request and one blocked request through the written workflow. Record the required output and stopping condition; a walkthrough is not observed agent behavior.
-- Check README inventory, displayed skill counts, and using-skills routing in the complete candidate.
-- Run the entrypoint's required validation commands and retain actual output and exit codes.
+- Check required destination inventories in the complete candidate. In ai-agent-skills, include README counts and using-skills routing.
+- Select the entrypoint's destination-specific validation path. Retain command output and exit codes, or the specified standalone read-back when no validator exists.
 
 ## Behavioral and Host Evidence
 
