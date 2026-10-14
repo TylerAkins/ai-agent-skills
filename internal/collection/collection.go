@@ -320,12 +320,15 @@ func Build(root, out, target string) error {
 		return fmt.Errorf("resolve output parent: %w", err)
 	}
 	absOut = filepath.Join(parent, filepath.Base(absOut))
-	rel, err := filepath.Rel(absRoot, absOut)
-	if err != nil {
-		return err
-	}
-	if rel == "." || !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != ".." {
-		return fmt.Errorf("output must be outside source collection")
+	// Paths on distinct Windows volumes cannot be inside one another.
+	if strings.EqualFold(filepath.VolumeName(absRoot), filepath.VolumeName(absOut)) {
+		rel, err := filepath.Rel(absRoot, absOut)
+		if err != nil {
+			return err
+		}
+		if rel == "." || !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != ".." {
+			return fmt.Errorf("output must be outside source collection")
+		}
 	}
 	if err = os.Mkdir(absOut, 0755); err != nil {
 		return fmt.Errorf("output must be a new directory: %w", err)
