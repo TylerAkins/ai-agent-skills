@@ -25,6 +25,7 @@ they do not install dependencies, authorize new actions, or spawn agents.
 | Write behavioral tests | [test-authoring](../test-authoring/SKILL.md) |
 | Design shared contracts | [api-design](../api-design/SKILL.md) |
 | Author, refine, or package agent skills | [skill-authoring](../skill-authoring/SKILL.md) |
+| Explain concepts, code, documents, or decisions simply | [explain-it](../explain-it/SKILL.md) |
 | Write documentation or decision records | [technical-documentation](../technical-documentation/SKILL.md) |
 | Build or improve UI | [frontend-engineering](../frontend-engineering/SKILL.md) |
 | Review code, plans, or PRs | [code-review](../code-review/SKILL.md) |
