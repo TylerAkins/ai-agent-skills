@@ -35,6 +35,7 @@ Flavors:
   claude             Claude Code plugin
   copilot-staging    Portable plugin staging only
   copilot-skills     Project .github/skills (--project required)
+  copilot-global     User ~/.copilot/skills
   codex-skills       Project .agents/skills (--project required)
   opencode-project   Project .opencode/skills (--project required)
   opencode-global    User ~/.config/opencode/skills

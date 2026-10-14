@@ -46,7 +46,7 @@ for flavor in gemini-project gemini-global muse-project muse-global antigravity-
   case "$flavor" in *-project) args+=(--project "$work/project") ;; esac
   bash "$installer" "${args[@]}"
 done
-for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills codex-skills opencode-project opencode-global gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
+for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills copilot-global codex-skills opencode-project opencode-global gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
   printf 'Testing %s.\n' "$flavor"
   args=(--flavor "$flavor" --version v1.0.0 --yes)
   case "$flavor" in
@@ -59,6 +59,7 @@ for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copi
   fi
   bash "$installer" "${args[@]}"
   case "$flavor" in
+    copilot-global) skill_root="$HOME/.copilot/skills" ;;
     gemini-project) skill_root="$work/project/.gemini/skills" ;;
     gemini-global) skill_root="$HOME/.gemini/skills" ;;
     muse-project) skill_root="$work/muse-project/.agents/skills" ;;
@@ -80,7 +81,7 @@ for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copi
     printf 'Existing installation was overwritten without permission.\n' >&2; exit 1
   fi
   case "$flavor" in
-    *-skills|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
+    *-skills|copilot-global|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
     *) bash "$installer" update "${args[@]}" ;;
   esac
   if [ -n "$skill_root" ]; then
@@ -165,8 +166,9 @@ for target in portable skills; do
 done
 cp "$fixtures/"* "$work/shared-assets/"
 (cd "$work/shared-assets"; shasum -a 256 ./*.tar.gz SOURCE_COMMIT > SHA256SUMS)
-for flavor in codex-desktop copilot-staging opencode-global; do
+for flavor in codex-desktop copilot-staging copilot-global opencode-global; do
   args=(update --flavor "$flavor" --version v1.0.0 --yes)
+  if [ "$flavor" = copilot-global ]; then args+=(--merge); fi
   expected=portable
   if [ "$flavor" = opencode-global ]; then args+=(--merge); expected=skills; fi
   # Restore the catalog damaged by the invalid-catalog check above.
@@ -178,9 +180,9 @@ mkdir "$work/shared-only"
 cp "$work/shared-assets/"* "$work/shared-only/"
 for target in codex copilot opencode; do rm "$work/shared-only/ai-agent-skills-$target-v1.0.0.tar.gz"; done
 (cd "$work/shared-only"; shasum -a 256 ./*.tar.gz SOURCE_COMMIT > SHA256SUMS)
-for flavor in codex-desktop copilot-staging opencode-global; do
+for flavor in codex-desktop copilot-staging copilot-global opencode-global; do
   args=(update --flavor "$flavor" --version v1.0.0 --yes)
-  if [ "$flavor" = opencode-global ]; then args+=(--merge); fi
+  if [ "$flavor" = opencode-global ] || [ "$flavor" = copilot-global ]; then args+=(--merge); fi
   INSTALLER_FIXTURES="$work/shared-only" bash "$installer" "${args[@]}" > "$work/shared-only.log"
 done
 mkdir "$work/legacy-opencode"

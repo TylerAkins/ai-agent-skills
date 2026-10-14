@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -104,6 +104,7 @@ $flavors = [ordered]@{
     claude = @('claude', '.local/share/ai-agent-skills/claude', $false)
     'copilot-staging' = @('copilot', '.local/share/ai-agent-skills/copilot', $false)
     'copilot-skills' = @('copilot', '.github/skills', $true)
+    'copilot-global' = @('copilot', '.copilot/skills', $true)
     'codex-skills' = @('codex', '.agents/skills', $true)
     'opencode-project' = @('opencode', '.opencode/skills', $true)
     'opencode-global' = @('opencode', '.config/opencode/skills', $true)

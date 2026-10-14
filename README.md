@@ -225,25 +225,23 @@ Confirm replacement, then launch a new Claude Code session with `--plugin-dir` a
 
 <a id="github-copilot"></a>
 <details>
-<summary><strong>GitHub Copilot</strong></summary>
-
-Replace the example project path below with your existing project directory.
+<summary><strong>GitHub Copilot app</strong></summary>
 
 ### Install on macOS / Linux
 
 ```sh
-bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
+bash scripts/install-ai-agent-skills.sh --flavor copilot-global
 ```
 
 ### Install on Windows
 
 ```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
+./scripts/install-ai-agent-skills.ps1 -Flavor copilot-global
 ```
 
 ### Activate and check
 
-The helper installs this collection into that project's `.github/skills` folder.
+The helper installs skills in `~/.copilot/skills` for use across projects.
 
 Open the project in the Copilot app, start a new session, and check
 **Customize > Skills**. Request `agent-planning` in chat. See
@@ -256,16 +254,19 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-bash scripts/install-ai-agent-skills.sh update --flavor copilot-skills --project /absolute/path/to/project --merge
+bash scripts/install-ai-agent-skills.sh update --flavor copilot-global --merge
 ```
 
 **Windows**
 
 ```powershell
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-skills -Project 'C:/path/to/project' -Merge
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-global -Merge
 ```
 
 Merge replaces this collection's skill folders and preserves unrelated skills. Start a new host session.
+
+For repository-specific skills, use `copilot-skills` with `--project` / `-Project`.
+See [project installation](docs/installer-reference.md#alternate-installations).
 
 A portable plugin can also be staged, but staging does not activate it or create
 a marketplace. See [alternate installations](docs/installer-reference.md#alternate-installations).
