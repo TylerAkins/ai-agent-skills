@@ -59,7 +59,7 @@ Options:
 HELP
 }
 prepare_bundle() {
-  local archive url expected line entry listing
+  local archive url expected line entry listing archive_host preferred
   if "$source_mode"; then
     need git
     command -v go >/dev/null || fail "Go >= 1.27.1 is required: brew install go or https://go.dev/dl/"
@@ -75,11 +75,21 @@ prepare_bundle() {
     (cd "$work/source" || exit; GOTOOLCHAIN=local go run ./cmd/skillpack -target "$host" -out "$work/package")
     return
   fi
-  archive="ai-agent-skills-$host-$version.tar.gz"
   url="https://github.com/TylerAkins/ai-agent-skills/releases/download/$version"
+  curl -fsSL "$url/SHA256SUMS" -o "$work/SHA256SUMS"
+  archive_host=$host
+  case "$host" in
+    codex|copilot) preferred=portable ;;
+    opencode) preferred=skills ;;
+    *) preferred=$host ;;
+  esac
+  archive="ai-agent-skills-$preferred-$version.tar.gz"
+  if awk -v file="$archive" '$2 == file || $2 == "./" file {found=1} END {exit !found}' "$work/SHA256SUMS"; then
+    archive_host=$preferred
+  fi
+  archive="ai-agent-skills-$archive_host-$version.tar.gz"
   printf 'Downloading %s.\n' "$archive"
   curl -fsSL "$url/$archive" -o "$work/$archive"
-  curl -fsSL "$url/SHA256SUMS" -o "$work/SHA256SUMS"
   curl -fsSL "$url/SOURCE_COMMIT" -o "$work/SOURCE_COMMIT"
   : > "$work/selected-checksums"
   for expected in "$archive" SOURCE_COMMIT; do
@@ -95,7 +105,7 @@ prepare_bundle() {
   [ -n "$listing" ] || fail "Empty release archive."
   while IFS= read -r entry; do
     case "$entry" in
-      "ai-agent-skills-$host"|"ai-agent-skills-$host/"*) ;;
+      "ai-agent-skills-$archive_host"|"ai-agent-skills-$archive_host/"*) ;;
       *) fail "Unexpected archive path: $entry" ;;
     esac
     case "/$entry/" in */../*|*/./*) fail "Unsafe archive path: $entry" ;; esac
@@ -104,7 +114,7 @@ prepare_bundle() {
   tar -tvzf "$work/$archive" > "$work/archive-types"
   if LC_ALL=C grep -q '^[^d-]' "$work/archive-types"; then fail "Release archive contains unsupported file types."; fi
   tar -xzf "$work/$archive" -C "$work"
-  mv "$work/ai-agent-skills-$host" "$work/package"
+  mv "$work/ai-agent-skills-$archive_host" "$work/package"
 }
 prepare_catalog() {
   local existing="$work/existing-marketplace.json"

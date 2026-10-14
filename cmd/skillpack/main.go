@@ -9,7 +9,7 @@ import (
 
 func main() {
 	root := flag.String("root", ".", "collection or package root")
-	target := flag.String("target", "source", "source, cursor, codex, claude, copilot, opencode, or skills")
+	target := flag.String("target", "source", "source, cursor, codex, claude, copilot, opencode, skills, or portable")
 	out := flag.String("out", "", "new output directory outside source; builds a package when set")
 	flag.Parse()
 	var err error

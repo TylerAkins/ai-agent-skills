@@ -445,8 +445,11 @@ Start a new session after updating. For project installation, see
 The `.agents/skills` directory used by Muse and Antigravity project installations
 is shared with other agents that discover it.
 Installing or updating there changes the collection those agents read too.
-The new flavors require a release containing `ai-agent-skills-skills`; older
-releases do not include that archive. For an unpublished local checkout, use
+OpenCode, Gemini, Muse, and Antigravity use `ai-agent-skills-skills`;
+Codex and Copilot use `ai-agent-skills-portable`. Update the installer checkout
+before using consolidated releases. Updated helpers also support legacy archive
+names. Gemini, Muse, and Antigravity require a release containing the skills
+archive, which is absent from releases predating those flavors. For an unpublished local checkout, use
 [manual installation](docs/installer-reference.md#source-builds-and-manual-installation).
 
 Release installs use checksum-verified bundles and retain backups when replacing

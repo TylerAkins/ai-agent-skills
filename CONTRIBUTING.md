@@ -40,7 +40,7 @@ go test -race ./...
 go vet ./...
 ```
 
-Build all five host targets into new scratch directories outside the checkout
+Build all release targets and legacy host aliases into new scratch directories outside the checkout
 when packaging changes. Use the commands in [packaging reference](docs/plugins.md).
 For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
 linting. It uses temporary HOME/project directories and generated release fixtures.

@@ -27,6 +27,19 @@ Set-Location ai-agent-skills
 
 Already cloned? Open that checkout and run `git pull --ff-only` instead.
 
+## Shared Release Archives
+
+The installer uses the release's `SHA256SUMS` to choose its archive. Codex/Copilot
+prefer `portable`; OpenCode prefers `skills`. When those shared names are absent,
+it selects the legacy host archive. All other hosts retain their archive selection.
+Download, checksum, and archive-validation failures stop before replacement;
+there is no fallback after a listed shared archive fails.
+
+Run `git pull --ff-only` in your installer checkout before consuming consolidated
+releases. Older helpers expect separate Codex, Copilot, and OpenCode archives and
+must be updated or pinned to a compatible older release. Flavor names, destinations,
+merge/replacement controls, and host activation steps remain the same.
+
 ## Replacement and Backups
 
 Plugin updates replace the selected directory after confirmation and print the backup
