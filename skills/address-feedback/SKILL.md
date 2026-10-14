@@ -90,10 +90,18 @@ verifying its remote existence and that it contains the relevant fix.
 Show exact replies with PR/thread destinations. Keep incomplete examples out of
 posting approval requests. When offering complete replies for publication, ask
 whether to post them under anti-ai-writing. For drafting-only requests, leave them
-local without prompting to post. List proposed thread resolutions and re-review
-requests separately; text approval does not authorize those actions.
+local without prompting to post. List proposed thread resolutions with their reasons
+and re-review requests separately; text approval does not authorize those actions.
 
 Before approved external writes, read [reply publication](references/publication.md).
 Report actual repairs, checks, independent review limits, remaining feedback, and
 publication state in chat. Never dismiss reviews or publish the chat report as an
 extra PR comment.
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| A won't-fix reply resolves the thread. | Perform the approved resolution mutation with the supported reason and verify `isResolved`; a reply alone changes neither state nor reason. |
+| All disagreements must stay open forever. | Keep unsettled decisions open; an approved decision not to fix can resolve as `WONT_FIX`, and a disproven concern can resolve as `INVALID`. |
+| The connector resolves threads, so it can select every reason. | Inspect its schema; use a verified reason-capable API when needed and report unsupported reasons instead of silently substituting one. |
