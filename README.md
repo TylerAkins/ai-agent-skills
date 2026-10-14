@@ -1,6 +1,6 @@
 # ai-agent-skills
 
-20 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot,
+21 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot,
 OpenCode, Gemini CLI, Muse Code, and Google Antigravity. Plan, build, test, review,
 and prepare delivery with consistent workflows and explicit authorization.
 
@@ -482,7 +482,7 @@ GitHub reviews and approvals are never dismissed.
 ## Skills
 
 <details>
-<summary><strong>Browse all 20 skills</strong></summary>
+<summary><strong>Browse all 21 skills</strong></summary>
 
 ### Clarify and Plan
 
@@ -500,6 +500,7 @@ GitHub reviews and approvals are never dismissed.
 | [writing-clean-simple-code](skills/writing-clean-simple-code/SKILL.md) | Implement and refactor with clear ownership and justified abstractions. |
 | [frontend-engineering](skills/frontend-engineering/SKILL.md) | Build responsive, accessible interfaces and verify interactions. |
 | [root-cause-debug](skills/root-cause-debug/SKILL.md) | Diagnose supported causes and verify repairs. |
+| [writing-optimized-sql](skills/writing-optimized-sql/SKILL.md) | Write and tune SQL across major engines with correctness and performance evidence. |
 | [test-authoring](skills/test-authoring/SKILL.md) | Write meaningful behavioral and regression coverage. |
 
 ### Review and Collaborate
