@@ -179,7 +179,7 @@ func Validate(root, target string) ([]string, error) {
 		}
 		components = append(components, "rules", "agents", ".cursor-plugin")
 	}
-	if (target == "source" || target == "codex" || target == "copilot") && m.Schema != Schema {
+	if (target == "source" || target == "codex" || target == "copilot" || target == "portable") && m.Schema != Schema {
 		return nil, fmt.Errorf("portable manifest schema missing or unsupported")
 	}
 	if target == "source" || target == "claude" {
@@ -385,7 +385,7 @@ func Build(root, out, target string) error {
 
 func packageTarget(target string) bool {
 	switch target {
-	case "cursor", "codex", "claude", "copilot", "opencode", "skills":
+	case "cursor", "codex", "claude", "copilot", "opencode", "skills", "portable":
 		return true
 	}
 	return false

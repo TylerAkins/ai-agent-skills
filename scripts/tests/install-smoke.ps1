@@ -80,7 +80,7 @@ try {
     $catalog = Join-Path $testHome '.agents/plugins/marketplace.json'
     [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($catalog))
     Set-Content -LiteralPath $catalog -Value '{"name":"existing","interface":{"displayName":"Existing"},"createdAt":"2026-10-13T00:00:00+05:30","plugins":[{"name":"other-plugin","source":"./other"}]}' -Encoding utf8NoBOM
-    foreach ($flavor in @('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) {
+    foreach ($flavor in @('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) {
         Write-Output "Testing $flavor."
         $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
         if ($flavor -eq 'codex-marketplace') { $options.MarketplaceRoot = Join-Path $work 'marketplace' }
@@ -91,6 +91,7 @@ try {
         }
         & $installer @options
         $skillRoot = switch ($flavor) {
+            'copilot-global' { Join-Path $testHome '.copilot/skills' }
             'gemini-project' { Join-Path $projectPath '.gemini/skills' }
             'gemini-global' { Join-Path $testHome '.gemini/skills' }
             'muse-project' { Join-Path $options.Project '.agents/skills' }
@@ -109,13 +110,81 @@ try {
         }
         Test-InstallerFailure $options 'Destination exists'
         $options.Action = 'Update'
-        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) { $options.Merge = $true }
+        if ($flavor -in @('copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) { $options.Merge = $true }
         & $installer @options
         if ($skillRoot) {
             Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'unrelated/file') -Raw).Trim() -eq 'Keep me') 'Merge lost unknown skills.'
             Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'test-authoring/SKILL.md') -Raw) -match 'name: test-authoring') 'Update did not replace incoming skill.'
         }
     }
+    $sharedAssets = Join-Path $work 'shared-assets'
+    Copy-Item -LiteralPath $Fixtures -Destination $sharedAssets -Recurse
+    $portablePackage = Join-Path $work 'ai-agent-skills-portable'
+    Push-Location $repoRoot
+    try { & go run ./cmd/skillpack -target portable -out $portablePackage }
+    finally { Pop-Location }
+    if ($LASTEXITCODE -ne 0) { throw 'Portable fixture build failed.' }
+    $portableArchive = 'ai-agent-skills-portable-v1.0.1.tar.gz'
+    & tar -czf (Join-Path $sharedAssets $portableArchive) -C $work 'ai-agent-skills-portable'
+    if ($LASTEXITCODE -ne 0) { throw 'Portable fixture archive failed.' }
+    $sums = foreach ($file in Get-ChildItem -LiteralPath $sharedAssets -File | Where-Object Name -ne 'SHA256SUMS') {
+        "$((Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLower())  $($file.Name)"
+    }
+    $sums | Set-Content -LiteralPath (Join-Path $sharedAssets 'SHA256SUMS') -Encoding utf8NoBOM
+    $downloadState.Root = $sharedAssets
+    foreach ($flavor in @('codex-desktop', 'copilot-staging', 'copilot-global', 'opencode-global')) {
+        $options = @{ Action = 'Update'; Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
+        if ($flavor -eq 'copilot-global') { $options.Merge = $true }
+        $expected = 'portable'
+        if ($flavor -eq 'opencode-global') { $options.Merge = $true; $expected = 'skills' }
+        $output = & $installer @options
+        Test-Condition (($output -join "`n") -like "*Downloading ai-agent-skills-$expected-v1.0.1.tar.gz.*") 'Wrong shared archive selected.'
+    }
+    $sharedOnly = Join-Path $work 'shared-only'
+    Copy-Item -LiteralPath $sharedAssets -Destination $sharedOnly -Recurse
+    foreach ($target in @('codex', 'copilot', 'opencode')) {
+        Remove-Item -LiteralPath (Join-Path $sharedOnly "ai-agent-skills-$target-v1.0.1.tar.gz")
+    }
+    Get-Content -LiteralPath (Join-Path $sharedAssets 'SHA256SUMS') | Where-Object { $_ -notmatch 'ai-agent-skills-(codex|copilot|opencode)-' } |
+        Set-Content -LiteralPath (Join-Path $sharedOnly 'SHA256SUMS') -Encoding utf8NoBOM
+    $downloadState.Root = $sharedOnly
+    foreach ($flavor in @('codex-desktop', 'copilot-staging', 'copilot-global', 'opencode-global')) {
+        $options = @{ Action = 'Update'; Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
+        if ($flavor -in @('opencode-global', 'copilot-global')) { $options.Merge = $true }
+        & $installer @options
+    }
+    $legacyAssets = Join-Path $work 'legacy-opencode'
+    Copy-Item -LiteralPath $Fixtures -Destination $legacyAssets -Recurse
+    Remove-Item -LiteralPath (Join-Path $legacyAssets 'ai-agent-skills-skills-v1.0.1.tar.gz')
+    Get-Content -LiteralPath (Join-Path $Fixtures 'SHA256SUMS') | Where-Object { $_ -notlike '*ai-agent-skills-skills-*' } |
+        Set-Content -LiteralPath (Join-Path $legacyAssets 'SHA256SUMS') -Encoding utf8NoBOM
+    $downloadState.Root = $legacyAssets
+    $output = & $installer -Action Update -Flavor opencode-global -Version v1.0.1 -HomeDirectory $testHome -Merge -Yes
+    Test-Condition (($output -join "`n") -like '*Downloading ai-agent-skills-opencode-v1.0.1.tar.gz.*') 'Legacy OpenCode archive not selected.'
+    $sharedSentinel = Join-Path $testHome '.local/share/ai-agent-skills/copilot/sentinel'
+    Set-Content -LiteralPath $sharedSentinel -Value 'Preserve selected plugin' -Encoding utf8NoBOM
+    foreach ($failure in @('corrupt', 'duplicate', 'missing-download', 'wrong-root')) {
+        $badShared = Join-Path $work "shared-$failure"
+        Copy-Item -LiteralPath $sharedAssets -Destination $badShared -Recurse
+        switch ($failure) {
+            'corrupt' { Add-Content -LiteralPath (Join-Path $badShared $portableArchive) -Value 'broken' }
+            'duplicate' {
+                Get-Content -LiteralPath (Join-Path $sharedAssets 'SHA256SUMS') | Where-Object { $_ -like "*$portableArchive" } |
+                    Add-Content -LiteralPath (Join-Path $badShared 'SHA256SUMS')
+            }
+            'missing-download' { Remove-Item -LiteralPath (Join-Path $badShared $portableArchive) }
+            'wrong-root' {
+                Copy-Item -LiteralPath (Join-Path $Fixtures 'ai-agent-skills-copilot-v1.0.1.tar.gz') -Destination (Join-Path $badShared $portableArchive) -Force
+                $hash = (Get-FileHash -LiteralPath (Join-Path $badShared $portableArchive)).Hash.ToLower()
+                $sums = @(Get-Content -LiteralPath (Join-Path $sharedAssets 'SHA256SUMS') | Where-Object { $_ -notlike "*$portableArchive" }) + @("$hash  $portableArchive")
+                Set-Content -LiteralPath (Join-Path $badShared 'SHA256SUMS') -Value $sums -Encoding utf8NoBOM
+            }
+        }
+        $downloadState.Root = $badShared
+        Test-InstallerFailure @{ Action = 'Update'; Flavor = 'copilot-staging'; Version = 'v1.0.1'; HomeDirectory = $testHome; Yes = $true } ''
+        Test-Condition ((Get-Content -LiteralPath $sharedSentinel -Raw).Trim() -eq 'Preserve selected plugin') 'Failed shared install changed destination.'
+    }
+    $downloadState.Root = $Fixtures
     $catalogText = Get-Content -LiteralPath $catalog -Raw
     $data = $catalogText | ConvertFrom-Json -AsHashtable
     Test-Condition ($data.name -eq 'existing' -and $data.interface.displayName -eq 'Existing') 'Marketplace metadata changed.'

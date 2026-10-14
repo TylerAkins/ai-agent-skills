@@ -27,6 +27,19 @@ Set-Location ai-agent-skills
 
 Already cloned? Open that checkout and run `git pull --ff-only` instead.
 
+## Shared Release Archives
+
+The installer uses the release's `SHA256SUMS` to choose its archive. Codex/Copilot
+prefer `portable`; OpenCode prefers `skills`. When those shared names are absent,
+it selects the legacy host archive. All other hosts retain their archive selection.
+Download, checksum, and archive-validation failures stop before replacement;
+there is no fallback after a listed shared archive fails.
+
+Run `git pull --ff-only` in your installer checkout before consuming consolidated
+releases. Older helpers expect separate Codex, Copilot, and OpenCode archives and
+must be updated or pinned to a compatible older release. Flavor names, destinations,
+merge/replacement controls, and host activation steps remain the same.
+
 ## Replacement and Backups
 
 Plugin updates replace the selected directory after confirmation and print the backup
@@ -158,6 +171,26 @@ a release containing it. Use manual installation for an unpublished local checko
 </details>
 
 <details>
+<summary><strong>GitHub Copilot project skills</strong></summary>
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
+```
+
+The project must exist. Skills are copied into `.github/skills` for that repository.
+For updates, add `update` / `-Action Update` and `--merge` / `-Merge`. Open the
+project in the Copilot app, start a new session, and check **Customize > Skills**.
+For use across projects, choose `copilot-global`, which installs to
+`~/.copilot/skills`. Personal skills are local; the cloud agent needs skills in
+its repository. See [Copilot skills](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills).
+
+</details>
+
+<details>
 <summary><strong>Copilot plugin staging</strong></summary>
 
 ```sh
@@ -209,6 +242,7 @@ an interactive terminal lists the choices and asks you to select one.
 | `claude` | `~/.local/share/ai-agent-skills/claude` |
 | `copilot-staging` | `~/.local/share/ai-agent-skills/copilot` |
 | `copilot-skills` | `$PROJECT/.github/skills` |
+| `copilot-global` | `~/.copilot/skills` |
 | `codex-skills` | `$PROJECT/.agents/skills` |
 | `opencode-project` | `$PROJECT/.opencode/skills` |
 | `opencode-global` | `~/.config/opencode/skills` |

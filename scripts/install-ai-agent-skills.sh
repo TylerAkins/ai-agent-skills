@@ -61,6 +61,7 @@ case "$flavor" in
     source_path="./plugins/ai-agent-skills" ;;
   claude) host=claude; destination="$HOME/.local/share/ai-agent-skills/claude" ;;
   copilot-staging) host=copilot; destination="$HOME/.local/share/ai-agent-skills/copilot" ;;
+  copilot-global) skills_only=true; host=copilot; destination="$HOME/.copilot/skills" ;;
   copilot-skills|codex-skills|opencode-project|gemini-project|muse-project|antigravity-project)
     [ -n "$project" ] || fail "Use --project with the full path to an existing project."
     require_absolute "$project"

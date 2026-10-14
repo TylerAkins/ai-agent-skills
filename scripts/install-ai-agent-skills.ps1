@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -104,6 +104,7 @@ $flavors = [ordered]@{
     claude = @('claude', '.local/share/ai-agent-skills/claude', $false)
     'copilot-staging' = @('copilot', '.local/share/ai-agent-skills/copilot', $false)
     'copilot-skills' = @('copilot', '.github/skills', $true)
+    'copilot-global' = @('copilot', '.copilot/skills', $true)
     'codex-skills' = @('codex', '.agents/skills', $true)
     'opencode-project' = @('opencode', '.opencode/skills', $true)
     'opencode-global' = @('opencode', '.config/opencode/skills', $true)
@@ -190,13 +191,24 @@ try {
             finally { Pop-Location }
         } finally { $env:GOTOOLCHAIN = $oldToolchain }
     } else {
-        $archiveName = "ai-agent-skills-$targetHost-$Version.tar.gz"
         $releaseUrl = "https://github.com/TylerAkins/ai-agent-skills/releases/download/$Version"
+        Get-ReleaseFile "$releaseUrl/SHA256SUMS" (Join-Path $work 'SHA256SUMS')
+        $lines = Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS')
+        $preferredHost = switch ($targetHost) {
+            { $_ -in @('codex', 'copilot') } { 'portable' }
+            'opencode' { 'skills' }
+            default { $targetHost }
+        }
+        $preferredName = "ai-agent-skills-$preferredHost-$Version.tar.gz"
+        $archiveHost = $targetHost
+        if (@($lines | Where-Object {
+            ($_ -split '\s+')[-1] -in @($preferredName, "./$preferredName", "*$preferredName", "*./$preferredName")
+        }).Count -gt 0) { $archiveHost = $preferredHost }
+        $archiveName = "ai-agent-skills-$archiveHost-$Version.tar.gz"
         Write-Output "Downloading $archiveName."
-        foreach ($asset in @($archiveName, 'SHA256SUMS', 'SOURCE_COMMIT')) {
+        foreach ($asset in @($archiveName, 'SOURCE_COMMIT')) {
             Get-ReleaseFile "$releaseUrl/$asset" (Join-Path $work $asset)
         }
-        $lines = Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS')
         foreach ($asset in @($archiveName, 'SOURCE_COMMIT')) {
             $pattern = '^([a-fA-F0-9]{64})\s+\*?(?:\./)?' + [regex]::Escape($asset) + '$'
             $matching = @($lines | Where-Object { $_ -match $pattern })
@@ -206,7 +218,7 @@ try {
             if ((Get-FileHash -LiteralPath (Join-Path $work $asset) -Algorithm SHA256).Hash -ne $expectedHash) { throw "Checksum mismatch: $asset" }
             Write-Output "Verified $asset."
         }
-        $extracted = Expand-VerifiedBundle (Join-Path $work $archiveName) $targetHost $work
+        $extracted = Expand-VerifiedBundle (Join-Path $work $archiveName) $archiveHost $work
         [IO.Directory]::Move($extracted, $package)
     }
     $payload = if ($skillsOnly) { Join-Path $package 'skills' } else { $package }

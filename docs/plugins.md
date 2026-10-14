@@ -8,14 +8,17 @@ This page is for maintainers inspecting or building host packages.
 
 Every target contains the complete `skills/` collection and supporting resources.
 
-| Target | Additional components |
-| --- | --- |
-| `cursor` | `.cursor-plugin/plugin.json`, `rules/`, `agents/`, LICENSE |
-| `codex` | Portable root `plugin.json`, LICENSE |
-| `claude` | `.claude-plugin/plugin.json`, `agents/`, LICENSE |
-| `copilot` | Portable root `plugin.json`, LICENSE |
-| `opencode` | LICENSE; no plugin manifest |
-| `skills` | LICENSE; shared skills-only bundle for Gemini CLI, Muse Code, and Antigravity, no plugin manifest |
+| Release target | Hosts | Additional components |
+| --- | --- | --- |
+| `cursor` | Cursor | `.cursor-plugin/plugin.json`, `rules/`, `agents/`, LICENSE |
+| `claude` | Claude Code | `.claude-plugin/plugin.json`, `agents/`, LICENSE |
+| `portable` | Codex, Copilot | Root `plugin.json`, LICENSE |
+| `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
+
+The release workflow publishes these four `.tar.gz` archives. Installer flavors
+still select host-specific destinations and activation steps. The `codex`,
+`copilot`, and `opencode` build targets remain available for existing source-build
+consumers; their contents match `portable`, `portable`, and `skills`, respectively.
 
 Cursor includes a routing rule and reviewer; Claude includes the reviewer.
 The agent requests read-only review through instructions, not a tool sandbox.
@@ -39,7 +42,7 @@ Build into new directories outside the checkout:
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor codex claude copilot opencode skills; do
+for host in cursor claude portable skills; do
   go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
 done
 ```

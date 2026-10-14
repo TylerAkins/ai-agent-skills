@@ -1,7 +1,8 @@
 # Prepare a Release
 
-The release workflow builds five host bundles plus the shared skills bundle and creates a GitHub draft
-release with SHA-256 checksums and the source commit. It does not publish the
+The release workflow builds four bundles: Cursor, Claude, portable plugin, and
+skills-only. It creates a GitHub draft release with SHA-256 checksums and the
+source commit. It does not publish the
 release or submit marketplace listings.
 
 ## Before Running
@@ -17,11 +18,28 @@ Do not create or push a release tag yourself; the workflow creates the tag when
 it creates the draft release, unless an identical tag already points at the
 current `main` commit (for example when retrying after a failed draft job).
 
+## Archive Compatibility
+
+Codex and Copilot share `ai-agent-skills-portable`; OpenCode, Gemini CLI, Muse Code,
+and Antigravity share `ai-agent-skills-skills`. Cursor and Claude retain separate
+archives. Each archive uses its package name as its internal root directory.
+
+Updated installers prefer shared names listed in `SHA256SUMS` and select legacy
+`codex`, `copilot`, or `opencode` archives only when the corresponding shared name
+is absent. Failed downloads, invalid checksums, or unexpected archive roots stop
+installation; they do not trigger fallback to another asset.
+
+Older installer copies cannot consume the new portable archive or the consolidated
+OpenCode distribution. Update the installer checkout before installing a new
+release, or pin a compatible older release. Already-installed host files are
+unaffected until an authorized installation/update. Source builds keep legacy host
+targets so updated helpers can still build historical release tags.
+
 ## Build a Draft
 
 On `main`, open Actions, select **Prepare release**, and run the workflow with
 no inputs. The read-only build job reads the manifest version on `main`, runs
-tests and vet, validates the collection, and packages all six distribution targets. A separate
+tests and vet, validates the collection, and packages all four distribution targets. A separate
 job uploads artifacts and uses `contents: write` to create tag `v{version}` at
 that commit (if needed) and a draft GitHub release.
 

@@ -225,25 +225,23 @@ Confirm replacement, then launch a new Claude Code session with `--plugin-dir` a
 
 <a id="github-copilot"></a>
 <details>
-<summary><strong>GitHub Copilot</strong></summary>
-
-Replace the example project path below with your existing project directory.
+<summary><strong>GitHub Copilot app</strong></summary>
 
 ### Install on macOS / Linux
 
 ```sh
-bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
+bash scripts/install-ai-agent-skills.sh --flavor copilot-global
 ```
 
 ### Install on Windows
 
 ```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
+./scripts/install-ai-agent-skills.ps1 -Flavor copilot-global
 ```
 
 ### Activate and check
 
-The helper installs this collection into that project's `.github/skills` folder.
+The helper installs skills in `~/.copilot/skills` for use across projects.
 
 Open the project in the Copilot app, start a new session, and check
 **Customize > Skills**. Request `agent-planning` in chat. See
@@ -256,16 +254,19 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-bash scripts/install-ai-agent-skills.sh update --flavor copilot-skills --project /absolute/path/to/project --merge
+bash scripts/install-ai-agent-skills.sh update --flavor copilot-global --merge
 ```
 
 **Windows**
 
 ```powershell
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-skills -Project 'C:/path/to/project' -Merge
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-global -Merge
 ```
 
 Merge replaces this collection's skill folders and preserves unrelated skills. Start a new host session.
+
+For repository-specific skills, use `copilot-skills` with `--project` / `-Project`.
+See [project installation](docs/installer-reference.md#alternate-installations).
 
 A portable plugin can also be staged, but staging does not activate it or create
 a marketplace. See [alternate installations](docs/installer-reference.md#alternate-installations).
@@ -445,8 +446,11 @@ Start a new session after updating. For project installation, see
 The `.agents/skills` directory used by Muse and Antigravity project installations
 is shared with other agents that discover it.
 Installing or updating there changes the collection those agents read too.
-The new flavors require a release containing `ai-agent-skills-skills`; older
-releases do not include that archive. For an unpublished local checkout, use
+OpenCode, Gemini, Muse, and Antigravity use `ai-agent-skills-skills`;
+Codex and Copilot use `ai-agent-skills-portable`. Update the installer checkout
+before using consolidated releases. Updated helpers also support legacy archive
+names. Gemini, Muse, and Antigravity require a release containing the skills
+archive, which is absent from releases predating those flavors. For an unpublished local checkout, use
 [manual installation](docs/installer-reference.md#source-builds-and-manual-installation).
 
 Release installs use checksum-verified bundles and retain backups when replacing
