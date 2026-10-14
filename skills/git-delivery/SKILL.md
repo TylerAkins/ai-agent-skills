@@ -27,8 +27,18 @@ authorized within the same scope.
 Inspect status, unstaged and staged diffs, recent commit style, the active branch,
 and relevant repository conventions. For a PR, verify the intended base, merge
 base, and full candidate diff, including relevant commits. Identify unrelated work
-before any mutation. Run required checks appropriate to the change; reuse recorded
-results only when they still apply to the candidate.
+before any mutation. Discover required checks from repository instructions, CI
+workflows, package scripts, and tool configuration. Include lint, formatter checks,
+type checks, and relevant tests for affected packages, using configured tool versions
+and working directories.
+
+Before each commit or push, run the applicable checks against the exact candidate
+and record commands, working directories, actual results, and exit codes. Reuse
+recorded results only when they still cover the unchanged candidate. Fix introduced
+failures and rerun affected checks after edits, formatter fixes, or hook changes.
+If a required check is unavailable or an unrelated failure prevents it from passing,
+report the concrete limitation and leave delivery blocked unless the user explicitly
+authorizes proceeding with that unmet check. Do not defer local validation to CI.
 
 ## Prepare and Commit
 
@@ -66,7 +76,7 @@ Working directory: <actual path>
 $ git status --porcelain
 <actual output, explicitly label empty output>
 Exit code: <actual code>
-$ <project linter/typechecker command(s)>
+$ <project lint/formatter/typecheck command(s)>
 <actual output>
 Exit code: <actual code>
 $ <project test runner command>
@@ -75,8 +85,8 @@ Exit code: <actual code>
 ```
 
 The transition requires empty `git status --porcelain` output, exit code 0 from
-all configured project lint/type checks, and exit code 0 with zero test failures
-and actual tests executed. Identify commands from repository configuration and CI.
+all applicable configured project lint/formatter/type checks, and exit code 0 with
+zero test failures and actual tests executed. Identify commands from repository configuration and CI.
 If a required checker or runner is absent or unavailable, record the missing check
 and leave the gate blocked. Candidate changes invalidate affected evidence.
 
@@ -105,3 +115,11 @@ remote state; check for a successful write before retrying an ambiguous failure.
 Do not change Git configuration, discard unrelated changes, skip checks or hooks,
 or perform destructive operations to finish delivery. These require specific user
 authorization. Never force-push a protected branch without a specific request.
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| The PR already exists, so the validation gate no longer applies. | Validate each commit and push, including updates to existing PRs. |
+| Ruff lint passed, so formatting is covered. | Run the configured formatter check separately when the repository requires it. |
+| The commit hook fixed files, so I can retry immediately. | Inspect hook changes and rerun affected checks before retrying. |

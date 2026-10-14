@@ -54,6 +54,15 @@ artifact. Reconcile changes with requirements as evidence develops. Update affec
 documentation through [technical-documentation](../technical-documentation/SKILL.md)
 when the behavior or setup changes. Keep temporary diagnostics out of the final diff.
 
+When committing is authorized, create local commits at coherent, verified checkpoints
+using [git-delivery](../git-delivery/SKILL.md). Each commit should capture a complete,
+reviewable change and pass applicable repository checks. Prefer checkpoints after
+completed tasks or closely related task groups rather than a fixed time or file
+count. Avoid accumulating unrelated completed tasks into one large commit. Preserve
+unrelated work and do not commit incomplete work merely to reach a checkpoint.
+Push only when separately authorized; local checkpoint commits do not require an
+immediate push or replace final whole-candidate verification and independent review.
+
 Before final review, inspect the complete candidate, including relevant untracked
 files, for omissions, accidental changes, and contract mismatches. Run applicable
 integration/build checks and browser verification for affected UI behavior. A completed
@@ -129,3 +138,4 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | Implementing all steps in one giant batch saves tokens. | Execute dependency-ordered, independently verifiable tasks. Complete each task's checks before advancing to dependent work. |
 | The fix is obvious, so failing tests can be skipped. | Investigate failures and complete the assertion gate. An expected outcome does not replace runner evidence. |
 | I can leave debug code and logs for later. | Remove temporary diagnostics and inspect the complete diff before final review. Do not advance with cleanup deferred. |
+| Local checkpoint commits require an immediate push. | Keep verified checkpoint commits local until pushing is separately authorized. |

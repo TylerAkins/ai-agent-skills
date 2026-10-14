@@ -85,10 +85,21 @@ ternaries, or elaborate fluent chains to make the diff shorter.
 
 ## Verify Behavior and Comprehension
 
-Run relevant repository checks in their package directories after meaningful
-changes. Confirm intended tests ran. Do not weaken expected behavior or regenerate
-snapshots merely to make a refactor pass; update tests only for justified interface
-changes or brittle implementation coupling while retaining the behavioral contract.
+Discover required checks from repository instructions, CI workflows, package scripts,
+and tool configuration before editing. Identify the affected packages, working
+directories, and configured tool versions. Include lint, formatter checks, type
+checks, and relevant tests; passing tests alone does not satisfy validation.
+
+Run the applicable commands in their package directories after meaningful changes
+and against the final candidate before declaring completion. Record each command,
+working directory, actual result, and exit code. Fix introduced failures and rerun
+affected checks after edits, including formatter fixes. Reuse results only while
+the checked candidate remains unchanged. If a required check is unavailable or an
+unrelated failure prevents it from passing, report the concrete limitation and leave
+validation incomplete. Confirm intended tests ran. Do not weaken expected behavior
+or regenerate snapshots merely to make a refactor pass; update tests only for
+justified interface changes or brittle implementation coupling while retaining
+the behavioral contract.
 
 Review the before/after execution path for semantic changes tests might miss:
 evaluation order, exception timing, async completion, cancellation, resource lifetime,
@@ -107,3 +118,11 @@ available, and authorized. Report the concrete change, meaningful verification,
 and material limits without claiming that clean style proves correctness. Commit,
 push, and publication require explicit authorization through
 [git-delivery](../git-delivery/SKILL.md).
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| Tests passed, so the change is validated. | Run configured lint, formatter, and type checks for affected packages as well as relevant tests. |
+| CI can catch formatting later. | Validate the final candidate locally before completion; report unavailable checks as incomplete. |
+| Checks passed before the last edit. | Rerun affected checks after edits or formatter fixes; earlier results do not cover changed files. |

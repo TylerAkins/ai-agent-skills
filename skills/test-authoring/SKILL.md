@@ -17,7 +17,11 @@ or reports. Keep changes scoped to the requested coverage and preserve unrelated
 Read repository instructions, neighboring tests, fixtures, dependency versions,
 runner configuration, and relevant CI commands. Prefer repository wrappers and
 scripts over assumed global commands. Identify the package directory and how to
-select focused tests, then confirm the runner actually executes them.
+select focused tests, then confirm the runner actually executes them. For test edits,
+follow the repository validation procedure in
+[writing-clean-simple-code](../writing-clean-simple-code/SKILL.md#verify-behavior-and-comprehension)
+to discover configured lint, formatter, and type checks, including rules that apply
+to test files. This validation does not authorize production changes.
 
 Derive expected outcomes from authoritative requirements, independently verified
 examples, or preserved contracts. Do not copy the implementation's formula into
@@ -118,7 +122,11 @@ failure accurately rather than weakening its assertion to obtain a green suite.
 
 ## Execute and Report
 
-Run the intended tests and relevant surrounding checks using actual repository
+Run the intended tests and the configured lint, formatter, and type checks for
+affected packages using the shared validation procedure above. Retain command
+results, rerun affected checks after edits, and report unavailable checks as
+incomplete. An intentionally failing reproduction test may remain at observed Red;
+that exception does not waive lint, formatter, or type checks. Use actual repository
 commands and working directories. Confirm selected tests ran and inspect failures;
 zero selected tests is not verification. Broaden or repeat checks only for material
 changes, failures, or unresolved concerns. Do not skip a flaky test or rerun until
@@ -142,3 +150,4 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | I verified the behavior mentally. | Run the actual test runner and retain its output. Reasoning cannot satisfy an execution gate. |
 | Mocking is too hard. | Use real collaborators or a suitable integration boundary. Do not mock the behavior under test or waive the gate because setup is difficult. |
 | I will write tests after implementation. | Write and run the behavioral test first. Production implementation cannot begin until Red evidence is recorded. |
+| Test-only changes do not need lint. | Run configured lint, formatter, and type checks for test edits, including intentionally failing reproduction tests. |
