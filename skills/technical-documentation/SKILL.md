@@ -21,31 +21,27 @@ and conceptual explanation. Use the form that answers the reader's question;
 link between forms instead of mixing every purpose into one long document.
 Do not create a documentation hierarchy or ADR for a trivial change.
 
-For a substantial rewrite, inspect the whole reader journey across the README
-and linked guides. Choose one recommended path for the primary reader. Place
-alternate hosts, installation modes, and maintainer procedures behind clearly
-named links or sections. Explain when to choose an alternative rather than giving
-several equally prominent setup paths.
+Organize the reader's complete task, not just individual files. Use the README
+for setup, first use, and links to optional detail. Keep a host's installation,
+activation, and updates together. Present supported hosts equally unless a
+recommendation is justified by the user or product requirements.
 
-Use the README as the front door: a runnable quick start, observable success,
-a realistic usage example, and links to detail. Keep complete install/update
-behavior in one guide and packaging/release procedures in maintainer docs. Repeat
-only the short entrypoint needed for onboarding; link to authoritative details
-instead of duplicating full procedures. Retain supported alternatives and material
-limits when reorganizing. Do not invent application scaffolds for an installed
-skill pack or prescribe a documentation hierarchy for a small edit.
+Make linked references usable directly: their title and filename should describe
+their purpose, and their commands should include prerequisites and a working
+directory. Avoid circular setup links, duplicate procedures, and maintainer detail
+in onboarding. Preserve supported alternatives, customization handling, and limits.
 
-When a command requires a checkout, show how to obtain it and where to run it.
-Make every listed host reachable from a concrete command and a next step. Tables
-compare choices; they do not replace execution instructions. State prerequisites
-near commands, distinguish first installation from updates, label platforms, and
-preserve customization/conflict handling. Keep maintainer test history out of the
-onboarding path. Read the examples as a newcomer who does not know the paths.
+Choose formatting for the renderer. On GitHub, native `<details>` / `<summary>`
+sections can make independent host paths or long optional material easier to scan.
+Use descriptive labels, blank lines around Markdown inside HTML, and complete
+expanded paths. Keep shared prerequisites visible; avoid nested disclosure piles.
+Headings, tables, and lists should help readers navigate or compare.
 
-For task guides, state prerequisites, actions in execution order, expected results,
-and consequential recovery or troubleshooting. For reference, document exact names,
-types, defaults, constraints, errors, and supported versions without hiding facts
-in a tutorial. For explanation, describe rationale and tradeoffs with evidence.
+For task guides, show prerequisites, ordered actions, expected results, and relevant
+recovery. Label platform-specific commands and placeholders. For reference, state
+exact names, types, defaults, constraints, errors, and supported versions. For
+explanation, describe rationale and tradeoffs. Do not invent scaffolds or impose
+an elaborate hierarchy for a small edit.
 
 ## Record Decisions Without Rewriting History
 
@@ -81,28 +77,23 @@ in a safe representative environment when feasible, following the instructions a
 a new reader would. Do not execute production/destructive steps to prove documentation.
 Record untested platforms, prerequisites, and live actions instead of claiming success.
 
-Inspect rendered Markdown or the target renderer when available, checking heading
-structure, tables, fences, navigation, and media. Source/link checks are a fallback,
-not proof of rendered quality. Reconcile prose and examples with final behavior after
-material edits. Generated reference output should follow its actual generation source,
-not be patched in a way the next build overwrites.
+Inspect the rendered result, including navigation, code fences, tables, and media.
+For disclosure sections, check the collapsed page and expand each reader path.
+Check narrow layouts when long commands or tables matter. Source/link checks are
+a fallback, not proof of rendered quality; disclose when visual checks are unavailable.
 
-For a new documentation workflow, use a realistic artifact to check whether a reader
-can find prerequisites, perform the task, and understand success and limitations.
-Keep behavioral evidence separate from formatting lint; one example is not proof of
-general effectiveness. Avoid tests that merely require particular headings or wording.
-Test the documented installation path in a fresh scratch destination, including
-required sibling resources and conflict handling where relevant. Separately verify
-host discovery when available; correct file placement alone does not establish that
-an agent loaded or used the skill. Report that distinction.
+For installation guides, test commands in fresh scratch destinations, preserving
+sibling resources and checking conflict handling. Verify host discovery separately:
+file placement does not prove an agent loaded or followed a skill. Keep verification
+proportional and report untested platforms or live steps. Reconcile the final prose
+with observed behavior after material edits. Change generated documentation at its
+source so the next build does not overwrite the repair.
 
-Before delivery, inspect navigation and the rendered result when available.
-Look for duplicate procedures, missing host examples, unexplained prerequisites,
-and links that send first-time users to maintainer instructions. For a substantial
-sourced redesign, record what was consulted and the principle each source informed.
-Do not claim a universal standard or historical provenance that was not recorded.
-See [documentation sources](references/documentation-sources.md) for this skill's
-current design references.
+Before delivery, trace one reader's task from entrypoint to success. Remove needless
+jumps, duplicate instructions, missing prerequisites, and misleading labels. For a
+substantial sourced redesign, record sources and the principle each informed; do
+not invent provenance or claim a universal standard. See
+[documentation sources](references/documentation-sources.md) for current references.
 
 Report the artifact, verified tasks, and material gaps. Creating local documentation
 does not authorize external posting or publication. Use authorized

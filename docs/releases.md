@@ -7,7 +7,7 @@ release or submit marketplace listings.
 ## Before Running
 
 Merge the intended changes through the repository's normal review process.
-Complete the live host checks in [host setup](plugins.md), or disclose the missing
+Complete the live host checks in [host verification](plugins.md#verify-in-each-host), or disclose the missing
 checks in the release notes. Update the version in `plugin.json`,
 `.cursor-plugin/plugin.json`, and `.claude-plugin/plugin.json` together to the
 same `MAJOR.MINOR.PATCH` value. The workflow derives the release tag as

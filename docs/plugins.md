@@ -1,6 +1,7 @@
 # Packaging Reference
 
-For normal installation, updates, and host activation, use [install and update](install.md).
+For normal installation, updates, and activation, expand your host in the
+[README](../README.md#install).
 This page is for maintainers inspecting or building host packages.
 
 ## Package Contents
@@ -47,7 +48,7 @@ each generated package. Checks cover our metadata, local links, inventories, and
 package contracts, not complete host schema or behavioral validation.
 
 For a temporary source checkout and local installation, use
-[installer source mode](install.md#source-builds-and-manual-installation).
+[installer source mode](installer-reference.md#source-builds-and-manual-installation).
 For release assets, use [release preparation](releases.md).
 
 ## Verify in Each Host

@@ -1,17 +1,28 @@
 # ai-agent-skills
 
-Shared engineering workflows for Cursor, Codex, Claude Code, GitHub Copilot, and
-OpenCode. The collection includes 19 skills for planning, implementation, testing,
-review, documentation, and delivery.
+19 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot, and
+OpenCode. Plan work, build it, test it, review it, and prepare delivery with
+consistent workflows and explicit authorization.
 
-## Quick Start: Cursor
+## Install
 
-### macOS
+Expand your host below. Each section includes installation, activation, and updates.
+The helpers download the latest published release; Go is not required.
 
-You need Git and jq. If you use Homebrew and need jq, run `brew install jq`.
-Go is not required for release installs.
+Install the host app and Git first. On **macOS/Linux**, you also need Bash, curl,
+tar, shasum, and jq. macOS includes Bash, curl, tar, and shasum; with Homebrew,
+install jq using `brew install jq`. On Linux, use your package manager for missing tools.
+On **Windows**, use [PowerShell 7.4+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows),
+not Windows PowerShell 5.1. No Bash or jq is needed on Windows.
 
-From the folder where you want to keep the checkout:
+Open a terminal in the folder where you want to keep this repo. If already cloned,
+open that checkout and skip `git clone` and the directory-change command.
+
+<a id="cursor"></a>
+<details>
+<summary><strong>Cursor</strong></summary>
+
+### Install on macOS / Linux
 
 ```sh
 git clone https://github.com/TylerAkins/ai-agent-skills.git
@@ -19,28 +30,7 @@ cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor cursor
 ```
 
-In Cursor, run **Developer: Reload Window** from the Command Palette
-(`Cmd+Shift+P`). Open **Customize** and check for **ai-agent-skills**, its skills,
-routing rule, and reviewer. Local plugin imports must be allowed by your account
-or team; a marketplace copy with the same name can take precedence.
-
-Already installed? From the checkout:
-
-```sh
-git pull --ff-only
-bash scripts/install-ai-agent-skills.sh update --flavor cursor
-```
-
-Confirm replacement, then reload Cursor. Updates keep a backup and download the
-latest published release. Pulling the checkout gets fixes to the installer itself.
-
-For **Codex, Claude Code, Copilot, OpenCode, project skills, or Linux**, follow
-[install and update](docs/install.md). Windows has a PowerShell installer; the
-guide includes its prerequisites and commands.
-
-### Windows
-
-Use [PowerShell 7.4 or newer](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) and Git:
+### Install on Windows
 
 ```powershell
 git clone https://github.com/TylerAkins/ai-agent-skills.git
@@ -48,37 +38,295 @@ Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor cursor
 ```
 
-Reload Cursor and check **Customize** as described in the Mac quick start.
-For updates, run `./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor`.
-The Windows helper uses built-in download, JSON, and checksum support; no jq or Go
-is needed for release installation.
+### Activate and check
 
-## Use a Skill
+Run **Developer: Reload Window** from Cursor's Command Palette
+(`Cmd+Shift+P` on Mac, `Ctrl+Shift+P` on Windows/Linux). Open **Customize** and
+check for **ai-agent-skills**, its skills, routing rule, and reviewer. Start a new
+Agent chat and request `agent-planning`.
+
+Local plugin imports must be allowed by your account/team. A marketplace copy
+with the same name can take precedence. See [Cursor plugins](https://cursor.com/docs/plugins).
+
+### Update
+
+Run from this checkout:
+
+**macOS / Linux**
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor cursor
+```
+
+**Windows**
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor
+```
+
+Confirm replacement, reload Cursor, and start a new chat.
+
+</details>
+
+<a id="codex"></a>
+<details>
+<summary><strong>Codex</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor codex-desktop
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor codex-desktop
+```
+
+### Activate and check
+
+Quit and reopen ChatGPT/Codex. In **Plugins**, select your personal marketplace
+and install **ai-agent-skills**. Start a new chat and request `agent-planning`.
+
+The helper installs files in `~/.codex/plugins/ai-agent-skills` and merges an entry
+into `~/.agents/plugins/marketplace.json`, preserving other plugins and metadata.
+You complete activation in the app. It does not register a CLI marketplace.
+See [OpenAI local marketplaces](https://developers.openai.com/plugins/build/plugins).
+
+### Update
+
+Run from this checkout:
+
+**macOS / Linux**
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor codex-desktop
+```
+
+**Windows**
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor codex-desktop
+```
+
+Confirm replacement, refresh/reinstall the plugin in Codex if its cached copy stays old,
+and start a new chat.
+
+For project skills or a separate marketplace root, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="claude-code"></a>
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor claude
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor claude
+```
+
+### Activate and check
+
+Launch Claude Code with the installed plugin directory.
+
+**macOS / Linux**
+
+```sh
+claude --plugin-dir "$HOME/.local/share/ai-agent-skills/claude"
+```
+
+**Windows**
+
+```powershell
+claude --plugin-dir "$env:USERPROFILE/.local/share/ai-agent-skills/claude"
+```
+
+Invoke `/ai-agent-skills:agent-planning` in that session. Use `--plugin-dir` when
+launching later sessions too; the helper does not configure a persistent marketplace.
+See [Claude plugins](https://code.claude.com/docs/en/plugins).
+
+### Update
+
+Run from this checkout:
+
+**macOS / Linux**
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor claude
+```
+
+**Windows**
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor claude
+```
+
+Confirm replacement, then launch a new Claude Code session with `--plugin-dir` as above.
+
+</details>
+
+<a id="github-copilot"></a>
+<details>
+<summary><strong>GitHub Copilot</strong></summary>
+
+Replace the example project path below with your existing project directory.
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
+```
+
+### Activate and check
+
+The helper installs this collection into that project's `.github/skills` folder.
+
+Open the project in the Copilot app, start a new session, and check
+**Customize > Skills**. Request `agent-planning` in chat. See
+[Copilot app customization](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app).
+
+### Update
+
+Run from this checkout:
+
+**macOS / Linux**
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor copilot-skills --project /absolute/path/to/project --merge
+```
+
+**Windows**
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-skills -Project 'C:/path/to/project' -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills. Start a new host session.
+
+A portable plugin can also be staged, but staging does not activate it or create
+a marketplace. See [alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="opencode"></a>
+<details>
+<summary><strong>OpenCode</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor opencode-global
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-global
+```
+
+### Activate and check
+
+Skills are installed in `~/.config/opencode/skills` for use across your projects.
+Start a new OpenCode session and request `agent-planning`.
+This is a skills installation. See [OpenCode skills](https://opencode.ai/docs/skills/).
+
+### Update
+
+Run from this checkout:
+
+**macOS / Linux**
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-global --merge
+```
+
+**Windows**
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-global -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills. Start a new host session.
+
+For installation in one project only, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+Release installs use checksum-verified bundles and retain backups when replacing
+existing files. Updates can replace local customizations. See
+[installer controls and troubleshooting](docs/installer-reference.md) for pinned versions,
+conflict handling, manual installation, and recovery.
+
+## Use
 
 Select a skill in your host or name it in your request:
 
-- `agent-planning`: Plan this feature, including dependencies and verification. Do not implement it yet.
-- `code-review`: Review this branch against main for regressions. Keep the code unchanged.
-- `root-cause-debug`: Reproduce this failure, find its cause, and fix it with regression coverage.
+```text
+Use agent-planning to plan this feature. Do not implement it yet.
+Use code-review to review this branch against main without changing the code.
+Use root-cause-debug to reproduce and fix this failure with regression coverage.
+```
 
-Use [using-skills](skills/using-skills/SKILL.md) when you need help selecting a
-workflow. Jira and GitHub connections must be configured separately in your host.
-
-### From Jira to Build
+For Jira-to-Build work:
 
 1. Use `jira-tickets` to read the issue in intake mode.
 2. Switch to Plan mode and use `agent-planning`. Review the plan and its `implement-plan` handoff.
 3. Request Build in the same chat, or supply the issue context and accepted plan in a new one.
 
-Implementation includes relevant skills, verification, and final independent
-`code-review` unless you explicitly skip it. If review is unavailable, the gate is
-reported incomplete. If the host misses the handoff, request `implement-plan`
-explicitly. This is an instructed workflow, not an automated host integration.
+Implementation includes relevant skills, verification, and independent `code-review`
+unless you explicitly skip it. Unavailable review is reported incomplete. If the
+host misses the handoff, request `implement-plan` explicitly. Jira/GitHub connections
+must be configured separately. This is an instructed workflow, not host automation.
 
-Skills preserve authorization. Build does not authorize commits, pushes, external
-replies, or deployment. GitHub reviews and approvals are never dismissed.
+Build does not authorize commits, pushes, external replies, or deployment.
+GitHub reviews and approvals are never dismissed.
 
 ## Skills
+
+<details>
+<summary><strong>Browse all 19 skills</strong></summary>
 
 ### Clarify and Plan
 
@@ -124,15 +372,16 @@ replies, or deployment. GitHub reviews and approvals are never dismissed.
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
 | [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 
-## Contribute
+</details>
 
-Use the [issue forms](https://github.com/TylerAkins/ai-agent-skills/issues/new/choose)
-for bugs or skill requests. See [CONTRIBUTING.md](CONTRIBUTING.md) for editing,
-checks, and PR conventions, and [AGENTS.md](AGENTS.md) for repository instructions.
+## Contributing
 
-[Packaging reference](docs/plugins.md) covers host bundles and maintainer checks.
-[Release preparation](docs/releases.md) explains draft releases and distribution.
-Installer tests and structural checks do not establish live host behavior.
+[Report a bug or request a skill](https://github.com/TylerAkins/ai-agent-skills/issues/new/choose).
+[CONTRIBUTING.md](CONTRIBUTING.md) covers editing, tests, and PR conventions;
+[AGENTS.md](AGENTS.md) contains repository instructions.
+
+Maintainers: [package builds](docs/plugins.md) and [release preparation](docs/releases.md).
+Installer tests establish file placement, not that a host loaded or followed a skill.
 
 ## License
 

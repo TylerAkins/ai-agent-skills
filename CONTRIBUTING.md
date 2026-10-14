@@ -20,7 +20,7 @@ and nearby skills before editing.
 - Write original guidance. Attribute external material when used and respect its license.
 
 For packaging changes, keep manifest names and versions aligned and follow
-[host setup](docs/plugins.md). Keep contributor files and repository instructions
+[packaging reference](docs/plugins.md). Keep contributor files and repository instructions
 out of installed host packages.
 
 ## Validate
@@ -41,7 +41,7 @@ go vet ./...
 ```
 
 Build all five host targets into new scratch directories outside the checkout
-when packaging changes. Use the commands in [host setup](docs/plugins.md).
+when packaging changes. Use the commands in [packaging reference](docs/plugins.md).
 For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
 linting. It uses temporary HOME/project directories and generated release fixtures.
 CI runs Bash tests on macOS/Linux and native PowerShell tests on Windows.
