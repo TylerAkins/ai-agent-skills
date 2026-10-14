@@ -1,100 +1,84 @@
 # ai-agent-skills
 
-Version-controlled engineering workflows for AI coding agents, built for Cursor
-first and shared with Codex, Claude Code, OpenCode, and the GitHub Copilot app.
-Keep reusable skills for planning, implementation, testing, review, and delivery in one repository instead of rebuilding them per project.
+Shared engineering workflows for Cursor, Codex, Claude Code, GitHub Copilot, and
+OpenCode. The collection includes 19 skills for planning, implementation, testing,
+review, documentation, and delivery.
 
-## Install
+## Quick Start: Cursor
 
-For guided Mac/Linux installation and updates from release bundles, see
-[install and update](docs/install.md). Go is only needed for source builds.
+### macOS
 
-### Install in a Project
+You need Git and jq. If you use Homebrew and need jq, run `brew install jq`.
+Go is not required for release installs.
 
-For host packages and installation paths, follow [host setup](docs/plugins.md).
-Cursor includes a routing rule and independent reviewer. Claude includes the
-reviewer; Codex and Copilot use portable skills plugins. OpenCode uses a skills
-bundle. The copy-based installation below remains available without Go.
-
-You need Git and a version of Cursor or Codex that supports Agent Skills.
-Clone this collection, then copy its skill folders into your project's
-`.agents/skills/` directory, which both hosts support.
-
-For macOS or Linux, run this from the directory where you want the collection checkout.
-Replace `/path/to/your-project` with your existing project directory:
+From the folder where you want to keep the checkout:
 
 ```sh
 git clone https://github.com/TylerAkins/ai-agent-skills.git
 cd ai-agent-skills
-mkdir -p /path/to/your-project/.agents/skills
-cp -Ri skills/. /path/to/your-project/.agents/skills/
+bash scripts/install-ai-agent-skills.sh --flavor cursor
 ```
 
-The interactive copy prompts before overwriting existing files. Compare conflicting
-skills before replacing them. On Windows, copy the folders inside `skills` into
-`<your-project>/.agents/skills` with your file manager, reviewing any conflicts.
+In Cursor, run **Developer: Reload Window** from the Command Palette
+(`Cmd+Shift+P`). Open **Customize** and check for **ai-agent-skills**, its skills,
+routing rule, and reviewer. Local plugin imports must be allowed by your account
+or team; a marketplace copy with the same name can take precedence.
 
-Copy the complete collection and each skill's supporting files. Skills reference
-siblings, so installing one folder alone may leave required guidance unavailable.
-For updates, compare and copy the updated folders again; copied files do not sync.
-Do not copy this repo's `AGENTS.md` into your project as an installation step.
+Already installed? From the checkout:
 
-### Cursor
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor cursor
+```
 
-Open the target project in Cursor and start a new Agent chat. Open Customize, then
-Skills, and check for the installed names. Type `/` and select a skill to invoke it explicitly;
-Agent can also choose relevant skills from your request. See
-[Cursor's skill documentation](https://cursor.com/docs/skills).
+Confirm replacement, then reload Cursor. Updates keep a backup and download the
+latest published release. Pulling the checkout gets fixes to the installer itself.
 
-Cursor also supports `.cursor/skills/` for project installation and
-`~/.cursor/skills/` for local user-level installation. Project installation keeps
-the collection alongside the code and avoids relying on user-level files on another machine.
+For **Codex, Claude Code, Copilot, OpenCode, project skills, or Linux**, follow
+[install and update](docs/install.md). Windows has a PowerShell installer; the
+guide includes its prerequisites and commands.
 
-### Codex
+### Windows
 
-Open the target project in Codex and start a new session. In the CLI or IDE extension, type `$`
-to select a skill explicitly. In the desktop app, use the available skill selector,
-or name the skill in your request. Codex can also select relevant guidance. For example, use
-`$agent-planning` with a feature request. See
-[Codex's skill documentation](https://developers.openai.com/codex/skills/)
-for discovery and user-level installation options.
+Use [PowerShell 7.4 or newer](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) and Git:
 
-Claude Code, OpenCode, and the new GitHub Copilot app have dedicated preparation
-and installation guidance in [host setup](docs/plugins.md). All five package targets
-are structurally checked in CI. Live host behavior and marketplace distribution
-remain to be verified; the installer prepares local files and marketplace entries.
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor cursor
+```
 
-## Try It
+Reload Cursor and check **Customize** as described in the Mac quick start.
+For updates, run `./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor`.
+The Windows helper uses built-in download, JSON, and checksum support; no jq or Go
+is needed for release installation.
 
-Select the named skill in your host, then provide a request such as:
+## Use a Skill
 
-- `agent-planning`: “Plan this feature from the ticket. Identify dependencies and verification. Do not implement it yet.”
-- `code-review`: “Review this branch against main for regressions and missing requirements. Keep the candidate unchanged.”
-- `root-cause-debug`: “Reproduce this failure, establish its cause, and fix it with regression coverage.”
+Select a skill in your host or name it in your request:
 
-[using-skills](skills/using-skills/SKILL.md) describes how the workflows fit together.
-Skills preserve the scope of your request. Commits, pushes, external replies, and
-production actions need authorization; GitHub reviews and approvals are never dismissed.
+- `agent-planning`: Plan this feature, including dependencies and verification. Do not implement it yet.
+- `code-review`: Review this branch against main for regressions. Keep the code unchanged.
+- `root-cause-debug`: Reproduce this failure, find its cause, and fix it with regression coverage.
 
-## Skills
+Use [using-skills](skills/using-skills/SKILL.md) when you need help selecting a
+workflow. Jira and GitHub connections must be configured separately in your host.
 
 ### From Jira to Build
 
-In the target project's Agent chat, use `jira-tickets` to read the issue in intake
-mode. Switch to Plan mode and use `agent-planning` to investigate the repository
-and define tasks. The generated plan includes an explicit `implement-plan` execution
-handoff. Check that it is present when reviewing the plan, then request Build.
-Keep the issue context and accepted plan in the same chat, or provide
-them explicitly when starting a separate one.
+1. Use `jira-tickets` to read the issue in intake mode.
+2. Switch to Plan mode and use `agent-planning`. Review the plan and its `implement-plan` handoff.
+3. Request Build in the same chat, or supply the issue context and accepted plan in a new one.
 
-Implementation includes relevant coding/domain skills, meaningful verification,
-and final independent `code-review` unless you explicitly skip it. Supported findings
-are repaired and material changes re-reviewed. If independent review is unavailable,
-the agent reports that gate incomplete. Build does not authorize commits or pushes.
+Implementation includes relevant skills, verification, and final independent
+`code-review` unless you explicitly skip it. If review is unavailable, the gate is
+reported incomplete. If the host misses the handoff, request `implement-plan`
+explicitly. This is an instructed workflow, not an automated host integration.
 
-This describes the intended skill handoff; it is not an automated integration or
-a guarantee that every host follows the embedded handoff. If the executor misses
-it, explicitly select `implement-plan` and supply the accepted plan.
+Skills preserve authorization. Build does not authorize commits, pushes, external
+replies, or deployment. GitHub reviews and approvals are never dismissed.
+
+## Skills
 
 ### Clarify and Plan
 
@@ -140,27 +124,15 @@ it, explicitly select `implement-plan` and supply the accepted plan.
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
 | [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 
-## Report a Problem or Suggest a Skill
+## Contribute
 
-Use a bug report for broken behavior, installation, packaging, or documentation.
-Use a skill or workflow request for new capabilities or improvements. Include a
-small reproduction or concrete use case; remove private information from examples.
-Blank issues remain available for questions and reports that do not fit either form.
+Use the [issue forms](https://github.com/TylerAkins/ai-agent-skills/issues/new/choose)
+for bugs or skill requests. See [CONTRIBUTING.md](CONTRIBUTING.md) for editing,
+checks, and PR conventions, and [AGENTS.md](AGENTS.md) for repository instructions.
 
-The forms live in [issue templates](.github/ISSUE_TEMPLATE).
-
-## Working on This Repository
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for change guidelines, validation, and PR
-submission. Edit canonical files under `skills/` and follow [AGENTS.md](AGENTS.md). The checked-in
-`.cursor/skills` symlink exposes those files when maintaining this repository in Cursor;
-it is not needed for the copy-based installation described above.
-
-CI validates the collection, lints shell scripts, and builds all five host packages.
-Live host testing remains separate from those structural checks. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for local checks and watching CI progress,
-[host setup](docs/plugins.md) for installation, and
-[release preparation](docs/releases.md) for draft bundles.
+[Packaging reference](docs/plugins.md) covers host bundles and maintainer checks.
+[Release preparation](docs/releases.md) explains draft releases and distribution.
+Installer tests and structural checks do not establish live host behavior.
 
 ## License
 

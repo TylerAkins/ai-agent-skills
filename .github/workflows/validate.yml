@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   validate:
-    needs: installer
+    needs: [installer, windows-installer]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -17,7 +17,10 @@ jobs:
       - name: Require installer checks
         env:
           INSTALLER_RESULT: ${{ needs.installer.result }}
-        run: test "$INSTALLER_RESULT" = success
+          WINDOWS_RESULT: ${{ needs.windows-installer.result }}
+        run: |
+          test "$INSTALLER_RESULT" = success
+          test "$WINDOWS_RESULT" = success
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -99,3 +102,40 @@ jobs:
       - name: Exercise installation and update behavior
         shell: bash
         run: bash scripts/tests/install-smoke.sh
+
+
+  windows-installer:
+    name: Installer (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Show Windows runtime
+        shell: pwsh
+        run: |
+          $PSVersionTable
+          go version
+      - name: Install pinned PowerShell analyzer
+        shell: pwsh
+        run: Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Force -Repository PSGallery
+      - name: Check PowerShell scripts
+        shell: pwsh
+        run: ./scripts/ci/check-powershell.ps1
+      - name: Exercise Windows installation and updates
+        shell: pwsh
+        run: ./scripts/tests/install-smoke.ps1
+      - name: Write Windows summary
+        if: always()
+        shell: pwsh
+        env:
+          RESULT: ${{ job.status }}
+        run: |
+          "## Windows installer`n`nRevision: $env:GITHUB_SHA`n`nResult: $env:RESULT" >> $env:GITHUB_STEP_SUMMARY
