@@ -468,11 +468,28 @@ Use code-review to review this branch against main without changing the code.
 Use root-cause-debug to reproduce and fix this failure with regression coverage.
 ```
 
-For Jira-to-Build work:
+For a feature that needs a plan, follow this workflow. Cursor is the example host;
+other flavors may use different controls or review tools. Small, understood changes
+can start with the relevant skill directly.
 
-1. Use `jira-tickets` to read the issue in intake mode.
-2. Switch to Plan mode and use `agent-planning`. Review the plan and its `implement-plan` handoff.
-3. Request Build in the same chat, or supply the issue context and accepted plan in a new one.
+```mermaid
+flowchart TD
+    A["Describe the change<br/>Optional: read a Jira issue"] --> B["Plan<br/>agent-planning"]
+    B --> C["Review the plan and authorize implementation"]
+    C --> D["Build<br/>implement-plan"]
+    D --> E["Verify behavior<br/>Tests and relevant checks"]
+    E --> F["Independent review<br/>code-review"]
+    F --> G{"Changes required?"}
+    G -->|Yes| H["Repair and rerun affected checks"]
+    H --> F
+    G -->|No| I["Report the result and verification limits"]
+    I --> J["When authorized: commit, push, or open a PR"]
+```
+
+Failed checks require investigation before advancing. Unavailable independent
+review leaves that gate incomplete. See the [Cursor workflow example](docs/cursor-workflow.md)
+for prompts, expected results, and recovery steps. The example describes the
+instructed workflow; a live Cursor validation run has not been recorded.
 
 Implementation includes relevant skills, verification, and independent `code-review`
 unless you explicitly skip it. Unavailable review is reported incomplete. If the
