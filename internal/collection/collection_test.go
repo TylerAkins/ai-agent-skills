@@ -37,7 +37,7 @@ func fixture(t *testing.T) string {
 
 func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 	root := fixture(t)
-	for _, target := range []string{"cursor", "codex", "claude", "copilot", "opencode"} {
+	for _, target := range []string{"cursor", "codex", "claude", "copilot", "opencode", "skills"} {
 		t.Run(target, func(t *testing.T) {
 			out := filepath.Join(t.TempDir(), "package")
 			if err := Build(root, out, target); err != nil {
@@ -57,7 +57,7 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 			if target != "cursor" {
 				absent = ".cursor-plugin"
 			}
-			if target == "claude" || target == "opencode" {
+			if target == "claude" || target == "opencode" || target == "skills" {
 				absent = "plugin.json"
 			}
 			if _, err := os.Stat(filepath.Join(out, absent)); !os.IsNotExist(err) {
@@ -69,6 +69,7 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 				"copilot":  {"LICENSE", "plugin.json", "skills"},
 				"claude":   {".claude-plugin", "LICENSE", "agents", "skills"},
 				"opencode": {"LICENSE", "skills"},
+				"skills":   {"LICENSE", "skills"},
 			}
 			entries, err := os.ReadDir(out)
 			if err != nil {

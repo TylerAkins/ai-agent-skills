@@ -38,6 +38,13 @@ Flavors:
   codex-skills       Project .agents/skills (--project required)
   opencode-project   Project .opencode/skills (--project required)
   opencode-global    User ~/.config/opencode/skills
+  gemini-project     Project .gemini/skills (--project required)
+  gemini-global      User ~/.gemini/skills
+  muse-project       Project .agents/skills (--project required)
+  muse-global        User ~/.agents/skills (shared with other agents)
+  antigravity-project    Project .agents/skills (--project required)
+  antigravity-global     App/IDE ~/.gemini/config/skills
+  antigravity-cli-global CLI ~/.gemini/antigravity-cli/skills
   list               Show this list
 Options:
   --version v1.0.0    Published release; default is latest stable release

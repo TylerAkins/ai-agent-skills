@@ -7,7 +7,7 @@ trap 'rm -rf "$work"' EXIT
 fixtures=${1:-"$work/assets"}
 mkdir -p "$fixtures"
 if [ "$#" -eq 0 ]; then
-  for host in cursor codex claude copilot opencode; do
+  for host in cursor codex claude copilot opencode skills; do
     printf 'Preparing %s test bundle.\n' "$host"
     (cd "$repo_root"; go run ./cmd/skillpack -target "$host" -out "$work/ai-agent-skills-$host")
     tar -czf "$fixtures/ai-agent-skills-$host-v1.0.0.tar.gz" -C "$work" "ai-agent-skills-$host"
@@ -40,21 +40,52 @@ for option in --flavor --version --project --marketplace-root --ref; do
   fi
   grep -q 'needs a value' "$work/missing-argument.log"
 done
-for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills codex-skills opencode-project opencode-global; do
+for flavor in gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
+  args=(--flavor "$flavor" --dry-run)
+  case "$flavor" in *-project) args+=(--project "$work/project") ;; esac
+  bash "$installer" "${args[@]}"
+done
+for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills codex-skills opencode-project opencode-global gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
   printf 'Testing %s.\n' "$flavor"
   args=(--flavor "$flavor" --version v1.0.0 --yes)
   case "$flavor" in
     codex-marketplace) args+=(--marketplace-root "$work/marketplace") ;;
-    *-skills|opencode-project) args+=(--project "$work/project") ;;
+    *-skills|*-project) args+=(--project "$work/project") ;;
   esac
+  if [ "$flavor" = muse-project ] || [ "$flavor" = antigravity-project ]; then
+    mkdir -p "$work/$flavor"
+    args=(--flavor "$flavor" --version v1.0.0 --yes --project "$work/$flavor")
+  fi
   bash "$installer" "${args[@]}"
+  case "$flavor" in
+    gemini-project) skill_root="$work/project/.gemini/skills" ;;
+    gemini-global) skill_root="$HOME/.gemini/skills" ;;
+    muse-project) skill_root="$work/muse-project/.agents/skills" ;;
+    muse-global) skill_root="$HOME/.agents/skills" ;;
+    antigravity-project) skill_root="$work/antigravity-project/.agents/skills" ;;
+    antigravity-global) skill_root="$HOME/.gemini/config/skills" ;;
+    antigravity-cli-global) skill_root="$HOME/.gemini/antigravity-cli/skills" ;;
+    *) skill_root= ;;
+  esac
+  if [ -n "$skill_root" ]; then
+    test -f "$skill_root/test-authoring/SKILL.md"
+    test -f "$skill_root/test-authoring/references/scope-and-state.md"
+    test ! -e "$skill_root/plugin.json"
+    mkdir -p "$skill_root/unrelated"
+    printf 'Keep me\n' > "$skill_root/unrelated/file"
+    printf 'Old content\n' > "$skill_root/test-authoring/SKILL.md"
+  fi
   if bash "$installer" "${args[@]}" > "$work/refusal.log" 2>&1; then
     printf 'Existing installation was overwritten without permission.\n' >&2; exit 1
   fi
   case "$flavor" in
-    *-skills|opencode-*) bash "$installer" update "${args[@]}" --merge ;;
+    *-skills|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
     *) bash "$installer" update "${args[@]}" ;;
   esac
+  if [ -n "$skill_root" ]; then
+    test "$(cat "$skill_root/unrelated/file")" = 'Keep me'
+    grep -q 'name: test-authoring' "$skill_root/test-authoring/SKILL.md"
+  fi
 done
 jq -e '.name == "existing" and .interface.displayName == "Existing" and ([.plugins[] | select(.name == "other-plugin")] | length == 1) and ([.plugins[] | select(.name == "ai-agent-skills")] | length == 1)' "$HOME/.agents/plugins/marketplace.json" >/dev/null
 mkdir "$work/project/.agents/skills/unrelated"

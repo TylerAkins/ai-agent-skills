@@ -15,6 +15,7 @@ Every target contains the complete `skills/` collection and supporting resources
 | `claude` | `.claude-plugin/plugin.json`, `agents/`, LICENSE |
 | `copilot` | Portable root `plugin.json`, LICENSE |
 | `opencode` | LICENSE; no plugin manifest |
+| `skills` | LICENSE; shared skills-only bundle for Gemini CLI, Muse Code, and Antigravity, no plugin manifest |
 
 Cursor includes a routing rule and reviewer; Claude includes the reviewer.
 The agent requests read-only review through instructions, not a tool sandbox.
@@ -38,7 +39,7 @@ Build into new directories outside the checkout:
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor codex claude copilot opencode; do
+for host in cursor codex claude copilot opencode skills; do
   go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
 done
 ```
@@ -72,9 +73,12 @@ workflow. Record the host/version, observed results, and missing checks.
 - [Claude plugins](https://code.claude.com/docs/en/plugins) and [manifest reference](https://code.claude.com/docs/en/plugins-reference)
 - [Copilot plugin formats](https://docs.github.com/en/copilot/concepts/agents/about-plugins)
 - [OpenCode skills](https://opencode.ai/docs/skills/)
+- [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/)
+- [Antigravity skills](https://antigravity.google/docs/skills)
+- [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/)
 
 Packaging and release assets do not create marketplace listings. Cursor submissions
 go through [the publisher form](https://cursor.com/marketplace/publish).
-Codex, Claude, and Copilot have separate marketplace formats; OpenCode consumes
-the skills bundle directly. Publishing/registering a marketplace remains a separate
+Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI, Muse Code, and Antigravity consume
+skill folders directly. Publishing/registering a marketplace remains a separate
 authorized action.

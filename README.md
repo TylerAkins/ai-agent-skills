@@ -1,7 +1,7 @@
 # ai-agent-skills
 
-20 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot, and
-OpenCode. Plan work, build it, test it, review it, and prepare delivery with
+20 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot,
+OpenCode, Gemini CLI, Muse Code, and Google Antigravity. Plan work, build it, test it, review it, and prepare delivery with
 consistent workflows and explicit authorization.
 
 ## Install
@@ -330,6 +330,156 @@ For installation in one project only, see
 [alternate installations](docs/installer-reference.md#alternate-installations).
 
 </details>
+
+<a id="gemini"></a>
+<details>
+<summary><strong>Gemini CLI</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor gemini-global
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor gemini-global
+```
+
+### Activate and check
+
+Skills are installed in `~/.gemini/skills` for use across projects.
+In Gemini CLI, run `/skills reload` and `/skills list`. Request `agent-planning`. See [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/).
+
+### Update
+
+Run from this checkout:
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor gemini-global --merge
+```
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor gemini-global -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills.
+Reload the host's skills after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="muse"></a>
+<details>
+<summary><strong>Muse Code</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor muse-global
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor muse-global
+```
+
+### Activate and check
+
+Skills are installed in `~/.agents/skills` for use across projects.
+In Muse Code, run `/skills reload`, then check `muse skills list` from a terminal.
+Invoke `/agent-planning` in the session. See [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
+
+### Update
+
+Run from this checkout:
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor muse-global --merge
+```
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor muse-global -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills.
+Reload the host's skills after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="antigravity"></a>
+<details>
+<summary><strong>Google Antigravity</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+bash scripts/install-ai-agent-skills.sh --flavor antigravity-global
+```
+
+### Install on Windows
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+./scripts/install-ai-agent-skills.ps1 -Flavor antigravity-global
+```
+
+The global flavor installs to `~/.gemini/config/skills` for the Antigravity app
+and standalone IDE. For the CLI, use `antigravity-cli-global` instead; it installs
+to `~/.gemini/antigravity-cli/skills`. These are separate installations.
+
+### Activate and check
+
+Start a new session and invoke `/agent-planning`. In the standalone IDE, inspect
+active skills through the agent side panel's **Customizations** menu. See
+[Antigravity skill locations and invocation](https://antigravity.google/docs/skills).
+File placement alone does not establish that the host loaded a skill.
+
+### Update
+
+Run from this checkout:
+
+```sh
+git pull --ff-only
+bash scripts/install-ai-agent-skills.sh update --flavor antigravity-global --merge
+```
+
+```powershell
+git pull --ff-only
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor antigravity-global -Merge
+```
+
+Use `antigravity-cli-global` in the update command for the CLI installation.
+Merge preserves unrelated skills and replaces this collection's skill folders.
+Start a new session after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+The `.agents/skills` directory used by Muse and Antigravity project installations
+is shared with other agents that discover it.
+Installing or updating there changes the collection those agents read too.
+The new flavors require a release containing `ai-agent-skills-skills`; older
+releases do not include that archive. For an unpublished local checkout, use
+[manual installation](docs/installer-reference.md#source-builds-and-manual-installation).
 
 Release installs use checksum-verified bundles and retain backups when replacing
 existing files. Updates can replace local customizations. See

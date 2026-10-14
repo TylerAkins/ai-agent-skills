@@ -28,7 +28,7 @@ try {
     if (-not $Fixtures) {
         $Fixtures = Join-Path $work 'assets'
         [void][IO.Directory]::CreateDirectory($Fixtures)
-        foreach ($targetHost in @('cursor', 'codex', 'claude', 'copilot', 'opencode')) {
+        foreach ($targetHost in @('cursor', 'codex', 'claude', 'copilot', 'opencode', 'skills')) {
             Write-Output "Preparing $targetHost test bundle."
             $packageName = "ai-agent-skills-$targetHost"
             Push-Location $repoRoot
@@ -80,16 +80,41 @@ try {
     $catalog = Join-Path $testHome '.agents/plugins/marketplace.json'
     [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($catalog))
     Set-Content -LiteralPath $catalog -Value '{"name":"existing","interface":{"displayName":"Existing"},"createdAt":"2026-10-13T00:00:00+05:30","plugins":[{"name":"other-plugin","source":"./other"}]}' -Encoding utf8NoBOM
-    foreach ($flavor in @('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global')) {
+    foreach ($flavor in @('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) {
         Write-Output "Testing $flavor."
         $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
         if ($flavor -eq 'codex-marketplace') { $options.MarketplaceRoot = Join-Path $work 'marketplace' }
-        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project')) { $options.Project = $projectPath }
+        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project')) { $options.Project = $projectPath }
+        if ($flavor -in @('muse-project', 'antigravity-project')) {
+            $options.Project = Join-Path $work "$flavor with spaces"
+            [void][IO.Directory]::CreateDirectory($options.Project)
+        }
         & $installer @options
+        $skillRoot = switch ($flavor) {
+            'gemini-project' { Join-Path $projectPath '.gemini/skills' }
+            'gemini-global' { Join-Path $testHome '.gemini/skills' }
+            'muse-project' { Join-Path $options.Project '.agents/skills' }
+            'muse-global' { Join-Path $testHome '.agents/skills' }
+            'antigravity-project' { Join-Path $options.Project '.agents/skills' }
+            'antigravity-global' { Join-Path $testHome '.gemini/config/skills' }
+            'antigravity-cli-global' { Join-Path $testHome '.gemini/antigravity-cli/skills' }
+            default { $null }
+        }
+        if ($skillRoot) {
+            Test-Condition (Test-Path -LiteralPath (Join-Path $skillRoot 'test-authoring/references/scope-and-state.md')) 'Skill reference missing.'
+            Test-Condition (-not (Test-Path -LiteralPath (Join-Path $skillRoot 'plugin.json'))) 'Plugin manifest shipped as a skill.'
+            [void][IO.Directory]::CreateDirectory((Join-Path $skillRoot 'unrelated'))
+            Set-Content -LiteralPath (Join-Path $skillRoot 'unrelated/file') -Value 'Keep me' -Encoding utf8NoBOM
+            Set-Content -LiteralPath (Join-Path $skillRoot 'test-authoring/SKILL.md') -Value 'Old content' -Encoding utf8NoBOM
+        }
         Test-InstallerFailure $options 'Destination exists'
         $options.Action = 'Update'
-        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global')) { $options.Merge = $true }
+        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) { $options.Merge = $true }
         & $installer @options
+        if ($skillRoot) {
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'unrelated/file') -Raw).Trim() -eq 'Keep me') 'Merge lost unknown skills.'
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'test-authoring/SKILL.md') -Raw) -match 'name: test-authoring') 'Update did not replace incoming skill.'
+        }
     }
     $catalogText = Get-Content -LiteralPath $catalog -Raw
     $data = $catalogText | ConvertFrom-Json -AsHashtable
