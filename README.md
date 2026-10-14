@@ -26,6 +26,12 @@ Select your agents and skills interactively. To list skills or select one by nam
 ```sh
 npx skills add TylerAkins/ai-agent-skills --list
 npx skills add TylerAkins/ai-agent-skills --skill test-authoring
+
+# Install globally for all projects/workspaces
+npx skills add TylerAkins/ai-agent-skills -g
+
+# Update installed skills to the latest revision
+npx skills update
 ```
 
 Skills link to other skills in this collection. Install the collection when you
