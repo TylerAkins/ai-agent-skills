@@ -1,6 +1,6 @@
 # ai-agent-skills
 
-19 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot, and
+20 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot, and
 OpenCode. Plan work, build it, test it, review it, and prepare delivery with
 consistent workflows and explicit authorization.
 
@@ -363,7 +363,7 @@ GitHub reviews and approvals are never dismissed.
 ## Skills
 
 <details>
-<summary><strong>Browse all 19 skills</strong></summary>
+<summary><strong>Browse all 20 skills</strong></summary>
 
 ### Clarify and Plan
 
@@ -406,6 +406,7 @@ GitHub reviews and approvals are never dismissed.
 | Skill | Purpose |
 | --- | --- |
 | [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
+| [skill-authoring](skills/skill-authoring/SKILL.md) | Author, evaluate, and register engineering skills with verified packages. |
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
 | [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 

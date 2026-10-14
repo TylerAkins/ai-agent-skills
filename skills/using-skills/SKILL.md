@@ -23,6 +23,7 @@ they do not install dependencies, authorize new actions, or spawn agents.
 | Diagnose and repair unexpected behavior | [root-cause-debug](../root-cause-debug/SKILL.md) |
 | Write behavioral tests | [test-authoring](../test-authoring/SKILL.md) |
 | Design shared contracts | [api-design](../api-design/SKILL.md) |
+| Author, refine, or package agent skills | [skill-authoring](../skill-authoring/SKILL.md) |
 | Write documentation or decision records | [technical-documentation](../technical-documentation/SKILL.md) |
 | Build or improve UI | [frontend-engineering](../frontend-engineering/SKILL.md) |
 | Review code, plans, or PRs | [code-review](../code-review/SKILL.md) |
