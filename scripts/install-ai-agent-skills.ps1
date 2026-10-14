@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -107,6 +107,13 @@ $flavors = [ordered]@{
     'codex-skills' = @('codex', '.agents/skills', $true)
     'opencode-project' = @('opencode', '.opencode/skills', $true)
     'opencode-global' = @('opencode', '.config/opencode/skills', $true)
+    'gemini-project' = @('skills', '.gemini/skills', $true)
+    'gemini-global' = @('skills', '.gemini/skills', $true)
+    'muse-project' = @('skills', '.agents/skills', $true)
+    'muse-global' = @('skills', '.agents/skills', $true)
+    'antigravity-project' = @('skills', '.agents/skills', $true)
+    'antigravity-global' = @('skills', '.gemini/config/skills', $true)
+    'antigravity-cli-global' = @('skills', '.gemini/antigravity-cli/skills', $true)
 }
 if (-not $Flavor -or $Flavor -eq 'list') {
     $flavors.Keys | ForEach-Object { Write-Output $_ }
@@ -121,7 +128,7 @@ if ($Ref -and $Ref -ne 'main') { Test-ReleaseVersion $Ref }
 if ($Ref -and $Version -and $Ref -ne $Version) { throw '-Version and -Ref disagree.' }
 $installRoot = Resolve-InstallPath $HomeDirectory
 $targetHost, $relativePath, $skillsOnly = $flavors[$Flavor]
-if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project')) {
+if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project')) {
     if (-not $Project) { throw '-Project is required for this flavor.' }
     $installRoot = Resolve-InstallPath $Project
     if (-not (Test-Path -LiteralPath $installRoot -PathType Container)) { throw 'Project directory does not exist.' }
@@ -274,6 +281,9 @@ try {
         'codex-marketplace' { Write-Output "Add a plugin marketplace with this full source path: $installRoot" }
         'claude' { Write-Output "Launch Claude Code with: claude --plugin-dir `"$destination`"" }
         'copilot-staging' { Write-Output 'Staging only. Copilot needs a marketplace under Customize > Plugins. See https://docs.github.com/en/copilot/concepts/agents/about-plugins' }
+        { $_ -like 'antigravity-*' } { Write-Output 'Start a new Antigravity session and invoke /agent-planning. In the IDE, inspect skills in the Customizations menu.' }
+        { $_ -like 'gemini-*' } { Write-Output 'In Gemini CLI, run /skills reload and /skills list, then request a skill.' }
+        { $_ -like 'muse-*' } { Write-Output 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.' }
         default { Write-Output 'Start a new host session and check for the installed skills.' }
     }
     Write-Output 'Refresh/reinstall the host plugin if its cached copy remains stale.'

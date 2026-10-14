@@ -45,8 +45,8 @@ solely because a domain is mentioned.
 
 Use [test-authoring](../test-authoring/SKILL.md) for independently justified behavioral
 coverage. Run focused checks in verified package directories and confirm actual test
-selection. Establish regression sensitivity for bug fixes where feasible. Investigate
-unexpected failures through [root-cause-debug](../root-cause-debug/SKILL.md), preserving
+selection. Complete the Red-Green-Refactor assertion gate for behavioral code changes.
+Investigate unexpected failures through [root-cause-debug](../root-cause-debug/SKILL.md), preserving
 evidence and distinguishing introduced failures from unrelated ones.
 
 Track actual task outcomes and material decisions in the existing plan or host task
@@ -58,6 +58,30 @@ Before final review, inspect the complete candidate, including relevant untracke
 files, for omissions, accidental changes, and contract mismatches. Run applicable
 integration/build checks and browser verification for affected UI behavior. A completed
 todo list or passing unrelated suite does not establish requirement coverage.
+
+## Red-Green-Refactor Assertion Gate
+
+For new behavior and bug repairs, the required state sequence is Red, Green, then
+Refactor. Do not write production implementation before completing Red.
+
+1. **Red:** Write the behavioral test and run the actual repository test runner
+   against the unchanged implementation. Display the command, working directory,
+   failing assertion output, and nonzero exit code before writing production code.
+   Confirm the failure expresses the requested behavior. Syntax, import, setup,
+   or unrelated failures do not satisfy Red; repair the test setup and rerun.
+2. **Green:** Implement the behavior, run the selected tests and required surrounding
+   checks, and display the actual runner output and exit code 0 with zero failures.
+   Confirm the intended tests executed; zero selected tests cannot satisfy Green.
+3. **Refactor:** Simplify only after Green. Rerun affected tests after refactoring
+   and display the clean output and exit code 0 before declaring completion.
+
+If execution is unavailable, stop dependent implementation and report the gate as
+blocked with the missing prerequisite. Never fabricate output or weaken assertions.
+For coverage of existing correct behavior or behavior-preserving refactoring,
+record a passing baseline and demonstrate regression sensitivity in an isolated
+copy before changing production code. Documentation-only changes use document
+validation rather than an artificial failing behavioral test. A reproduction-only
+request ends at observed Red and does not authorize a production repair.
 
 ## Independently Review the Complete Candidate
 
@@ -94,3 +118,14 @@ pushes, or PR preparation. Do not hide unmet required steps behind a delivery re
 report limits if the user asks to proceed despite them. Preserve approvals and review
 history. Live deployment uses authorized
 [release-readiness](../release-readiness/SKILL.md), not an automatic consequence of Build.
+
+## Anti-Rationalization Guardrails
+
+These rules govern phase transitions. Missing evidence leaves the gate incomplete;
+do not substitute a declaration of confidence or silently waive a requirement.
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| Implementing all steps in one giant batch saves tokens. | Execute dependency-ordered, independently verifiable tasks. Complete each task's checks before advancing to dependent work. |
+| The fix is obvious, so failing tests can be skipped. | Investigate failures and complete the assertion gate. An expected outcome does not replace runner evidence. |
+| I can leave debug code and logs for later. | Remove temporary diagnostics and inspect the complete diff before final review. Do not advance with cleanup deferred. |

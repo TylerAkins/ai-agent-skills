@@ -38,8 +38,9 @@ Exercise production code. Do not mock the changed parser, compiler, engine, quer
 or component whose behavior the test is meant to establish. Textual source checks
 are appropriate only for an explicitly textual contract, not as runtime coverage.
 Use real query/database behavior when mocks conceal tenant or scope defects.
-Choose manual verification when automation cannot establish the requirement, and
-state that limitation. Avoid fixed test-level percentages or unnecessary end-to-end
+Use manual verification for requirements automation cannot establish, and state
+that limitation. Manual checks cannot replace required runner evidence for a
+behavioral code change. Avoid fixed test-level percentages or unnecessary end-to-end
 tests when focused coverage establishes the same behavior.
 
 Cover relevant success, negative, boundary, null/empty, and failure cases. Include
@@ -74,18 +75,42 @@ Use snapshots only for meaningful, reviewable output contracts. Inspect expected
 changes deliberately; do not regenerate snapshots merely to make failures green.
 Use focused assertions when a broad snapshot hides the behavior of interest.
 
+## Red-Green-Refactor Assertion Gate
+
+For new behavior and bug repairs, the required state sequence is Red, Green, then
+Refactor. Do not write production implementation before completing Red.
+
+1. **Red:** Write the behavioral test and run the actual repository test runner
+   against the unchanged implementation. Display the command, working directory,
+   failing assertion output, and nonzero exit code before writing production code.
+   Confirm the failure expresses the requested behavior. Syntax, import, setup,
+   or unrelated failures do not satisfy Red; repair the test setup and rerun.
+2. **Green:** Implement the behavior, run the selected tests and required surrounding
+   checks, and display the actual runner output and exit code 0 with zero failures.
+   Confirm the intended tests executed; zero selected tests cannot satisfy Green.
+3. **Refactor:** Simplify only after Green. Rerun affected tests after refactoring
+   and display the clean output and exit code 0 before declaring completion.
+
+If execution is unavailable, stop dependent implementation and report the gate as
+blocked with the missing prerequisite. Never fabricate output or weaken assertions.
+For coverage of existing correct behavior or behavior-preserving refactoring,
+record a passing baseline and demonstrate regression sensitivity in an isolated
+copy before changing production code. Documentation-only changes use document
+validation rather than an artificial failing behavioral test. A reproduction-only
+request ends at observed Red and does not authorize a production repair.
+
 ## Establish Regression Sensitivity
 
 For a bug, build a realistic fixture that distinguishes defective and corrected
-behavior. When feasible, observe the expected behavioral assertion fail against
-the defective version before verifying success against the corrected version.
+behavior. Observe the expected behavioral assertion fail against the defective version
+before verifying success against the corrected version.
 Syntax errors, import failures, or unrelated mutations do not establish sensitivity.
 
 Use isolated copies or precisely restore only agent-owned edits for before/after
 checks. Never broadly reset or stash mixed user work. For existing correct behavior,
 a test passing immediately can provide useful coverage: verify that it reaches
-the relevant path and would detect a meaningful regression. Use a focused mutation
-experiment when useful, not as a mandatory ritual for every test.
+the relevant path and would detect a meaningful regression. Demonstrate sensitivity
+with a focused mutation in an isolated copy.
 
 A request to write a reproduction test does not authorize repairing production code.
 If the test is expected to remain failing for a later repair, report the reproduced
@@ -105,3 +130,15 @@ before/after evidence, and material limits. Distinguish authored but unrun tests
 from verified coverage. Passing tests do not prove absence of defects or that an
 unexecuted browser/live flow works. Commit, push, and publication require separate
 authorization through the applicable workflow.
+
+## Anti-Rationalization Guardrails
+
+These rules govern phase transitions. Missing evidence leaves the gate incomplete;
+do not substitute a declaration of confidence or silently waive a requirement.
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| The change is too small to test. | For any behavioral code change, complete the assertion gate before implementation; size does not waive coverage. |
+| I verified the behavior mentally. | Run the actual test runner and retain its output. Reasoning cannot satisfy an execution gate. |
+| Mocking is too hard. | Use real collaborators or a suitable integration boundary. Do not mock the behavior under test or waive the gate because setup is difficult. |
+| I will write tests after implementation. | Write and run the behavioral test first. Production implementation cannot begin until Red evidence is recorded. |

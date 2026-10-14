@@ -100,3 +100,14 @@ Report implemented stages separately from executed migration, verified cutover,
 and completed retirement. State remaining dependencies, irreversible effects, and
 verification limits. Commit, push, and publication require authorization through
 [git-delivery](../git-delivery/SKILL.md).
+
+## Anti-Rationalization Guardrails
+
+These rules govern phase transitions. Missing evidence leaves the gate incomplete;
+do not substitute a declaration of confidence or silently waive a requirement.
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| Additive columns never cause table locks. | Verify locking and rewrite behavior for the actual database version and operation. Record representative rehearsal evidence before advancing. |
+| Rollback scripts are unnecessary. | Prepare and safely verify actionable recovery before cutover. If reversal is impossible, define restoration or forward repair and the irreversible boundary. |
+| Testing directly on staging is fine. | First rehearse against representative data in an isolated safe environment. Shared staging execution requires its own authorization and cannot replace that rehearsal. |

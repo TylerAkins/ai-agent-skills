@@ -1,13 +1,49 @@
 # ai-agent-skills
 
-19 shared engineering skills for Cursor, Codex, Claude Code, GitHub Copilot, and
-OpenCode. Plan work, build it, test it, review it, and prepare delivery with
-consistent workflows and explicit authorization.
+22 shared engineering skills for AI coding agents. Plan, build, test, review,
+and prepare delivery with consistent workflows and explicit authorization.
 
 ## Install
 
-Expand your host below. Each section includes installation, activation, and updates.
-The helpers download the latest published release; Go is not required.
+Choose a distribution path:
+
+| Path | Requirements | Installs |
+| --- | --- | --- |
+| Open Skills CLI (`npx skills`) | Node.js/npm and Git; no manual clone | Skill folders and supporting resources for supported agents |
+| Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing/reviewer configuration where supported |
+
+### Open Skills CLI
+
+Run from your target project directory:
+
+```sh
+npx skills add TylerAkins/ai-agent-skills
+```
+
+Select your agents and skills interactively. To list skills or select one by name:
+
+```sh
+npx skills add TylerAkins/ai-agent-skills --list
+npx skills add TylerAkins/ai-agent-skills --skill test-authoring
+
+# Install globally for all projects/workspaces
+npx skills add TylerAkins/ai-agent-skills -g
+
+# Update installed skills to the latest revision
+npx skills update
+```
+
+Skills link to other skills in this collection. Install the collection when you
+need those workflows; a single skill retains its own `references/` resources but
+does not install sibling skills automatically. See the
+[Open Skills CLI documentation](https://github.com/vercel-labs/skills) for supported
+agents, global installation, and updates.
+
+### Native Shell Installers
+
+Expand your host below for installation, activation, and updates. These installers
+use Bash on macOS/Linux or PowerShell on Windows with the prerequisites below;
+they do not require a Node.js runtime or additional language package installation.
 
 Install the host app and Git first. On **macOS/Linux**, you also need Bash, curl,
 tar, shasum, and jq. macOS includes Bash, curl, tar, and shasum; with Homebrew,
@@ -15,8 +51,25 @@ install jq using `brew install jq`. On Linux, use your package manager for missi
 On **Windows**, use [PowerShell 7.4+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows),
 not Windows PowerShell 5.1. No Bash or jq is needed on Windows.
 
-Open a terminal in the folder where you want to keep this repo. If already cloned,
-open that checkout and skip `git clone` and the directory-change command.
+Clone once, then run your host's commands below from this checkout.
+
+**macOS / Linux**
+
+```sh
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+cd ai-agent-skills
+```
+
+**Windows**
+
+```powershell
+git clone https://github.com/TylerAkins/ai-agent-skills.git
+Set-Location ai-agent-skills
+```
+
+For an existing checkout, skip cloning. Before updating, run `git pull --ff-only`
+once, then use your host's update command below. Skills-only updates use merge to
+preserve unrelated skill folders; plugin updates replace the plugin with a backup.
 
 <a id="cursor"></a>
 <details>
@@ -25,16 +78,12 @@ open that checkout and skip `git clone` and the directory-change command.
 ### Install on macOS / Linux
 
 ```sh
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor cursor
 ```
 
 ### Install on Windows
 
 ```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor cursor
 ```
 
@@ -55,14 +104,12 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-git pull --ff-only
 bash scripts/install-ai-agent-skills.sh update --flavor cursor
 ```
 
 **Windows**
 
 ```powershell
-git pull --ff-only
 ./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor
 ```
 
@@ -77,16 +124,12 @@ Confirm replacement, reload Cursor, and start a new chat.
 ### Install on macOS / Linux
 
 ```sh
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor codex-desktop
 ```
 
 ### Install on Windows
 
 ```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor codex-desktop
 ```
 
@@ -107,14 +150,12 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-git pull --ff-only
 bash scripts/install-ai-agent-skills.sh update --flavor codex-desktop
 ```
 
 **Windows**
 
 ```powershell
-git pull --ff-only
 ./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor codex-desktop
 ```
 
@@ -133,16 +174,12 @@ For project skills or a separate marketplace root, see
 ### Install on macOS / Linux
 
 ```sh
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor claude
 ```
 
 ### Install on Windows
 
 ```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor claude
 ```
 
@@ -173,14 +210,12 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-git pull --ff-only
 bash scripts/install-ai-agent-skills.sh update --flavor claude
 ```
 
 **Windows**
 
 ```powershell
-git pull --ff-only
 ./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor claude
 ```
 
@@ -197,16 +232,12 @@ Replace the example project path below with your existing project directory.
 ### Install on macOS / Linux
 
 ```sh
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
 ```
 
 ### Install on Windows
 
 ```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
 ```
 
@@ -225,14 +256,12 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-git pull --ff-only
 bash scripts/install-ai-agent-skills.sh update --flavor copilot-skills --project /absolute/path/to/project --merge
 ```
 
 **Windows**
 
 ```powershell
-git pull --ff-only
 ./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor copilot-skills -Project 'C:/path/to/project' -Merge
 ```
 
@@ -250,16 +279,12 @@ a marketplace. See [alternate installations](docs/installer-reference.md#alterna
 ### Install on macOS / Linux
 
 ```sh
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor opencode-global
 ```
 
 ### Install on Windows
 
 ```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor opencode-global
 ```
 
@@ -276,14 +301,12 @@ Run from this checkout:
 **macOS / Linux**
 
 ```sh
-git pull --ff-only
 bash scripts/install-ai-agent-skills.sh update --flavor opencode-global --merge
 ```
 
 **Windows**
 
 ```powershell
-git pull --ff-only
 ./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-global -Merge
 ```
 
@@ -293,6 +316,138 @@ For installation in one project only, see
 [alternate installations](docs/installer-reference.md#alternate-installations).
 
 </details>
+
+<a id="gemini"></a>
+<details>
+<summary><strong>Gemini CLI</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor gemini-global
+```
+
+### Install on Windows
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor gemini-global
+```
+
+### Activate and check
+
+Skills are installed in `~/.gemini/skills` for use across projects.
+In Gemini CLI, run `/skills reload` and `/skills list`. Request `agent-planning`. See [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/).
+
+### Update
+
+Run from this checkout:
+
+```sh
+bash scripts/install-ai-agent-skills.sh update --flavor gemini-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor gemini-global -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills.
+Reload the host's skills after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="muse"></a>
+<details>
+<summary><strong>Muse Code</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor muse-global
+```
+
+### Install on Windows
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor muse-global
+```
+
+### Activate and check
+
+Skills are installed in `~/.agents/skills` for use across projects.
+In Muse Code, run `/skills reload`, then check `muse skills list` from a terminal.
+Invoke `/agent-planning` in the session. See [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
+
+### Update
+
+Run from this checkout:
+
+```sh
+bash scripts/install-ai-agent-skills.sh update --flavor muse-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor muse-global -Merge
+```
+
+Merge replaces this collection's skill folders and preserves unrelated skills.
+Reload the host's skills after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+<a id="antigravity"></a>
+<details>
+<summary><strong>Google Antigravity</strong></summary>
+
+### Install on macOS / Linux
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor antigravity-global
+```
+
+### Install on Windows
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor antigravity-global
+```
+
+The global flavor installs to `~/.gemini/config/skills` for the Antigravity app
+and standalone IDE. For the CLI, use `antigravity-cli-global` instead; it installs
+to `~/.gemini/antigravity-cli/skills`. These are separate installations.
+
+### Activate and check
+
+Start a new session and invoke `/agent-planning`. In the standalone IDE, inspect
+active skills through the agent side panel's **Customizations** menu. See
+[Antigravity skill locations and invocation](https://antigravity.google/docs/skills).
+File placement alone does not establish that the host loaded a skill.
+
+### Update
+
+Run from this checkout:
+
+```sh
+bash scripts/install-ai-agent-skills.sh update --flavor antigravity-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor antigravity-global -Merge
+```
+
+Use `antigravity-cli-global` in the update command for the CLI installation.
+Merge preserves unrelated skills and replaces this collection's skill folders.
+Start a new session after updating. For project installation, see
+[alternate installations](docs/installer-reference.md#alternate-installations).
+
+</details>
+
+The `.agents/skills` directory used by Muse and Antigravity project installations
+is shared with other agents that discover it.
+Installing or updating there changes the collection those agents read too.
+The new flavors require a release containing `ai-agent-skills-skills`; older
+releases do not include that archive. For an unpublished local checkout, use
+[manual installation](docs/installer-reference.md#source-builds-and-manual-installation).
 
 Release installs use checksum-verified bundles and retain backups when replacing
 existing files. Updates can replace local customizations. See
@@ -326,7 +481,7 @@ GitHub reviews and approvals are never dismissed.
 ## Skills
 
 <details>
-<summary><strong>Browse all 19 skills</strong></summary>
+<summary><strong>Browse all 22 skills</strong></summary>
 
 ### Clarify and Plan
 
@@ -344,6 +499,7 @@ GitHub reviews and approvals are never dismissed.
 | [writing-clean-simple-code](skills/writing-clean-simple-code/SKILL.md) | Implement and refactor with clear ownership and justified abstractions. |
 | [frontend-engineering](skills/frontend-engineering/SKILL.md) | Build responsive, accessible interfaces and verify interactions. |
 | [root-cause-debug](skills/root-cause-debug/SKILL.md) | Diagnose supported causes and verify repairs. |
+| [writing-optimized-sql](skills/writing-optimized-sql/SKILL.md) | Write and tune SQL across major engines with correctness and performance evidence. |
 | [test-authoring](skills/test-authoring/SKILL.md) | Write meaningful behavioral and regression coverage. |
 
 ### Review and Collaborate
@@ -368,7 +524,9 @@ GitHub reviews and approvals are never dismissed.
 
 | Skill | Purpose |
 | --- | --- |
+| [explain-it](skills/explain-it/SKILL.md) | Explain unfamiliar material simply, with concise summaries and accurate examples. |
 | [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
+| [skill-authoring](skills/skill-authoring/SKILL.md) | Author, evaluate, and register engineering skills with verified packages. |
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
 | [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
 

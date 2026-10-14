@@ -159,7 +159,7 @@ func Validate(root, target string) ([]string, error) {
 		mpath = ".claude-plugin/plugin.json"
 	}
 	var m Manifest
-	if target != "opencode" {
+	if target != "opencode" && target != "skills" {
 		m, err = manifest(root, mpath)
 		if err != nil {
 			return nil, err
@@ -346,7 +346,7 @@ func Build(root, out, target string) error {
 	if target == "claude" {
 		components = []string{"skills", "LICENSE", ".claude-plugin", "agents"}
 	}
-	if target == "opencode" {
+	if target == "opencode" || target == "skills" {
 		components = []string{"skills", "LICENSE"}
 	}
 	for _, component := range components {
@@ -385,7 +385,7 @@ func Build(root, out, target string) error {
 
 func packageTarget(target string) bool {
 	switch target {
-	case "cursor", "codex", "claude", "copilot", "opencode":
+	case "cursor", "codex", "claude", "copilot", "opencode", "skills":
 		return true
 	}
 	return false

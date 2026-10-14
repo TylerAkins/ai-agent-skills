@@ -21,8 +21,11 @@ they do not install dependencies, authorize new actions, or spawn agents.
 | Build an accepted plan through verification and final review | [implement-plan](../implement-plan/SKILL.md) |
 | Implement or simplify code | [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md) |
 | Diagnose and repair unexpected behavior | [root-cause-debug](../root-cause-debug/SKILL.md) |
+| Write, review, or optimize SQL queries and procedures | [writing-optimized-sql](../writing-optimized-sql/SKILL.md) |
 | Write behavioral tests | [test-authoring](../test-authoring/SKILL.md) |
 | Design shared contracts | [api-design](../api-design/SKILL.md) |
+| Author, refine, or package agent skills | [skill-authoring](../skill-authoring/SKILL.md) |
+| Explain concepts, code, documents, or decisions simply | [explain-it](../explain-it/SKILL.md) |
 | Write documentation or decision records | [technical-documentation](../technical-documentation/SKILL.md) |
 | Build or improve UI | [frontend-engineering](../frontend-engineering/SKILL.md) |
 | Review code, plans, or PRs | [code-review](../code-review/SKILL.md) |

@@ -100,6 +100,64 @@ Start a new OpenCode session in that project and request a skill. To update, add
 </details>
 
 <details>
+<summary><strong>Gemini CLI or Muse Code in one project</strong></summary>
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor gemini-project --project /absolute/path/to/project
+bash scripts/install-ai-agent-skills.sh --flavor muse-project --project /absolute/path/to/project
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor gemini-project -Project 'C:/path/to/project'
+./scripts/install-ai-agent-skills.ps1 -Flavor muse-project -Project 'C:/path/to/project'
+```
+
+Choose the command for your host. To update, use `update` / `-Action Update` and
+`--merge` / `-Merge` with the same project path. Gemini uses `.gemini/skills`;
+Muse uses `.agents/skills`, which is also read by other compatible agents.
+Muse and Codex project flavors share a destination; use explicit merge when one
+is already installed rather than trying a second ordinary install.
+
+In Gemini CLI, run `/skills reload` and `/skills list`. In Muse Code, reload with
+`/skills reload` and check `muse skills list --source project` in a workspace you
+have trusted through the host's prompt. The installer does not grant workspace
+trust. See [Gemini skill management](https://geminicli.com/docs/cli/using-agent-skills/)
+and [Muse skill discovery](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
+
+Both hosts use the `ai-agent-skills-skills` release archive. Releases predating
+this archive cannot supply these flavors. Use a release containing it, explicit
+source mode after the change reaches remote `main`, or manual installation from
+a local checkout. Global flavors and their activation
+steps are in the [README](../README.md#install).
+
+</details>
+
+<details>
+<summary><strong>Google Antigravity in one project</strong></summary>
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor antigravity-project --project /absolute/path/to/project
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor antigravity-project -Project 'C:/path/to/project'
+```
+
+The app, standalone IDE, and CLI discover project skills in `.agents/skills`.
+This shares a destination with Codex and Muse project flavors. For an existing
+installation, use explicit `--merge` / `-Merge`; for updates, also use `update` /
+`-Action Update`. Start a new Antigravity session and invoke `/agent-planning`.
+See [Antigravity skills](https://antigravity.google/docs/skills).
+
+Global installation differs by surface: `antigravity-global` targets the app/IDE,
+while `antigravity-cli-global` targets the CLI. See the
+[README](../README.md#antigravity) for global install and update commands.
+All Antigravity flavors use the shared `ai-agent-skills-skills` archive and need
+a release containing it. Use manual installation for an unpublished local checkout.
+
+</details>
+
+<details>
 <summary><strong>Copilot plugin staging</strong></summary>
 
 ```sh
@@ -154,6 +212,13 @@ an interactive terminal lists the choices and asks you to select one.
 | `codex-skills` | `$PROJECT/.agents/skills` |
 | `opencode-project` | `$PROJECT/.opencode/skills` |
 | `opencode-global` | `~/.config/opencode/skills` |
+| `gemini-project` | `$PROJECT/.gemini/skills` |
+| `gemini-global` | `~/.gemini/skills` |
+| `muse-project` | `$PROJECT/.agents/skills` |
+| `muse-global` | `~/.agents/skills` |
+| `antigravity-project` | `$PROJECT/.agents/skills` |
+| `antigravity-global` | `~/.gemini/config/skills` (app/IDE) |
+| `antigravity-cli-global` | `~/.gemini/antigravity-cli/skills` (CLI) |
 | `list` | No installation |
 
 Project paths must exist and be absolute; marketplace roots must be absolute.
@@ -197,6 +262,9 @@ all folders inside this checkout's `skills/` to your project's skills directory:
 | Cursor or Codex | `.agents/skills/` |
 | Copilot | `.github/skills/` |
 | OpenCode | `.opencode/skills/` |
+| Gemini CLI | `.gemini/skills/` |
+| Muse Code | `.agents/skills/` |
+| Antigravity app, IDE, or CLI | `.agents/skills/` |
 
 Keep sibling skills and supporting resources together, compare conflicts, and do
 not copy the repository's `AGENTS.md` as installation instructions. Manual copies

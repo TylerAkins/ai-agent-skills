@@ -76,6 +76,39 @@ repair. Confirm prerequisites, permissions, expected recovery time when measured
 and irreversible boundaries. Rehearse safely when authorized; label untested procedures.
 Do not claim that reverting a commit or deploying an old binary reverses data changes.
 
+## Evidence Block
+
+Before opening a PR or creating a release tag, run these checks against the exact
+candidate and display a Markdown evidence block containing the revision, working
+directory, each command, actual output, and exit code. Run the commands rather than
+copying example output or treating earlier confidence as evidence.
+
+```text
+Evidence
+Candidate: <actual git revision>
+Working directory: <actual path>
+$ git status --porcelain
+<actual output, explicitly label empty output>
+Exit code: <actual code>
+$ <project linter/typechecker command(s)>
+<actual output>
+Exit code: <actual code>
+$ <project test runner command>
+<actual output and executed test count>
+Exit code: <actual code>
+```
+
+The transition requires empty `git status --porcelain` output, exit code 0 from
+all configured project lint/type checks, and exit code 0 with zero test failures
+and actual tests executed. Identify commands from repository configuration and CI.
+If a required checker or runner is absent or unavailable, record the missing check
+and leave the gate blocked. Candidate changes invalidate affected evidence.
+
+Preserve unrelated dirty or untracked files. Use a verified clean isolated checkout
+of the candidate when needed; never discard files or create an unauthorized commit
+to make status clean. Record the checkout identity in the block. Passing this gate
+does not authorize commits, PR publication, tagging, or release execution.
+
 ## Execute Only the Authorized Stages
 
 Immediately before execution, recheck candidate identity, current environment state,

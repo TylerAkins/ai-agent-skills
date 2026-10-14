@@ -1,6 +1,6 @@
 # Prepare a Release
 
-The release workflow builds all five host bundles and creates a GitHub draft
+The release workflow builds five host bundles plus the shared skills bundle and creates a GitHub draft
 release with SHA-256 checksums and the source commit. It does not publish the
 release or submit marketplace listings.
 
@@ -21,7 +21,7 @@ current `main` commit (for example when retrying after a failed draft job).
 
 On `main`, open Actions, select **Prepare release**, and run the workflow with
 no inputs. The read-only build job reads the manifest version on `main`, runs
-tests and vet, validates the collection, and packages the five hosts. A separate
+tests and vet, validates the collection, and packages all six distribution targets. A separate
 job uploads artifacts and uses `contents: write` to create tag `v{version}` at
 that commit (if needed) and a draft GitHub release.
 

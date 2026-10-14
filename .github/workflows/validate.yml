@@ -55,9 +55,15 @@ jobs:
         run: go vet ./...
       - name: Validate source
         run: go run ./cmd/skillpack
+      - name: Check Open Skills CLI discovery
+        env:
+          DISABLE_TELEMETRY: '1'
+        run: |
+          node --version
+          npx --yes skills@1.7.2 add . --list
       - name: Build and validate host packages
         run: |
-          for host in cursor codex claude copilot opencode; do
+          for host in cursor codex claude copilot opencode skills; do
             printf '::group::Build %s package\n' "$host"
             go run ./cmd/skillpack -target "$host" -out "$RUNNER_TEMP/$host-package"
             printf '::endgroup::\n'

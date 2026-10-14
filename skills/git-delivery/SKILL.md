@@ -52,6 +52,39 @@ succeeded or amend an earlier commit to recover from a failed attempt.
 After committing, verify the commit contents and working state. Report the actual
 result without implying unrelated working changes were included or removed.
 
+## Evidence Block
+
+Before opening a PR or creating a release tag, run these checks against the exact
+candidate and display a Markdown evidence block containing the revision, working
+directory, each command, actual output, and exit code. Run the commands rather than
+copying example output or treating earlier confidence as evidence.
+
+```text
+Evidence
+Candidate: <actual git revision>
+Working directory: <actual path>
+$ git status --porcelain
+<actual output, explicitly label empty output>
+Exit code: <actual code>
+$ <project linter/typechecker command(s)>
+<actual output>
+Exit code: <actual code>
+$ <project test runner command>
+<actual output and executed test count>
+Exit code: <actual code>
+```
+
+The transition requires empty `git status --porcelain` output, exit code 0 from
+all configured project lint/type checks, and exit code 0 with zero test failures
+and actual tests executed. Identify commands from repository configuration and CI.
+If a required checker or runner is absent or unavailable, record the missing check
+and leave the gate blocked. Candidate changes invalidate affected evidence.
+
+Preserve unrelated dirty or untracked files. Use a verified clean isolated checkout
+of the candidate when needed; never discard files or create an unauthorized commit
+to make status clean. Record the checkout identity in the block. Passing this gate
+does not authorize commits, PR publication, tagging, or release execution.
+
 ## PR Descriptions and Remote Actions
 
 For titles, descriptions, or PR creation, read

@@ -61,7 +61,7 @@ case "$flavor" in
     source_path="./plugins/ai-agent-skills" ;;
   claude) host=claude; destination="$HOME/.local/share/ai-agent-skills/claude" ;;
   copilot-staging) host=copilot; destination="$HOME/.local/share/ai-agent-skills/copilot" ;;
-  copilot-skills|codex-skills|opencode-project)
+  copilot-skills|codex-skills|opencode-project|gemini-project|muse-project|antigravity-project)
     [ -n "$project" ] || fail "Use --project with the full path to an existing project."
     require_absolute "$project"
     [ -d "$project" ] || fail "Project directory does not exist: $project"
@@ -70,8 +70,14 @@ case "$flavor" in
       copilot-skills) host=copilot; destination="$project/.github/skills" ;;
       codex-skills) host=codex; destination="$project/.agents/skills" ;;
       opencode-project) host=opencode; destination="$project/.opencode/skills" ;;
+      gemini-project) host=skills; destination="$project/.gemini/skills" ;;
+      muse-project|antigravity-project) host=skills; destination="$project/.agents/skills" ;;
     esac ;;
   opencode-global) skills_only=true; host=opencode; destination="$HOME/.config/opencode/skills" ;;
+  gemini-global) skills_only=true; host=skills; destination="$HOME/.gemini/skills" ;;
+  muse-global) skills_only=true; host=skills; destination="$HOME/.agents/skills" ;;
+  antigravity-global) skills_only=true; host=skills; destination="$HOME/.gemini/config/skills" ;;
+  antigravity-cli-global) skills_only=true; host=skills; destination="$HOME/.gemini/antigravity-cli/skills" ;;
   *) fail "Unknown flavor: $flavor. Use --flavor list." ;;
 esac
 require_absolute "$HOME"
@@ -139,6 +145,9 @@ case "$flavor" in
   codex-marketplace) printf 'In the app, add a plugin marketplace with this full source path: %s\n' "$marketplace_root" ;;
   claude) printf 'Launch Claude Code with: claude --plugin-dir "%s"\n' "$destination" ;;
   copilot-staging) printf 'This stages the bundle only. Copilot needs a marketplace under Customize > Plugins.\nSee https://docs.github.com/en/copilot/concepts/agents/about-plugins\n' ;;
+  antigravity-*) printf 'Start a new Antigravity session and invoke /agent-planning. In the IDE, inspect skills in the Customizations menu.\n' ;;
+  gemini-*) printf 'In Gemini CLI, run /skills reload and /skills list, then request a skill.\n' ;;
+  muse-*) printf 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.\n' ;;
   *) printf 'Start a new host session and check for the installed skills.\n' ;;
 esac
 printf 'For updates, refresh/reinstall the host plugin if its cached copy remains stale.\n'
