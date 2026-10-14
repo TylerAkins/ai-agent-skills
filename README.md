@@ -6,8 +6,39 @@ consistent workflows and explicit authorization.
 
 ## Install
 
-Expand your host below. Each section includes installation, activation, and updates.
-The helpers download the latest published release; Go is not required.
+Choose a distribution path:
+
+| Open Skills CLI (`npx skills`) | Native Shell Installers |
+| --- | --- |
+| Universal skill installation for Cursor, Claude Code, Windsurf, Codex, and other supported agents without manually cloning this repository. Requires Node.js/npm and Git. | Use `scripts/install-ai-agent-skills.sh` or `scripts/install-ai-agent-skills.ps1` without Node.js or Go. Downloads the latest published host package using native platform tools. |
+| Installs skill folders and their supporting resources. | Includes the host package's routing and reviewer configuration where supported. |
+
+### Open Skills CLI
+
+Run from your target project directory:
+
+```sh
+npx skills add TylerAkins/ai-agent-skills
+```
+
+Select your agents and skills interactively. To list skills or select one by name:
+
+```sh
+npx skills add TylerAkins/ai-agent-skills --list
+npx skills add TylerAkins/ai-agent-skills --skill test-authoring
+```
+
+Skills link to other skills in this collection. Install the collection when you
+need those workflows; a single skill retains its own `references/` resources but
+does not install sibling skills automatically. See the
+[Open Skills CLI documentation](https://github.com/vercel-labs/skills) for supported
+agents, global installation, and updates.
+
+### Native Shell Installers
+
+Expand your host below for installation, activation, and updates. These installers
+use Bash on macOS/Linux or PowerShell on Windows with the prerequisites below;
+they do not require a Node.js runtime or additional language package installation.
 
 Install the host app and Git first. On **macOS/Linux**, you also need Bash, curl,
 tar, shasum, and jq. macOS includes Bash, curl, tar, and shasum; with Homebrew,

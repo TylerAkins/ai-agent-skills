@@ -106,3 +106,14 @@ For GitHub reviews, read [GitHub review delivery](references/github-review.md).
 Keep the investigation report in chat and concrete findings inline. Present the
 exact verdict, body, comments, and destinations before posting. Review requests
 do not authorize unseen publication or pending review uploads.
+
+## Anti-Rationalization Guardrails
+
+These rules govern phase transitions. Missing evidence leaves the gate incomplete;
+do not substitute a declaration of confidence or silently waive a requirement.
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| The linter passed, so no review comments are needed. | Trace changed behavior, contracts, consumers, and failure paths before issuing a verdict. Lint output cannot satisfy review coverage. |
+| A small PR needs no scrutiny. | Review the complete candidate against authoritative intent regardless of diff size. Report unavailable coverage as incomplete. |
+| Style inconsistency is fine. | Check applicable repository conventions and address supported violations proportionally. Distinguish maintenance risks from optional preferences; do not invent blockers. |
