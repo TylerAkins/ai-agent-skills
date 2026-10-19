@@ -95,13 +95,17 @@ and re-review requests separately; text approval does not authorize those action
 
 Before approved external writes, read [reply publication](references/publication.md).
 Report actual repairs, checks, independent review limits, remaining feedback, and
-publication state in chat. Never dismiss reviews or publish the chat report as an
-extra PR comment.
+publication state in chat. After replies post, state each substantive thread's
+disposition: a proposed resolution with its reason awaiting separate approval, or
+the open question or unsettled disagreement that keeps it open. Unstated
+dispositions leave the delivery incomplete. Never dismiss reviews or publish the
+chat report as an extra PR comment.
 
 ## Anti-Rationalization Guardrails
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
 | A won't-fix reply resolves the thread. | Perform the approved resolution mutation with the supported reason and verify `isResolved`; a reply alone changes neither state nor reason. |
+| The replies posted, so the threads are handled. | A posted reply is not a resolution or completion. State each thread's disposition: a proposed resolution with its reason awaiting separate approval, or the reason it stays open. |
 | All disagreements must stay open forever. | Keep unsettled decisions open; an approved decision not to fix can resolve as `WONT_FIX`, and a disproven concern can resolve as `INVALID`. |
 | The connector resolves threads, so it can select every reason. | Inspect its schema; use a verified reason-capable API when needed and report unsupported reasons instead of silently substituting one. |
