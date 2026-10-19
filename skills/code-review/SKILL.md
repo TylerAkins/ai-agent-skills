@@ -25,7 +25,8 @@ Pin the target before judging it:
   unstaged, and untracked files. Do not confuse the working tree with committed HEAD.
 - For a GitHub PR, resolve the repository, number, author, head SHA, base SHA,
   merge base, changed files, and linked requirements. Read the exact candidate and
-  affected unchanged consumers.
+  affected unchanged consumers, swept by import and usage sites of each changed
+  file, including components, not only by callers of changed symbols.
 - For a plan, identify its version and source requirements. Inspect the repository
   to verify proposed paths, interfaces, dependencies, and verification commands.
 
@@ -69,6 +70,13 @@ or demonstrable maintenance risk introduced or exposed by the change. Include a
 supported location, trigger, consequence, and evidence. Distinguish unrelated
 existing defects from paths newly activated by the candidate. State required
 behavior or a minimal correction when known; do not invent an implementation.
+
+A cleared path and a stated correction carry the same evidence duty as a finding.
+Compute the dates, counts, offsets, or boundaries a clearance depends on, and trace
+the consumers a correction changes, especially null returns, clamps, throws, and
+fallbacks, which shift control flow. Show the worked values or named consumers in
+chat when the verdict rests on the clearance or correction, or label the path
+unverified.
 
 Use impact to distinguish feedback:
 
@@ -116,4 +124,5 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | --- | --- |
 | The linter passed, so no review comments are needed. | Trace changed behavior, contracts, consumers, and failure paths before issuing a verdict. Lint output cannot satisfy review coverage. |
 | A small PR needs no scrutiny. | Review the complete candidate against authoritative intent regardless of diff size. Report unavailable coverage as incomplete. |
+| The trace found nothing wrong. | Tracing establishes coverage, not correctness. Compute the dates, counts, offsets, or boundaries the clearance depends on and show them, or record the path as unverified. |
 | Style inconsistency is fine. | Check applicable repository conventions and address supported violations proportionally. Distinguish maintenance risks from optional preferences; do not invent blockers. |
