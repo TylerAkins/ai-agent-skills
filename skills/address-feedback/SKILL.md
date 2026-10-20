@@ -85,7 +85,10 @@ Draft one direct reply per substantive thread, usually 1–3 sentences explainin
 the verified change, evidence-based disagreement, or specific clarification needed.
 Include necessary technical detail without praise, formulaic apologies, headings,
 investigation narration, or repeated test summaries. Link a commit only after
-verifying its remote existence and that it contains the relevant fix.
+verifying its remote existence and that it contains the relevant fix. Do not
+hard-wrap reply prose to a fixed column width or character limit; keep each paragraph
+continuous and let GitHub wrap it to the reader's display. Preserve line breaks
+required for Markdown structure.
 
 Show exact replies with PR/thread destinations. Keep incomplete examples out of
 posting approval requests. When offering complete replies for publication, ask

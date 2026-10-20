@@ -9,6 +9,12 @@ behavior, real ticket when present, and verification actually performed.
 
 ## Write Proportionally
 
+Do not hard-wrap prose to a fixed column width or character limit. Keep each
+paragraph as one continuous Markdown paragraph and let GitHub wrap it to the
+reader's display. Host or editor line-length defaults, including OpenCode defaults,
+do not apply to PR prose. Preserve line breaks required for Markdown structure,
+such as headings, list items, table rows, and fenced code.
+
 Without a required template, default to this structure:
 
 ```markdown

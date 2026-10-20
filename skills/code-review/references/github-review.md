@@ -17,6 +17,9 @@ Use verified diff coordinates: `RIGHT` for new lines and `LEFT` for deletions.
 Anchor an unchanged-file issue only on a changed line causing or participating in
 it, naming the actual affected file. Never use an unrelated line to satisfy the API.
 Keep the author mention in the body, not each inline comment.
+Do not hard-wrap inline comment prose to a fixed column width or character limit;
+keep each comment paragraph continuous and let GitHub wrap it to the reader's display.
+Preserve line breaks required for Markdown structure.
 
 Do not duplicate an existing finding merely to make a payload nonempty. If a
 finding has no truthful anchor or existing thread, retain it in chat and keep
@@ -52,6 +55,8 @@ existing feedback; do not imply new inlines when there are none. Add no headings
 summaries, checklists, CI recaps, praise, limitations, or extra conversation comment.
 Keep material verification limits in chat. Only a direct user request for a
 different published format overrides this contract; ordinary posting approval does not.
+Do not hard-wrap the review body to a fixed column width or character limit. Keep it
+as one continuous paragraph and let GitHub wrap it to the reader's display.
 
 ## Approval and Publication
 

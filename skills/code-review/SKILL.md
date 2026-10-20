@@ -103,7 +103,9 @@ impact, evidence, and required behavior or correction. Use supported file links,
 backticks for identifiers, and language-tagged fences only when code helps.
 Omit praise, filler, em dashes, investigation narration, and generic test reminders.
 A test or documentation finding must name the uncovered behavior or incorrect claim
-and its consequence.
+and its consequence. Do not hard-wrap finding prose to a fixed column width or
+character limit; keep each paragraph on one continuous source line and let GitHub
+wrap it to the reader's display. Preserve line breaks required for Markdown structure.
 
 For local reviews, lead with blocking issues, non-blocking notes, no findings, or
 incomplete review as supported. Give findings and material limits. With no findings,
