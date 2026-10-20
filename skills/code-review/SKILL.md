@@ -35,17 +35,20 @@ not author reasoning, self-review, proposed findings, or the implementation plan
 proof. If implementation reasoning is already in context, use a fresh reviewer
 when available and authorized; otherwise disclose the independence limit.
 
-## Investigate in Two Passes
+## Three-Phase Review
+
+### Phase 1: Candidate Issue Discovery
 
 First reconcile requirements with behavior. Look for missing, incorrect, and
 unauthorized behavior. Verify requirements already satisfied by unchanged code;
-do not require a diff merely because a plan lists an implementation task.
+do not require a diff merely because a plan lists an implementation task. Treat
+every concern discovered in this phase as an unverified hypothesis. Do not draft
+or announce blockers during discovery.
 
 Then use the [five-axis rubric](references/review-rubric.md) to inspect correctness,
 readability, architecture, security, and performance. Trace actual execution paths,
 callers, consumers, configuration, failure handling, and relevant tests. Verify
-unfamiliar APIs against installed dependency versions. Seek counterexamples to
-suspected defects before reporting them.
+unfamiliar APIs against installed dependency versions.
 
 For plans, apply the rubric to the proposed behavior and design. Check dependency
 order, shared contracts, unresolved decisions, acceptance criteria, and whether
@@ -63,20 +66,61 @@ conversation comments. Verify earlier findings against the current candidate.
 Deduplicate new comments while retaining still-valid unresolved blockers. Partial
 retrieval and open-thread counts do not establish complete feedback coverage.
 
+### Phase 2: Mandatory Adversarial Verification
+
+Before assigning blocker status to a candidate, make a separate verification pass
+for that concern. State the strongest plausible author defense, then inspect the
+source that could confirm or refute it. Depending on the concern, this may include
+macro definitions and expansion, runtime control flow, schemas, public contracts,
+tests exercising the path, and peer implementations in the same repository. Treat
+author explanations and tests as evidence to check, not as proof by themselves.
+
+A blocker requires all of the following:
+
+- A specific changed location and reachable trigger.
+- The exact changed code and relevant macro or runtime definition whose behavior,
+  under the described trigger, demonstrably fails, violates a named contract, or
+  produces invalid data.
+- A causal explanation connecting that behavior to a material consequence.
+- Evidence that addresses the strongest plausible defense or establishes why it
+  does not apply.
+
+Do not promote an inference about an unverified consumer, a speculative downstream
+effect, or a stylistic preference to blocker status. If a concern is useful but not
+fully proved, demote it to a non-blocking note or question and name the missing
+evidence. Drop concerns with no useful action or question. If required evidence
+cannot be obtained, leave the path unverified and do not issue a clean approval when
+that gap makes review coverage incomplete.
+
+Apply the same evidence duty to a cleared path and a proposed correction. Compute
+dates, counts, offsets, or boundaries used in the decision, and trace consumers
+affected by control-flow changes such as null returns, clamps, throws, or fallbacks.
+Show worked values or named consumers in chat when the verdict depends on them, or
+label the path unverified.
+
+### Phase 3: Calibrated Verdict and Report
+
+Set the baseline to `APPROVE` when review coverage is complete, the implementation
+fits supported repository patterns, relevant checks pass, and no actionable feedback
+remains. Passing tests support this assessment but do not replace source and contract
+verification. Use `COMMENT` for actionable non-blocking feedback and
+`REQUEST_CHANGES` only for verified blockers. Incomplete coverage prevents a clean
+approval.
+
+In the chat report, summarize high-level architectural impact, list verified
+blockers with their failure proof, and place non-blocking observations under Notes /
+Questions. State material verification limits. For GitHub, keep the fixed review-body
+contract and put the investigation report in chat; inline comments must carry the
+verified evidence and consequence. Read [GitHub review delivery](references/github-review.md).
+
 ## Finding Bar and Verdict
 
 Retain a finding only when evidence supports a concrete failure, contract violation,
-or demonstrable maintenance risk introduced or exposed by the change. Include a
-supported location, trigger, consequence, and evidence. Distinguish unrelated
-existing defects from paths newly activated by the candidate. State required
+or demonstrable maintenance risk introduced or exposed by the change. A maintenance
+risk alone is non-blocking. A blocker must satisfy the Phase 2 proof requirements.
+Include a supported location, trigger, consequence, and evidence. Distinguish
+unrelated existing defects from paths newly activated by the candidate. State required
 behavior or a minimal correction when known; do not invent an implementation.
-
-A cleared path and a stated correction carry the same evidence duty as a finding.
-Compute the dates, counts, offsets, or boundaries a clearance depends on, and trace
-the consumers a correction changes, especially null returns, clamps, throws, and
-fallbacks, which shift control flow. Show the worked values or named consumers in
-chat when the verdict rests on the clearance or correction, or label the path
-unverified.
 
 Use impact to distinguish feedback:
 
@@ -105,10 +149,9 @@ Omit praise, filler, em dashes, investigation narration, and generic test remind
 A test or documentation finding must name the uncovered behavior or incorrect claim
 and its consequence.
 
-For local reviews, lead with blocking issues, non-blocking notes, no findings, or
-incomplete review as supported. Give findings and material limits. With no findings,
-use a short verdict; omit routine Summary/Findings/Verification sections and CI recaps
-unless a detailed report was requested.
+For local review reports, always use the Summary, Blockers, and Notes / Questions
+structure, keeping empty sections brief. State incomplete coverage and material
+limits. Omit routine CI recaps.
 
 For GitHub reviews, read [GitHub review delivery](references/github-review.md).
 Keep the investigation report in chat and concrete findings inline. Present the
@@ -126,3 +169,6 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | A small PR needs no scrutiny. | Review the complete candidate against authoritative intent regardless of diff size. Report unavailable coverage as incomplete. |
 | The trace found nothing wrong. | Tracing establishes coverage, not correctness. Compute the dates, counts, offsets, or boundaries the clearance depends on and show them, or record the path as unverified. |
 | Style inconsistency is fine. | Check applicable repository conventions and address supported violations proportionally. Distinguish maintenance risks from optional preferences; do not invent blockers. |
+| The suspicious line looks wrong, so it must be a blocker. | Treat it as a hypothesis. Check the strongest author defense and actual macro/runtime path; require causal evidence before assigning blocker status. |
+| A plausible consumer might reject this value. | Verify the consumer and contract. If downstream behavior is unavailable or inferred, report a question or leave the path unverified, not a blocker. |
+| A confident explanation is enough to clear or confirm a concern. | Cite source behavior, trigger, and consequence. Confidence, reviewer instinct, and author intent do not satisfy the proof gate. |
