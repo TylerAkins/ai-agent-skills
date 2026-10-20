@@ -56,6 +56,11 @@ description: >-
 - Use ordinary punctuation. Avoid decorative arrows, Unicode bullets, ornamental
   separators, emoji, repeated exclamation marks, and ellipses used for dramatic
   effect. Use standard Markdown lists when a list helps.
+- For GitHub PR descriptions, review bodies, inline comments, and thread replies,
+  keep prose paragraphs continuous instead of hard-wrapping to a fixed width or
+  character limit. Let GitHub wrap them to the reader's display. Host or editor
+  line-length defaults, including OpenCode, do not apply. Preserve Markdown
+  structure such as headings, list items, tables, and fenced code.
 - Prefer direct sentences over rhetorical questions, sentence fragments used for
   emphasis, and formulaic contrasts such as "This isn't about X. It's about Y."
 - Remove stock openers and closers such as "Great question," "Absolutely," "Let's
