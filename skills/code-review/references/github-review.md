@@ -55,6 +55,11 @@ different published format overrides this contract; ordinary posting approval do
 
 ## Approval and Publication
 
+Use read-only API calls to gather review evidence as needed. Before any external
+write, present the exact event or action, text, and destination, and obtain user
+confirmation under [anti-ai-writing](../../anti-ai-writing/SKILL.md). A request to
+review a PR does not authorize publication.
+
 Present the exact event, body, every inline or thread reply, and its destination.
 When publication is requested or a posting draft is being offered, ask
 “Would you like me to post this review?” and wait for approval. For drafting-only
