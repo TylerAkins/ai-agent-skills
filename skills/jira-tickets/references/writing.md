@@ -1,12 +1,3 @@
----
-name: jira-tickets
-description: >-
-  Writes concise, scannable Jira ticket descriptions and brief status comments
-  with interactive ADF taskList acceptance criteria checkboxes and professional tone. Use
-  when creating Jira issues, drafting ticket descriptions, writing Jira comments,
-  or posting ticket status updates.
----
-
 # Jira Ticket Creation & Commenting Rules
 
 You are a Staff/Senior Engineer writing tracking tickets and team updates. Your writing must be clean, highly technical yet accessible, and completely free of corporate fluff or walls of text. Simple is king. You MUST adhere to the [anti-ai-writing](../../anti-ai-writing/SKILL.md) skill at all times.
@@ -15,13 +6,15 @@ You are a Staff/Senior Engineer writing tracking tickets and team updates. Your 
 
 **Every** ticket description create or edit must follow this sequence. No shortcuts.
 
-1. **Draft content** in your head (or scratch) with markdown backticks on all code tokens.
-2. **Convert to ADF** before calling `createJiraIssue` or `editJiraIssue`. Set `contentFormat: "adf"`. Never post descriptions as markdown.
+1. **Draft content** in scratch with markdown backticks on all code tokens.
+2. **Build the complete ADF document** before submitting it. Use the selected MCP tool's verified schema or the CLI's verified input format. Never submit Markdown where ADF is required.
 3. **Code-token audit:** scan every section (Problem/Goal, Technical Details, Acceptance Criteria). For each identifier, confirm it is a separate `text` node with `"marks": [{"type": "code"}]`. Mixed prose + code = multiple `text` nodes, never one blob.
-4. **Post** with full ADF `doc` payload.
-5. **Verify:** call `getJiraIssue` with `responseContentFormat: "adf"` and confirm every expected code token has a `code` mark. Fix immediately if any token is plain text.
+4. **Post** with the full ADF document using an interface whose help or schema confirms ADF input.
+5. **Verify:** read the issue back as ADF using the selected interface and confirm every expected code token has a `code` mark. Fix immediately if any token is plain text.
 
-The markdown echo in create/edit tool responses is **not** a formatting check. Only ADF read-back counts.
+Rendered Markdown or plain-text output from create/edit is **not** a formatting check. Only ADF read-back counts.
+
+For CLI use, inspect the installed command's help and input schema first. The Atlassian CLI `acli` documents ADF input for descriptions and comments, and its `workitem view --json` can return ADF; verify these capabilities against the installed version before relying on them. Do not assume another CLI has the same contract. If the chosen interface cannot accept ADF or return it for verification, keep the content as a local draft rather than silently degrading formatting.
 
 ## 1. Ticket Creation Rules
 
@@ -48,14 +41,14 @@ Mentioning files helps engineers start fast. Listing files as if they are the fu
 
 | Label | When to use | Example phrasing |
 |-------|-------------|------------------|
-| **Starting point** | Symbol or change is confirmed here; scope may extend | "Starting point: `BigQueryExportService.kt`" |
-| **Primary touchpoint** | Work is localized to one class/config | "`PowerBiPremiumChangeListener.kt` owns the in-memory cache" |
-| **Known reference** | Line-level TODO or prior audit finding | "TODO at `BigQueryToGcsExtractService.kt` line 86" |
+| **Starting point** | Symbol or change is confirmed here; scope may extend | "Starting point: `OrderExportService.kt`" |
+| **Primary touchpoint** | Work is localized to one class/config | "`CacheRefreshListener.kt` owns the in-memory cache" |
+| **Known reference** | Line-level TODO or prior audit finding | "TODO at `ExportConfig.kt` line 86" |
 
 **Do not** present a file list as complete scope unless you have traced dependencies (callers, shared modules, config loaders, tests). For cross-cutting refactors, say what to find, not every file to edit:
 
-- Good AC: "All export executor callers updated; no blocking BQ metadata calls in `suspend` paths"
-- Bad AC: "Edit `BigQueryExportService.kt`, `FooExecutor.kt`, `BarExecutor.kt`"
+- Good AC: "All export executor callers updated; no blocking metadata calls in asynchronous paths"
+- Bad AC: "Edit `OrderExportService.kt`, `FooExecutor.kt`, `BarExecutor.kt`"
 
 **Where files belong:**
 - **Problem / Goal:** class or service names (behavior), not file paths, unless the file *is* the problem (e.g. duplicated YAML).
@@ -86,7 +79,7 @@ Every ticket must name at least one GitHub repo where work happens. Do not make 
     "type": "paragraph",
     "content": [
       { "type": "text", "text": "GitHub Repo: " },
-      { "type": "inlineCard", "attrs": { "url": "https://github.com/gocrisp/motiion-platform" } },
+      { "type": "inlineCard", "attrs": { "url": "https://github.com/example/project" } },
       { "type": "text", "text": " " }
     ]
   }]
@@ -102,9 +95,9 @@ Every ticket must name at least one GitHub repo where work happens. Do not make 
     "type": "paragraph",
     "content": [
       { "type": "text", "text": "GitHub Repo(s): " },
-      { "type": "inlineCard", "attrs": { "url": "https://github.com/gocrisp/motiion-platform" } },
+      { "type": "inlineCard", "attrs": { "url": "https://github.com/example/project" } },
       { "type": "text", "text": ", " },
-      { "type": "inlineCard", "attrs": { "url": "https://github.com/gocrisp/motiion-dbt" } },
+      { "type": "inlineCard", "attrs": { "url": "https://github.com/example/related-project" } },
       { "type": "text", "text": " " }
     ]
   }]
@@ -117,24 +110,24 @@ For simple tickets without Technical Details, use the same `inlineCard` pattern 
 
 - **Structure:** Keep descriptions short and scannable.
 - **Visuals & Layout:** Use clean Markdown headers and bullet points. Never use dense walls of text.
-- **Hyperlinks:** Ensure all URLs are properly formatted as clickable Markdown links. Use shortened, descriptive anchor text where appropriate (e.g., `[PR #18384](url)` instead of pasting the raw link text).
+- **Hyperlinks:** Ensure all URLs are properly formatted as clickable Markdown links. Use shortened, descriptive anchor text where appropriate (e.g., `[PR #183](https://github.com/example/project/pull/183)` instead of pasting the raw link text).
 - **Style Guardrail:** Follow the [anti-ai-writing](../../anti-ai-writing/SKILL.md) skill. Use a direct tone, no em dashes. Do not over-explain or over-complicate the ticket; trust that a competent engineer is reading it.
 - **No positional references:** Never write "see above", "see below", "as mentioned earlier", or similar. Jira's rendered layout doesn't guarantee section order or position, so these references are often wrong. Instead, name the section explicitly (e.g. "see Technical Details") or link directly to it.
 
 ### Inline code (critical, all sections)
 
-When posting ADF (`contentFormat: "adf"`), markdown backticks do **not** apply. Every code-like token must be a separate `text` node with a `code` mark. This applies to **Problem / Goal**, **Technical Details**, and **Acceptance Criteria** (including inside `taskItem` nodes).
+When submitting ADF, markdown backticks do **not** apply. Every code-like token must be a separate `text` node with a `code` mark. This applies to **Problem / Goal**, **Technical Details**, and **Acceptance Criteria** (including inside `taskItem` nodes).
 
 **Rule of thumb:** if you would wrap it in backticks in a PR description, it needs a `code` mark in ADF. When in doubt, code-format it.
 
 **Always code-format:**
-- File paths and extensions (`PowerBiManifestWriter.kt`, `application.yml`)
-- Class, object, function, and method names (`BigQueryExportService`, `tableExists`, `suspend fun`)
-- Config keys and env vars (`motiion.export.onelake.write-timeout-ms`, `enable_manifest_export`)
-- Database tables/columns (`power_bi_resource_transfer`, `connector_configuration_property_value`)
-- Metric/log names (`report.exporter.powerbi.manifest.publish.stale`)
-- CLI flags and enum values (`--outbound-connector`, `ConnectorApplication`)
-- Constants and magic strings tied to code (`_LATEST.json`, `TABLE_NAME_LUMINATE_UPC_SALES`)
+- File paths and extensions (`OrderExportService.kt`, `application.yml`)
+- Class, object, function, and method names (`OrderExportService`, `loadItems`, `suspend fun`)
+- Config keys and environment variables (`app.export.timeout-ms`, `ENABLE_EXPORT`)
+- Database tables and columns (`order_items`, `customer_id`)
+- Metric and log names (`export.job.failure.count`)
+- CLI flags and enum values (`--dry-run`, `JobStatus`)
+- Constants and magic strings tied to code (`CURRENT_VERSION`, `DEFAULT_REGION`)
 
 **ADF pattern:** split mixed prose into multiple `text` nodes; add `"marks": [{"type": "code"}]` on each code token:
 
@@ -143,11 +136,11 @@ When posting ADF (`contentFormat: "adf"`), markdown backticks do **not** apply. 
   "type": "paragraph",
   "content": [
     { "type": "text", "text": "Convert " },
-    { "type": "text", "text": "BigQueryExportService.tableExists", "marks": [{ "type": "code" }] },
+    { "type": "text", "text": "OrderExportService.loadItems", "marks": [{ "type": "code" }] },
     { "type": "text", "text": " to a " },
     { "type": "text", "text": "suspend fun", "marks": [{ "type": "code" }] },
     { "type": "text", "text": " routed through " },
-    { "type": "text", "text": "AsyncBigQueryTemplate", "marks": [{ "type": "code" }] },
+    { "type": "text", "text": "AsyncQueryRunner", "marks": [{ "type": "code" }] },
     { "type": "text", "text": "." }
   ]
 }
@@ -160,11 +153,11 @@ When posting ADF (`contentFormat: "adf"`), markdown backticks do **not** apply. 
   "type": "taskItem",
   "attrs": { "localId": "ac-1", "state": "TODO" },
   "content": [
-    { "type": "text", "text": "tableExists", "marks": [{ "type": "code" }] },
+    { "type": "text", "text": "loadItems", "marks": [{ "type": "code" }] },
     { "type": "text", "text": " is a " },
     { "type": "text", "text": "suspend fun", "marks": [{ "type": "code" }] },
     { "type": "text", "text": " using " },
-    { "type": "text", "text": "AsyncBigQueryTemplate", "marks": [{ "type": "code" }] }
+    { "type": "text", "text": "AsyncQueryRunner", "marks": [{ "type": "code" }] }
   ]
 }
 ```
@@ -174,20 +167,20 @@ See **GitHub Repo(s) (required)** above for repo bullet placement and multi-repo
 ### Common code-formatting mistakes (do not do these)
 
 - Plain `text` nodes for identifiers in Acceptance Criteria. They render without monospace styling (this is the most common failure).
-- Relying on markdown backticks when `contentFormat` is `adf`.
+- Relying on Markdown backticks in ADF content.
 - One giant `text` node mixing prose and code. Split and mark each token.
-- Editing a ticket with markdown instead of ADF (wipes or drops `code` marks on existing content).
-- Skipping ADF read-back after post; the tool's markdown echo shows backticks even when ADF marks are missing.
+- Editing a ticket with Markdown instead of ADF, which can drop `code` marks on existing content.
+- Skipping ADF read-back after posting; rendered Markdown can hide missing ADF marks.
 
 ## Acceptance Criteria checkboxes (critical)
 
-Interactive Jira checkboxes require an ADF `taskList`. The Atlassian MCP markdown converter does **not** map markdown `- [ ]` task lists to ADF task lists; it renders them as plain bullets with literal `[ ]` text. To get working checkboxes you must post the description as ADF (`contentFormat: "adf"`) with a `taskList` node.
+Interactive Jira checkboxes require an ADF `taskList`. Markdown-to-ADF conversion may render `- [ ]` task lists as plain bullets with literal `[ ]` text. Do not rely on conversion: submit a `taskList` node in ADF and verify it after writing.
 
 Use a `taskList` **only** under `## Acceptance Criteria`. Everywhere else (Problem/Goal, Technical Details) uses normal paragraphs and `bulletList` nodes.
 
 ### Correct format (ADF)
 
-Pass `contentFormat: "adf"` and build the Acceptance Criteria as a `taskList` of `taskItem` nodes. Each `taskItem` needs a unique `localId` and `state: "TODO"`:
+Submit the description as ADF and build Acceptance Criteria as a `taskList` of `taskItem` nodes. Each `taskItem` needs a unique `localId` and `state: "TODO"`:
 
 ```json
 {
@@ -203,15 +196,15 @@ Pass `contentFormat: "adf"` and build the Acceptance Criteria as a `taskList` of
       "type": "taskItem",
       "attrs": { "localId": "ac-1", "state": "TODO" },
       "content": [
-        { "type": "text", "text": "Retool saves filters whose object path includes " },
-        { "type": "text", "text": "INFORMATION_SCHEMA", "marks": [{ "type": "code" }] },
+        { "type": "text", "text": "The export includes records whose status is " },
+        { "type": "text", "text": "READY", "marks": [{ "type": "code" }] },
         { "type": "text", "text": "." }
       ]
     },
     {
       "type": "taskItem",
       "attrs": { "localId": "ac-2", "state": "TODO" },
-      "content": [{ "type": "text", "text": "Existing lowercase BQ table/view filters unchanged" }]
+      "content": [{ "type": "text", "text": "Existing inactive records remain excluded" }]
     }
   ]
 }
@@ -219,18 +212,18 @@ Pass `contentFormat: "adf"` and build the Acceptance Criteria as a `taskList` of
 
 Inline code uses a `code` mark; links use a `link` mark with an `href` attr.
 
-Reference: [WAL-2441](https://gocrisp.atlassian.net/browse/WAL-2441)
+Reference: [PROJ-123](https://example.atlassian.net/browse/PROJ-123)
 
 ### Common mistakes (do not do these)
 
-- Posting `- [ ]` as markdown (`contentFormat: "markdown"`) and expecting checkboxes. It renders as literal `[ ]` text, not interactive checkboxes.
+- Posting `- [ ]` as Markdown and expecting conversion to preserve interactive checkboxes.
 - Using a `taskList` outside Acceptance Criteria. Technical Details use `bulletList`, not task lists.
 - Omitting `localId` or `state` on `taskItem`/`taskList` nodes.
 - Reusing the same `localId` across items. Each must be unique within the doc.
 
 ### Pre-post checklist (all items required)
 
-- [ ] `contentFormat: "adf"` on create **and** edit
+- [ ] The create or edit operation submits ADF, not Markdown
 - [ ] Acceptance Criteria is a single `taskList` directly under the `## Acceptance Criteria` heading
 - [ ] Every `taskItem` has a unique `localId` and `state: "TODO"`
 - [ ] No `taskList` outside Acceptance Criteria
@@ -246,34 +239,34 @@ Reference: [WAL-2441](https://gocrisp.atlassian.net/browse/WAL-2441)
 
 ## Tagging people (@-mentions)
 
-Typing `@Name` or writing someone's full name as plain text does **not** create a real Jira mention. It just renders as literal text and does not notify anyone. A working mention is an ADF `mention` node with a resolved `accountId`, which means mentions can only be posted with `contentFormat: "adf"`.
+Typing `@Name` or writing someone's full name as plain text does **not** create a real Jira mention. It just renders as literal text and does not notify anyone. A working mention is an ADF `mention` node with a resolved `accountId`. Use mentions only when the selected interface supports ADF mentions and provides a way to resolve the intended user's account ID.
 
 ### Steps
 
-1. Resolve the account ID first with `lookupJiraAccountId` (`cloudId`, `searchString: "<name or email>"`). Never guess or reuse an ID from memory, ID formats and users can differ per site.
+1. Resolve the account ID using the selected interface's documented user lookup. Never guess or reuse an ID from memory; IDs and users can differ per site. If the interface cannot resolve the person, keep the write as a draft and explain the limitation rather than omitting or guessing the mention.
 2. Insert a `mention` node inline wherever the name would go, using the resolved `id` and `text` (the text must include the leading `@`):
 
 ```json
 {
   "type": "mention",
   "attrs": {
-    "id": "712020:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "text": "@Laura Smith"
+    "id": "<resolved-account-id>",
+    "text": "@Example User"
   }
 }
 ```
 
 3. This node is placed inline inside a `paragraph`'s `content` array alongside `text` nodes, e.g. `"cc "` + `mention` node + `" for review."`.
-4. Post with `contentFormat: "adf"`, same as Acceptance Criteria task lists. If a description/comment needs both a mention and a task list, build the whole document as ADF, don't mix markdown and ADF fragments.
+4. Submit the whole description or comment as ADF. If it needs both a mention and a task list, build one ADF document rather than mixing Markdown and ADF fragments.
 
 ### Common mistakes (do not do these)
-- Writing `@Laura` or `Laura Smith` as plain text and assuming it tags her. It does not; it's inert text with no notification.
-- Skipping `lookupJiraAccountId` and hand-writing an `accountId`.
-- Posting a `mention` node via `contentFormat: "markdown"`. Markdown has no mention syntax the converter understands, so it will render as plain text.
+- Writing `@Example` or `Example User` as plain text and assuming it tags them. It does not; it's inert text with no notification.
+- Skipping the documented user lookup and hand-writing an `accountId`.
+- Posting a `mention` node as Markdown. Markdown mention syntax may render as plain text.
 - Omitting `text` on the `mention` node's `attrs`, or omitting the `@` prefix within it.
 
 ### Before tagging someone
 Confirm:
-- `lookupJiraAccountId` was called and returned a match for the intended person.
+- The selected interface's documented user lookup returned the intended person.
 - The mention is a `mention` node (not plain text) inside an ADF paragraph.
-- The whole description/comment is posted with `contentFormat: "adf"`.
+- The whole description/comment is submitted as ADF.

@@ -1,6 +1,6 @@
 {
   "name": "ai-agent-skills",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Engineering workflows for planning, implementation, verification, review, and delivery.",
   "author": {
     "name": "Tyler Akins"

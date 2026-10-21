@@ -4,11 +4,13 @@ This mode does not edit, comment, transition, or log work in Jira.
 
 ## Fetch Relevant Context
 
-Resolve the issue and site using the configured connector's verified schemas.
+Resolve the issue and site using a verified MCP schema or CLI command contract.
+For a CLI, inspect its help and authentication status before running read commands.
 Fetch the description, acceptance-criteria fields, and relevant discussion. Follow
 necessary discussion pages and relevant parent issues, linked issues, and design
-context. Do not treat truncated discussion as complete. With no connector, use
-supplied issue content or request only the missing text needed for the task.
+context. Paginate when supported and do not treat partial output as complete. With
+no authenticated interface, use supplied issue content or request only the missing
+text needed for the task.
 
 ## Establish Requirements and Authority
 

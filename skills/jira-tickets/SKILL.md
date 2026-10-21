@@ -22,12 +22,14 @@ Preserve prior authorization within its scope.
 - If the task includes both, establish sourced requirements through intake first,
   then apply the writing rules to the authorized draft or write.
 
-Discover the configured Atlassian tools and verify their actual schemas. Resolve
-the site from the supplied URL or accessible resources; do not hardcode cloud IDs
-or tool namespaces. The writing reference names the tested operations and parameter
-contracts. If the available connector cannot preserve those contracts, keep the
-draft local and explain the unsupported operation instead of silently degrading
-the formatting. With no connector, use supplied content for intake or drafting.
+Discover available Jira interfaces before acting. Check configured MCP tools and
+installed CLI executables, then inspect the actual tool schemas or command help and
+authentication status. Resolve the site from the supplied URL or verified account
+configuration; do not guess cloud IDs, command names, or parameter contracts.
+Choose either MCP or CLI based on the verified capabilities of the operation. For
+writes, use an interface only when it can submit the required ADF and support the
+required read-back. If neither interface is available, or it cannot preserve those
+contracts, keep the draft local and use supplied issue content for intake.
 
 Prepare complete text, destinations, and ADF payloads before any required approval.
 Drafting alone does not authorize issue creation, edits, transitions, or work logs.
