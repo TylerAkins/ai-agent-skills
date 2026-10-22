@@ -27,7 +27,10 @@ separately.
 Read the routing table in [using-skills](../using-skills/SKILL.md) to select relevant
 planning and task workflows. Read selected skills before relying on their procedures.
 Select only skills that materially apply to the requirements and repository; do not
-inventory or load the entire collection.
+inventory or load the entire collection. Also inspect repository-local agent
+instructions and skill catalogs for workflows that apply to this task. Link relevant
+local skills from the plan and tell the executor which task they govern; do not assume
+the host discovers them automatically.
 
 For Jira requirements, use [jira-tickets](../jira-tickets/SKILL.md) in intake mode.
 For consequential unresolved intent, use [decision-partner](../decision-partner/SKILL.md).
@@ -42,6 +45,11 @@ supporting procedures, not mandatory stages; retain established intent and evide
    dependency versions. Verify unfamiliar APIs against those versions.
 3. Identify affected contracts, authorization and tenant boundaries, migrations,
    concurrency concerns, and rollback risks where relevant. Preserve unrelated work.
+   For stateful, asynchronous, or interactive behavior, identify the state owner,
+   important states and transitions, and what success, failure, retry, rollback,
+   overlapping operations, and identity changes should leave visible and persisted.
+   Select the high-risk combinations that need acceptance criteria and tests; do not
+   enumerate irrelevant combinations.
 4. Resolve uncertainty from evidence where possible. For a behavior-changing choice
    that requires user input, mark it as needing a decision and identify dependent
    tasks. Continue independent investigation without treating silence as acceptance.
@@ -56,6 +64,8 @@ supporting procedures, not mandatory stages; retain established intent and evide
    - Intended outcome and specific acceptance criteria.
    - Likely files, grounded in repository evidence.
    - Dependencies and shared interfaces or contractual values.
+   - For stateful behavior, the relevant invariant and transition scenarios, including
+     applicable failure or overlapping-operation cases.
    - Relevant verification commands, package directories, and observable success criteria.
    Mark unverified paths, signatures, or commands explicitly. Avoid speculative code
    bodies and arbitrary task sizes; split tasks when they mix independent outcomes

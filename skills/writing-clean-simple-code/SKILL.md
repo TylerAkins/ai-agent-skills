@@ -27,6 +27,16 @@ ownership, and security or tenant boundaries. Understand why compatibility code,
 wrappers, caching, or unusual control flow exists before removing it. Check history
 when the current code and contracts do not explain the constraint.
 
+Before changing stateful, asynchronous, or interactive behavior, state the invariant
+the code must preserve and identify which layer owns each value. Trace how displayed,
+pending, and persisted state relate. For work that can overlap or outlive its caller,
+decide which identity and inputs own its completion, rollback, cleanup, and error
+state. Include the reachable failure, retry, and identity-change paths in the design
+before production edits. Use [test-authoring](../test-authoring/SKILL.md) and its
+[scope and state coverage](../test-authoring/references/scope-and-state.md) prompts
+to make the important transitions executable without testing every theoretical
+combination.
+
 For simplification, preserve observable behavior and public contracts. A discovered
 bug or desired behavior change is a separate decision; do not hide it inside cleanup.
 For new behavior, implement the accepted requirement without speculative features.
@@ -64,8 +74,10 @@ patterns unless evidence shows they obstruct the requested work.
 
 For new behavior, use [test-authoring](../test-authoring/SKILL.md) to establish
 meaningful expected outcomes. Prefer a focused failing behavioral test before
-implementation when practical. Write enough production code to satisfy the full
-contract, including relevant failures and boundaries, not just one fixture.
+implementation when practical. For stateful or asynchronous changes, test the
+important completion orders and failure or retry transitions before relying on the
+happy path. Write enough production code to satisfy the full contract, including
+relevant failures and boundaries, not just one fixture.
 
 For refactoring, establish relevant baseline behavior and coverage before changing
 structure. Add characterization coverage for material gaps when useful. Keep

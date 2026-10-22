@@ -30,6 +30,12 @@ Pin the target before judging it:
 - For a plan, identify its version and source requirements. Inspect the repository
   to verify proposed paths, interfaces, dependencies, and verification commands.
 
+Read applicable root and nested agent instructions. Inspect repository-local skill
+catalogs or review playbooks for procedures that govern the changed paths, and load
+the relevant ones before discovery. Do not assume the host selected a skill because
+it was mentioned in chat or a plan. Report an unavailable local procedure when it
+leaves a material review gap; do not load unrelated skills.
+
 For delegated independent review, receive raw requirements and the exact candidate,
 not author reasoning, self-review, proposed findings, or the implementation plan as
 proof. If implementation reasoning is already in context, use a fresh reviewer
@@ -52,6 +58,20 @@ readability, architecture, security, and performance. Trace actual execution pat
 callers, consumers, configuration, failure handling, and relevant tests. Verify
 unfamiliar APIs against installed dependency versions.
 
+For substantial or high-risk changes, make distinct passes for requirement fidelity,
+repository standards, and runtime correctness so one concern does not mask another.
+Use separate reviewers for these passes only when they are available, permitted, and
+given the same raw requirements and candidate. Otherwise perform separate passes
+and report that they were not independent.
+
+For stateful, asynchronous, or interactive behavior, read the [scope and state
+coverage](../test-authoring/references/scope-and-state.md) prompts. Identify who owns
+each value and operation, then trace important failure, retry, overlap, rollback,
+identity-change, dismissal, and unmount transitions. Check that visible, pending, and
+persisted state agree where required, and that tests control the relevant completion
+orders. Do not substitute a happy-path test for an interleaving that can lose edits
+or let stale work affect a new owner.
+
 For plans, apply the rubric to the proposed behavior and design. Check dependency
 order, shared contracts, unresolved decisions, acceptance criteria, and whether
 the proposed checks can establish the requirements. Do not claim implementation
@@ -61,6 +81,12 @@ Run focused checks when they can establish a concern or material behavior. Passi
 tests do not establish correctness or completeness. Verify actual test selection;
 zero tests is not passing coverage. When useful, assess regression sensitivity in
 an isolated copy. Record unperformed checks and unavailable paths.
+
+For browser-visible changes, use an available Playwright or browser tool against a
+safe local or preview environment to verify the affected user flow. Inspect rendered
+state and relevant console or network failures. Browser checks complement deterministic
+tests and do not establish all async interleavings. If a safe runnable environment or
+tool is unavailable, report that coverage limit.
 
 For GitHub, form an assessment before reading earlier reviewers' conclusions.
 Then retrieve review bodies, all paginated threads and nested replies, and
@@ -141,8 +167,10 @@ investigate, not automatic blockers.
 
 Keep completion separate from findings. Report incomplete coverage explicitly,
 even when no defect was confirmed. For repairs, verify earlier triggers and expand
-coverage when contracts or approach changed. Material candidate changes invalidate
-affected prior coverage; an aborted or empty independent attempt remains pending.
+coverage when contracts or approach changed. After a repair, inspect its delta and
+search the wider candidate and affected callers for sibling instances of the same
+failure pattern. Material candidate changes invalidate affected prior coverage; an
+aborted or empty independent attempt remains pending.
 
 ## Deliver Concise Feedback
 
@@ -174,5 +202,6 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | The trace found nothing wrong. | Tracing establishes coverage, not correctness. Compute the dates, counts, offsets, or boundaries the clearance depends on and show them, or record the path as unverified. |
 | Style inconsistency is fine. | Check applicable repository conventions and address supported violations proportionally. Distinguish maintenance risks from optional preferences; do not invent blockers. |
 | The suspicious line looks wrong, so it must be a blocker. | Treat it as a hypothesis. Check the strongest author defense and actual macro/runtime path; require causal evidence before assigning blocker status. |
+| The happy path passed, so async behavior is covered. | Trace ownership and failure or completion order for affected state; verify high-risk interleavings with controlled tests and browser behavior where relevant. |
 | A plausible consumer might reject this value. | Verify the consumer and contract. If downstream behavior is unavailable or inferred, report a question or leave the path unverified, not a blocker. |
 | A confident explanation is enough to clear or confirm a concern. | Cite source behavior, trigger, and consequence. Confidence, reviewer instinct, and author intent do not satisfy the proof gate. |
