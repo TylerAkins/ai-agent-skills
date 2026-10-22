@@ -30,3 +30,18 @@ stale caches, old schemas, profile overrides, and defaults. Trace configuration
 through its producer and real consumer; testing a parsed flag alone does not
 establish downstream behavior. Keep fixture state isolated between runs and verify
 cleanup or restoration on failure.
+
+## Asynchronous and Interactive State
+
+Identify the owner of each value and operation, including the UI target or session
+that started asynchronous work. Keep displayed, pending, and persisted state
+distinct in assertions. Cover the transitions that share mutable state: success and
+failure, overlapping operations that settle in different orders, target changes,
+dismissal or unmount, rollback, and retry. Assert both the visible result and the
+persisted payload or state when both are part of the contract.
+
+Use deferred promises, barriers, or repository scheduling utilities to control
+interleavings. Avoid arbitrary sleeps. Select combinations where operations compete
+for the same state or ownership; do not build a full Cartesian product of unrelated
+events. A regression test should fail when the old behavior loses an edit, applies a
+stale completion, or leaves the visible state inconsistent with what was saved.

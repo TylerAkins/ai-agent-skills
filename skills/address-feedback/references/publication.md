@@ -18,7 +18,16 @@ After each write, verify the resulting text and destination. If submission fails
 ambiguously, check whether it succeeded before retrying. Report unknown state
 instead of claiming success.
 
-Resolve only separately approved threads with an evidence-supported reason:
+Before asking to publish replies, pair each reply with its intended thread disposition.
+For a thread to be resolved, include the exact evidence-supported reason and rationale
+in the same approval request as the exact reply and destination. For a thread to stay
+open, include why it remains open. One approval covers the listed replies and their
+listed resolutions. After approval, post each reply and perform its approved
+resolution in the same publication workflow, without asking again between the two
+writes. The API may require sequential writes; the approval is for the complete
+workflow, not an atomic GitHub mutation.
+
+Resolve only threads and reasons included in that approval:
 
 | Reason | Required basis |
 | --- | --- |
@@ -28,7 +37,10 @@ Resolve only separately approved threads with an evidence-supported reason:
 
 Keep unresolved questions and unsettled disagreements open. A local triage state
 or posted reply is not a GitHub resolution. Do not label a declined change as fixed.
-Approval must cover the thread and reason; preserve authorization already given.
+If a reply or resolution fails, inspect the remote state and report which authorized
+action succeeded. Do not repeat approval for an unchanged, already-authorized action;
+obtain new approval only if its text, destination, disposition, or reason materially
+changes. Preserve authorization already given.
 
 GitHub's [GraphQL reference](https://docs.github.com/en/graphql/reference/pulls#resolvereviewthreadinput)
 documents `resolutionReason` on `ResolveReviewThreadInput` for Copilot code review

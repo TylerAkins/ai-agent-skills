@@ -24,6 +24,14 @@ separately.
 
 ## Investigate Before Planning
 
+Read the routing table in [using-skills](../using-skills/SKILL.md) to select relevant
+planning and task workflows. Read selected skills before relying on their procedures.
+Select only skills that materially apply to the requirements and repository; do not
+inventory or load the entire collection. Also inspect repository-local agent
+instructions and skill catalogs for workflows that apply to this task. Link relevant
+local skills from the plan and tell the executor which task they govern; do not assume
+the host discovers them automatically.
+
 For Jira requirements, use [jira-tickets](../jira-tickets/SKILL.md) in intake mode.
 For consequential unresolved intent, use [decision-partner](../decision-partner/SKILL.md).
 For shared interface decisions, use [api-design](../api-design/SKILL.md). These are
@@ -37,6 +45,11 @@ supporting procedures, not mandatory stages; retain established intent and evide
    dependency versions. Verify unfamiliar APIs against those versions.
 3. Identify affected contracts, authorization and tenant boundaries, migrations,
    concurrency concerns, and rollback risks where relevant. Preserve unrelated work.
+   For stateful, asynchronous, or interactive behavior, identify the state owner,
+   important states and transitions, and what success, failure, retry, rollback,
+   overlapping operations, and identity changes should leave visible and persisted.
+   Select the high-risk combinations that need acceptance criteria and tests; do not
+   enumerate irrelevant combinations.
 4. Resolve uncertainty from evidence where possible. For a behavior-changing choice
    that requires user input, mark it as needing a decision and identify dependent
    tasks. Continue independent investigation without treating silence as acceptance.
@@ -51,6 +64,8 @@ supporting procedures, not mandatory stages; retain established intent and evide
    - Intended outcome and specific acceptance criteria.
    - Likely files, grounded in repository evidence.
    - Dependencies and shared interfaces or contractual values.
+   - For stateful behavior, the relevant invariant and transition scenarios, including
+     applicable failure or overlapping-operation cases.
    - Relevant verification commands, package directories, and observable success criteria.
    Mark unverified paths, signatures, or commands explicitly. Avoid speculative code
    bodies and arbitrary task sizes; split tasks when they mix independent outcomes
@@ -67,7 +82,15 @@ supporting procedures, not mandatory stages; retain established intent and evide
 ### Task Template
 
 Include an execution handoff in the generated plan itself, including native Cursor
-plan artifacts. Do not leave it only in chat or these skill instructions. Use:
+plan artifacts. Do not leave it only in chat or these skill instructions. Name the
+relevant task skills in the plan, link each skill from the plan's location, and state
+which task or decision it governs. Use canonical skill names and repository paths so
+an executor can find the procedure even when the host does not activate it
+automatically. Include only skills that materially apply. If a required skill is not
+available to the executor, the plan must surface that limit rather than imply it was
+used. For saved plans, resolve each Markdown link from the plan file; for chat plans,
+use a Markdown link to the repository-root path, such as
+`skills/<skill-name>/SKILL.md`. Use:
 
 > Once implementation is authorized, execute this plan using `implement-plan`,
 > including meaningful verification, final independent `code-review`, and affected
@@ -77,8 +100,10 @@ plan artifacts. Do not leave it only in chat or these skill instructions. Use:
 Carry any explicit review skip or existing Git authorization into the handoff
 accurately. Include source requirement pointers and the final review/repair tasks
 in the plan so a Build or separate-session executor receives the same contract.
-The handoff is an instruction for later execution, not permission to start from
-a planning-only request.
+For each task, instruct the executor to read and follow its linked skills before
+starting that work. Do not rely on a skill alias, host discovery, or a chat-only
+reminder as the handoff. The handoff is an instruction for later execution, not
+permission to start from a planning-only request.
 
 Use this structure when explicit tasks help. Adapt it to the project's native
 plan format rather than creating a duplicate checklist.
@@ -89,6 +114,7 @@ plan format rather than creating a duplicate checklist.
 Approach: [Concrete changes and relevant contracts]
 Files: [Verified paths; label uncertain paths]
 Depends on: [Task IDs or none]
+Skills: [Linked skill name and the task guidance it provides, or none]
 
 Acceptance criteria:
 - [ ] [Specific behavior, including relevant boundaries or failure cases]
@@ -115,3 +141,11 @@ Needs decision: [Unresolved choice and what it blocks, or none]
     again. This skill remains planning-only. An unresolved
     decision blocks only dependent work. Creating a plan does not itself authorize
     implementation, commits, pushes, or publication.
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| The executor can infer which skill to use from the task. | Link each materially relevant skill to the task or decision it governs, and tell the executor to read it before starting. |
+| Listing every skill prevents omissions. | Select only skills supported by the task and repository evidence; do not turn the plan into a catalog or require unrelated procedures. |
+| A skill alias works in every host. | Include the canonical skill name and a path that resolves from the plan location. If the skill is unavailable, report that limit and use a scoped fallback. |

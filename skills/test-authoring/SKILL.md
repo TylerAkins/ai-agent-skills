@@ -53,8 +53,8 @@ reachability or contracts. For shared repairs, include the original defect and a
 plausible repair-induced failure from actual producers and consumers. Investigate
 conflicting expectations across layers even when both suites pass.
 
-For query changes, optimizations, or persisted configuration, read
-[scope and state coverage](references/scope-and-state.md).
+For query changes, optimizations, persisted configuration, or asynchronous and
+interactive state, read [scope and state coverage](references/scope-and-state.md).
 
 ## Write Readable, Deterministic Tests
 

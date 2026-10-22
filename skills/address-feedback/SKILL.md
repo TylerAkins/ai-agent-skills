@@ -3,7 +3,8 @@ name: address-feedback
 description: >-
   Collect and verify GitHub PR feedback, repair supported issues within authorized
   scope, and draft concise thread replies. Use when asked to address PR comments
-  or review feedback. Posting replies and resolving threads require separate approval.
+  or review feedback. Get approval for the exact replies and their intended thread
+  resolutions together before publishing either action.
 ---
 
 # Address Feedback
@@ -85,27 +86,38 @@ Draft one direct reply per substantive thread, usually 1–3 sentences explainin
 the verified change, evidence-based disagreement, or specific clarification needed.
 Include necessary technical detail without praise, formulaic apologies, headings,
 investigation narration, or repeated test summaries. Link a commit only after
-verifying its remote existence and that it contains the relevant fix.
+verifying its remote existence and that it contains the relevant fix. When a reply
+mentions a commit, make its short SHA a Markdown link to that commit's page on the
+repository's web host, for example `[abc1234](https://github.com/owner/repo/commit/abc1234)`.
+Do not leave a bare SHA or link a local, unpushed commit.
 
 Show exact replies with PR/thread destinations. Keep incomplete examples out of
-posting approval requests. When offering complete replies for publication, ask
-whether to post them under anti-ai-writing. For drafting-only requests, leave them
-local without prompting to post. List proposed thread resolutions with their reasons
-and re-review requests separately; text approval does not authorize those actions.
+posting approval requests. For each thread, include the intended disposition
+(resolve or leave open) and, when resolving, the exact reason and evidence-based
+rationale alongside the reply. Ask once whether to publish the listed replies and
+perform their listed resolutions. That approval covers both actions; after approval,
+post each reply and carry out its approved resolution in the same publication
+workflow without a second approval prompt. The API may require sequential writes,
+but do not pause for another approval between them. For a thread left open, state
+the reason. For drafting-only requests, leave replies and dispositions local without
+prompting to publish. Request re-review separately when it is desired.
 
 Before approved external writes, read [reply publication](references/publication.md).
 Report actual repairs, checks, independent review limits, remaining feedback, and
-publication state in chat. After replies post, state each substantive thread's
-disposition: a proposed resolution with its reason awaiting separate approval, or
-the open question or unsettled disagreement that keeps it open. Unstated
-dispositions leave the delivery incomplete. Never dismiss reviews or publish the
-chat report as an extra PR comment.
+publication state in chat. After publication, state whether each substantive thread's
+approved resolution succeeded or, if it remains open, the open question or unsettled
+disagreement that keeps it open. If either an approved reply or resolution fails,
+verify the remote state and report the partial result; do not repeat an approval
+request for the unchanged, already-authorized action. Unstated dispositions leave
+the delivery incomplete. Never dismiss reviews or publish the chat report as an
+extra PR comment.
 
 ## Anti-Rationalization Guardrails
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
-| A won't-fix reply resolves the thread. | Perform the approved resolution mutation with the supported reason and verify `isResolved`; a reply alone changes neither state nor reason. |
-| The replies posted, so the threads are handled. | A posted reply is not a resolution or completion. State each thread's disposition: a proposed resolution with its reason awaiting separate approval, or the reason it stays open. |
+| A won't-fix reply resolves the thread. | A reply alone changes neither state nor reason. Include the intended disposition and supported reason in the pre-publication approval, then perform and verify the approved resolution mutation. |
+| Posting a reply completes the thread workflow. | Carry out the approved resolution in the same publication workflow after posting the reply; state whether it succeeded or why the thread stays open. |
 | All disagreements must stay open forever. | Keep unsettled decisions open; an approved decision not to fix can resolve as `WONT_FIX`, and a disproven concern can resolve as `INVALID`. |
 | The connector resolves threads, so it can select every reason. | Inspect its schema; use a verified reason-capable API when needed and report unsupported reasons instead of silently substituting one. |
+| A bare commit SHA is enough context in a reply. | Verify the remote commit and link its short SHA to the commit page on the repository's web host. |

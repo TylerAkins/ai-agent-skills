@@ -69,6 +69,23 @@ Before distributing a changed workflow, test it in the relevant app:
 File placement and installer tests do not establish that an agent followed the
 workflow. Record the host/version, observed results, and missing checks.
 
+## Skill Activation Limits
+
+Skills are selected from their names and descriptions when a host decides a request
+matches. The `using-skills` description is intended to route work covered by this
+collection to its primary workflow, but skill selection and instruction following
+remain model behavior, not an enforced runtime gate. A link in a plan proves only that
+the executor has a path to the skill. It does not prove the skill was loaded or used.
+
+For projects where a workflow must be considered on every task, configure a short
+always-loaded instruction in that host's supported project or personal instruction
+file. Tell the agent to read `using-skills` first for work covered by this collection,
+then read the selected skill before acting. Keep the detailed procedure in the skill.
+Do not copy this repository's `AGENTS.md` as generic installed instructions. Verify
+the instruction mechanism for the target host and surface, then test a new session by
+asking for work that should trigger a specific skill and checking both skill discovery
+and the agent's actions. This improves activation odds but cannot guarantee compliance.
+
 ## Host References and Distribution
 
 - [Cursor plugins](https://cursor.com/docs/plugins) and [manifest reference](https://cursor.com/docs/reference/plugins)

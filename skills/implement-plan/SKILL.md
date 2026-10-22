@@ -20,7 +20,9 @@ Read the accepted plan and its authoritative requirements, including accepted
 decisions and unresolved choices. Use [jira-tickets](../jira-tickets/SKILL.md) in
 intake mode when necessary issue context is missing. Inspect repository instructions,
 branch/base, working changes, relevant execution paths, and dependency versions.
-Preserve unrelated work and reuse suitable task context rather than restarting intake.
+Read task skills linked by the plan and applicable repository-local skills or
+instructions. Preserve unrelated work and reuse suitable task context rather than
+restarting intake.
 
 Verify plan paths, interfaces, contractual values, dependencies, and check commands
 against the repository. Treat the plan as a proposal to reconcile, not proof of
@@ -43,6 +45,13 @@ procedures when needed: [api-design](../api-design/SKILL.md),
 [ci-cd-workflows](../ci-cd-workflows/SKILL.md). Do not load all skills or add scope
 solely because a domain is mentioned.
 
+Before production edits to a stateful, asynchronous, or interactive task, reconcile
+its plan criteria with the actual state owners, invariants, and high-risk transitions
+in the source. If an important failure, retry, overlap, or identity-change case is
+missing, add the needed criterion and verification to the existing task before
+implementation. Use [scope and state coverage](../test-authoring/references/scope-and-state.md)
+to select scenarios without expanding into unrelated combinations.
+
 Use [test-authoring](../test-authoring/SKILL.md) for independently justified behavioral
 coverage. Run focused checks in verified package directories and confirm actual test
 selection. Complete the Red-Green-Refactor assertion gate for behavioral code changes.
@@ -53,6 +62,13 @@ Track actual task outcomes and material decisions in the existing plan or host t
 artifact. Reconcile changes with requirements as evidence develops. Update affected
 documentation through [technical-documentation](../technical-documentation/SKILL.md)
 when the behavior or setup changes. Keep temporary diagnostics out of the final diff.
+
+For a high-risk task with interacting state transitions, run a focused read-only
+[code-review](../code-review/SKILL.md) on its completed delta after relevant checks
+pass and before dependent tasks proceed. Verify the fix against its trigger, then
+search the full candidate and affected callers for sibling instances of the same
+failure pattern. This targeted review does not replace final whole-candidate review;
+skip it for tasks whose behavior does not carry comparable risk.
 
 When committing is authorized, create local commits at coherent, verified checkpoints
 using [git-delivery](../git-delivery/SKILL.md). Each commit should capture a complete,
