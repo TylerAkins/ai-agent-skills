@@ -85,7 +85,10 @@ Draft one direct reply per substantive thread, usually 1–3 sentences explainin
 the verified change, evidence-based disagreement, or specific clarification needed.
 Include necessary technical detail without praise, formulaic apologies, headings,
 investigation narration, or repeated test summaries. Link a commit only after
-verifying its remote existence and that it contains the relevant fix.
+verifying its remote existence and that it contains the relevant fix. When a reply
+mentions a commit, make its short SHA a Markdown link to that commit's page on the
+repository's web host, for example `[abc1234](https://github.com/owner/repo/commit/abc1234)`.
+Do not leave a bare SHA or link a local, unpushed commit.
 
 Show exact replies with PR/thread destinations. Keep incomplete examples out of
 posting approval requests. When offering complete replies for publication, ask
@@ -109,3 +112,4 @@ chat report as an extra PR comment.
 | The replies posted, so the threads are handled. | A posted reply is not a resolution or completion. State each thread's disposition: a proposed resolution with its reason awaiting separate approval, or the reason it stays open. |
 | All disagreements must stay open forever. | Keep unsettled decisions open; an approved decision not to fix can resolve as `WONT_FIX`, and a disproven concern can resolve as `INVALID`. |
 | The connector resolves threads, so it can select every reason. | Inspect its schema; use a verified reason-capable API when needed and report unsupported reasons instead of silently substituting one. |
+| A bare commit SHA is enough context in a reply. | Verify the remote commit and link its short SHA to the commit page on the repository's web host. |

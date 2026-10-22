@@ -34,6 +34,8 @@ For delegated independent review, receive raw requirements and the exact candida
 not author reasoning, self-review, proposed findings, or the implementation plan as
 proof. If implementation reasoning is already in context, use a fresh reviewer
 when available and authorized; otherwise disclose the independence limit.
+AI-agent review output is issue-discovery input, not proof. Verify each retained
+finding against the candidate, repository contracts, and the required evidence bar.
 
 ## Three-Phase Review
 
@@ -111,7 +113,9 @@ In the chat report, summarize high-level architectural impact, list verified
 blockers with their failure proof, and place non-blocking observations under Notes /
 Questions. State material verification limits. For GitHub, keep the fixed review-body
 contract and put the investigation report in chat; inline comments must carry the
-verified evidence and consequence. Read [GitHub review delivery](references/github-review.md).
+verified evidence and consequence. When a small, exact correction is fully supported,
+include a GitHub suggested-change block in the inline comment. Read [GitHub review
+delivery](references/github-review.md) for eligibility and formatting.
 
 ## Finding Bar and Verdict
 

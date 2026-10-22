@@ -22,6 +22,34 @@ Do not duplicate an existing finding merely to make a payload nonempty. If a
 finding has no truthful anchor or existing thread, retain it in chat and keep
 publication pending until the user approves a visible explanation and destination.
 
+## Suggested Changes
+
+Offer a suggested-change block when the correction is small, self-contained, and
+fully supported by verified behavior and repository conventions. The replacement
+must be exact for the selected diff range, preserve surrounding contracts, and be
+safe to apply as a single edit. Do not turn an uncertain diagnosis, broad refactor,
+or question about intended behavior into a suggested change. A suggestion does not
+lower the blocker evidence bar or change the review verdict by itself.
+
+Place the replacement in a `suggestion` fence in the inline comment. Include no
+placeholder text or omitted lines inside the fence. The selected comment range must
+match the lines the suggestion replaces. Explain the defect and consequence outside
+the fence when they are not already clear from the comment.
+
+For example, after verifying that a nil value must be skipped:
+
+```suggestion
+if value == nil {
+    continue
+}
+```
+
+Treat the suggested replacement as a proposed correction and verify it with the
+same evidence duty as the finding. Do not claim it was applied or tested unless that
+occurred. Include the complete suggestion text and its inline destination in the
+exact draft shown for approval. Never apply a suggestion to the candidate or PR
+branch as part of review.
+
 ## Fixed Review Body
 
 Resolve the PR author and authenticated poster from live metadata. Prefix the

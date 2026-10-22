@@ -48,6 +48,13 @@ verification and final independent review gates. Jira intake supplies source int
 agent-planning supplies tasks, and implement-plan verifies execution against both.
 The generated plan must contain the execution handoff, not just a chat reminder,
 so native Build and separate-session execution can carry the coordinator instruction.
+When authoring a plan, identify only the skills that materially apply, link each one
+from the plan's location, map it to the task or decision it supports, and state the
+specific guidance the executor should use. Keep the implement-plan coordinator
+instruction distinct from task-specific skills. Tell the executor to read each linked
+skill before its task; do not assume host discovery or skill aliases will activate it.
+If a linked skill is unavailable, surface that limit and use a scoped fallback without
+claiming the skill was applied.
 
 When skills reference each other, reuse already-loaded guidance and evidence rather
 than recursively restarting workflows. In testing/debugging, retain the current
@@ -58,3 +65,11 @@ If a required skill or tool is unavailable, state the limitation and use a scope
 fallback when possible. Never claim a missing procedure, independent review, live
 check, or deployment occurred. Use delegation only when permitted and useful,
 with raw intent and the exact candidate; do not create personas merely to route tasks.
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| A skill name is enough for a later executor to find it. | In generated plans, link applicable skills from the plan's location, map each link to the task it supports, and instruct the executor to read it before starting. |
+| Every plan should list the full skill catalog. | Select only skills that materially apply to the request; omit unrelated skills and their procedures. |
+| The host will discover and activate every linked skill. | Treat links as explicit handoff paths, not proof of host discovery. Report unavailable skills and use a scoped fallback without claiming they were applied. |
