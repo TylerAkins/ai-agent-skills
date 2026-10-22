@@ -1,18 +1,30 @@
 ---
 name: using-skills
 description: >-
-  Select and combine this collection's skills for a task without redundant workflows.
-  Use when choosing a workflow, coordinating multi-stage work, or resolving overlap
-  between skills. Load only relevant procedures and preserve task authorization.
+  Route any engineering task covered by the ai-agent-skills collection to the right
+  workflow. Use at the start of implementation, planning, testing, debugging, review,
+  delivery, or other listed work, especially when more than one skill may apply.
+  Load only relevant procedures and preserve task authorization.
 ---
 
 # Using Skills
 
-Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before human-facing text.
-Choose the primary skill from the requested outcome. Load supporting skills only
-when their procedure is needed; do not read every skill or force a full lifecycle.
-Follow explicit user requests and repository instructions. Skill links route work;
-they do not install dependencies, authorize new actions, or spawn agents.
+## Route Before Work
+
+When this collection is available and the requested engineering work matches a
+listed workflow, use this router before planning, editing, testing, debugging,
+reviewing, or delivering. Match the requested outcome to the routing table, read the
+primary skill's full instructions before acting, and load supporting skills when their
+procedures materially apply. An explicit user skill selection takes precedence as the
+primary workflow; load supporting skills only as needed. Do not read every skill or
+force a full lifecycle.
+
+If the collection or a selected skill is unavailable, say so and use a scoped fallback.
+Do not claim to have used a skill based only on its name, description, or a link in a
+plan. Follow explicit user requests and repository instructions. Skill links route
+work; they do not install dependencies, authorize new actions, or spawn agents.
+
+Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting human-facing text.
 
 | Task | Primary skill |
 | --- | --- |
@@ -70,6 +82,8 @@ with raw intent and the exact candidate; do not create personas merely to route 
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
+| This is a small coding task, so I can skip the router. | If the collection is available and the request matches a listed workflow, route first and read the primary skill before acting. |
+| I know what this skill says from its description or a past task. | Read the current full skill file before relying on its procedure. |
 | A skill name is enough for a later executor to find it. | In generated plans, link applicable skills from the plan's location, map each link to the task it supports, and instruct the executor to read it before starting. |
 | Every plan should list the full skill catalog. | Select only skills that materially apply to the request; omit unrelated skills and their procedures. |
 | The host will discover and activate every linked skill. | Treat links as explicit handoff paths, not proof of host discovery. Report unavailable skills and use a scoped fallback without claiming they were applied. |

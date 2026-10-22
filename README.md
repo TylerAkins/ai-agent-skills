@@ -549,7 +549,7 @@ GitHub reviews and approvals are never dismissed.
 | [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
 | [skill-authoring](skills/skill-authoring/SKILL.md) | Author, evaluate, and register engineering skills with verified packages. |
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
-| [using-skills](skills/using-skills/SKILL.md) | Select relevant skills without forcing a full lifecycle. |
+| [using-skills](skills/using-skills/SKILL.md) | Route covered work to the right skill before acting. |
 
 </details>
 
