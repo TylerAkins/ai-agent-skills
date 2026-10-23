@@ -54,13 +54,17 @@ to select scenarios without expanding into unrelated combinations.
 
 Use [test-authoring](../test-authoring/SKILL.md) for independently justified behavioral
 coverage. Run focused checks in verified package directories and confirm actual test
-selection. Complete the Red-Green-Refactor assertion gate for behavioral code changes.
+selection. Establish the relevant before/after evidence described below.
 Investigate unexpected failures through [root-cause-debug](../root-cause-debug/SKILL.md), preserving
 evidence and distinguishing introduced failures from unrelated ones.
 
-Track actual task outcomes and material decisions in the existing plan or host task
-artifact. Reconcile changes with requirements as evidence develops. Update affected
-documentation through [technical-documentation](../technical-documentation/SKILL.md)
+Track each task's intended outcome, verification, observed result, and material
+decisions in the existing plan or host task artifact. Before a dependent task, compare
+the interface, value, or invariant it expects with what the earlier task actually
+produced; resolve conflicts against source requirements. Mark a task complete only
+when its outcome and checks match. Reconcile changes with requirements as evidence
+develops. Update affected documentation through
+[technical-documentation](../technical-documentation/SKILL.md)
 when the behavior or setup changes. Keep temporary diagnostics out of the final diff.
 
 For a high-risk task with interacting state transitions, run a focused read-only
@@ -84,29 +88,23 @@ files, for omissions, accidental changes, and contract mismatches. Run applicabl
 integration/build checks and browser verification for affected UI behavior. A completed
 todo list or passing unrelated suite does not establish requirement coverage.
 
-## Red-Green-Refactor Assertion Gate
+## Establish Behavioral Evidence
 
-For new behavior and bug repairs, the required state sequence is Red, Green, then
-Refactor. Do not write production implementation before completing Red.
+For new behavior or a bug repair, prefer a focused behavioral test that fails on
+the unchanged implementation before production edits. Confirm the failure is the
+intended assertion, then run the same test and applicable checks after the change.
+If a pre-change test cannot run safely or meaningfully, record why, establish the
+strongest available baseline or reproduction, and choose the post-change check
+before editing. Do not claim observed regression sensitivity from a test that was
+never run against the old behavior.
 
-1. **Red:** Write the behavioral test and run the actual repository test runner
-   against the unchanged implementation. Display the command, working directory,
-   failing assertion output, and nonzero exit code before writing production code.
-   Confirm the failure expresses the requested behavior. Syntax, import, setup,
-   or unrelated failures do not satisfy Red; repair the test setup and rerun.
-2. **Green:** Implement the behavior, run the selected tests and required surrounding
-   checks, and display the actual runner output and exit code 0 with zero failures.
-   Confirm the intended tests executed; zero selected tests cannot satisfy Green.
-3. **Refactor:** Simplify only after Green. Rerun affected tests after refactoring
-   and display the clean output and exit code 0 before declaring completion.
-
-If execution is unavailable, stop dependent implementation and report the gate as
-blocked with the missing prerequisite. Never fabricate output or weaken assertions.
-For coverage of existing correct behavior or behavior-preserving refactoring,
-record a passing baseline and demonstrate regression sensitivity in an isolated
-copy before changing production code. Documentation-only changes use document
-validation rather than an artificial failing behavioral test. A reproduction-only
-request ends at observed Red and does not authorize a production repair.
+For behavior-preserving refactoring, establish the relevant passing baseline and
+check it again after the change. Follow [test-authoring](../test-authoring/SKILL.md)
+for coverage and sensitivity choices rather than duplicating its procedure here.
+Confirm actual test selection and results; a successful command with zero selected
+tests is not verification. If a required check is unavailable, report the gap and
+pause only work that depends on it. Documentation-only work uses document checks;
+a reproduction-only request does not authorize production repair.
 
 ## Independently Review the Complete Candidate
 
@@ -152,6 +150,6 @@ do not substitute a declaration of confidence or silently waive a requirement.
 | Model Rationalization | Enforced Rule |
 | --- | --- |
 | Implementing all steps in one giant batch saves tokens. | Execute dependency-ordered, independently verifiable tasks. Complete each task's checks before advancing to dependent work. |
-| The fix is obvious, so failing tests can be skipped. | Investigate failures and complete the assertion gate. An expected outcome does not replace runner evidence. |
+| The fix is obvious, so verification can wait. | Choose pre-change and post-change evidence before editing; prefer an observed failing behavioral test when feasible and report any missing runner evidence. |
 | I can leave debug code and logs for later. | Remove temporary diagnostics and inspect the complete diff before final review. Do not advance with cleanup deferred. |
 | Local checkpoint commits require an immediate push. | Keep verified checkpoint commits local until pushing is separately authorized. |

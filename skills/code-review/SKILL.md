@@ -11,146 +11,119 @@ description: >-
 
 ## Scope and Intent
 
-Review the candidate without editing, staging, or committing it. Use an isolated
-copy for checks that write or mutate code. Do not implement repairs during review.
-Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting feedback.
+Review without editing, staging, committing, or repairing the candidate. Run
+mutating checks in an isolated copy. Read
+[anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting feedback.
 
-Establish authoritative requirements, accepted decisions, and applicable repository
-contracts. Treat plans, tests, comments, author explanations, and earlier verdicts
-as claims to verify. Preserve consequential uncertainty rather than inventing intent.
+Establish authoritative requirements, accepted decisions, and repository contracts.
+Verify claims in plans, tests, comments, author explanations, and earlier reviews.
+Do not invent intent where uncertainty matters.
 
 Pin the target before judging it:
 
-- For local changes, identify the base, candidate commits, and included staged,
-  unstaged, and untracked files. Do not confuse the working tree with committed HEAD.
+- For local changes, identify the base, candidate commits, and staged, unstaged,
+  and untracked files; do not confuse the working tree with HEAD.
 - For a GitHub PR, resolve the repository, number, author, head SHA, base SHA,
   merge base, changed files, and linked requirements. Read the exact candidate and
-  affected unchanged consumers, swept by import and usage sites of each changed
-  file, including components, not only by callers of changed symbols.
-- For a plan, identify its version and source requirements. Inspect the repository
-  to verify proposed paths, interfaces, dependencies, and verification commands.
+  affected unchanged consumers by import and usage sites of each changed file,
+  including components, not just callers of changed symbols.
+- For a plan, identify its version and requirements; verify proposed paths,
+  interfaces, dependencies, and checks against the repository.
 
-Read applicable root and nested agent instructions. Inspect repository-local skill
-catalogs or review playbooks for procedures that govern the changed paths, and load
-the relevant ones before discovery. Do not assume the host selected a skill because
-it was mentioned in chat or a plan. Report an unavailable local procedure when it
-leaves a material review gap; do not load unrelated skills.
+Read applicable root and nested agent instructions, skill catalogs, and review
+playbooks before discovery. Load relevant local skills; a mention in chat or a plan
+does not prove host activation. Report material gaps from unavailable procedures.
 
-For delegated independent review, receive raw requirements and the exact candidate,
-not author reasoning, self-review, proposed findings, or the implementation plan as
-proof. If implementation reasoning is already in context, use a fresh reviewer
-when available and authorized; otherwise disclose the independence limit.
-AI-agent review output is issue-discovery input, not proof. Verify each retained
-finding against the candidate, repository contracts, and the required evidence bar.
+For independent review, give a fresh reviewer raw requirements and the exact
+candidate, without author reasoning, self-review, or proposed findings. If no fresh
+reviewer is available and permitted, disclose the independence limit. Treat agent
+findings as hypotheses and verify them against the candidate and contracts.
 
 ## Three-Phase Review
 
 ### Phase 1: Candidate Issue Discovery
 
-First reconcile requirements with behavior. Look for missing, incorrect, and
-unauthorized behavior. Verify requirements already satisfied by unchanged code;
-do not require a diff merely because a plan lists an implementation task. Treat
-every concern discovered in this phase as an unverified hypothesis. Do not draft
-or announce blockers during discovery.
+Make separate passes for requirements, repository standards, and runtime correctness,
+scaled to risk. Check for missing, incorrect, and unauthorized behavior, including
+requirements already met by unchanged code. Use the [five-axis rubric](references/review-rubric.md)
+for correctness, readability, architecture, security, and performance. Trace
+execution, callers, consumers, configuration, failures, and tests; verify unfamiliar
+APIs against installed dependency versions. A plan task alone does not require a diff.
 
-Then use the [five-axis rubric](references/review-rubric.md) to inspect correctness,
-readability, architecture, security, and performance. Trace actual execution paths,
-callers, consumers, configuration, failure handling, and relevant tests. Verify
-unfamiliar APIs against installed dependency versions.
+Keep a brief working record of requirements checked, consumers traced, high-risk
+transitions, candidate findings, and unverified paths. Record behavior and evidence,
+not just checked boxes or file names. Treat concerns as hypotheses during discovery;
+do not announce blockers yet.
+Use separate reviewers only when available and permitted, with the same raw
+requirements and candidate; otherwise disclose that the passes were not independent.
 
-For substantial or high-risk changes, make distinct passes for requirement fidelity,
-repository standards, and runtime correctness so one concern does not mask another.
-Use separate reviewers for these passes only when they are available, permitted, and
-given the same raw requirements and candidate. Otherwise perform separate passes
-and report that they were not independent.
+For stateful, asynchronous, or interactive behavior, read
+[scope and state coverage](../test-authoring/references/scope-and-state.md). Identify
+owners of values and operations. Trace failure, retry, overlap, rollback, identity
+change, dismissal, and unmount. Check visible, pending, and persisted state and
+tests that control relevant completion orders; happy-path tests do not cover lost
+edits or stale work affecting a new owner.
 
-For stateful, asynchronous, or interactive behavior, read the [scope and state
-coverage](../test-authoring/references/scope-and-state.md) prompts. Identify who owns
-each value and operation, then trace important failure, retry, overlap, rollback,
-identity-change, dismissal, and unmount transitions. Check that visible, pending, and
-persisted state agree where required, and that tests control the relevant completion
-orders. Do not substitute a happy-path test for an interleaving that can lose edits
-or let stale work affect a new owner.
-
-For plans, apply the rubric to the proposed behavior and design. Check dependency
-order, shared contracts, unresolved decisions, acceptance criteria, and whether
-the proposed checks can establish the requirements. Do not claim implementation
+For plans, check dependency order, shared contracts, decisions, acceptance criteria,
+and whether proposed checks establish requirements. Do not claim implementation
 verification from a plan review.
 
-Run focused checks when they can establish a concern or material behavior. Passing
-tests do not establish correctness or completeness. Verify actual test selection;
-zero tests is not passing coverage. When useful, assess regression sensitivity in
-an isolated copy. Record unperformed checks and unavailable paths.
+Run focused checks when useful; confirm selected tests ran. Zero tests is not
+coverage, and green tests do not prove completeness. Assess regression sensitivity
+in an isolated copy when useful. Record unperformed checks and unavailable paths.
 
-For browser-visible changes, use an available Playwright or browser tool against a
-safe local or preview environment to verify the affected user flow. Inspect rendered
-state and relevant console or network failures. Browser checks complement deterministic
-tests and do not establish all async interleavings. If a safe runnable environment or
-tool is unavailable, report that coverage limit.
+For browser-visible changes, use an available browser tool against a safe local or
+preview environment. Check the affected flow, rendered state, and relevant console
+or network failures. Browser checks do not prove all async interleavings; report
+unavailable safe tooling or environments as coverage limits.
 
-For GitHub, form an assessment before reading earlier reviewers' conclusions.
-Then retrieve review bodies, all paginated threads and nested replies, and
-conversation comments. Verify earlier findings against the current candidate.
-Deduplicate new comments while retaining still-valid unresolved blockers. Partial
-retrieval and open-thread counts do not establish complete feedback coverage.
+For GitHub, record your own findings and gaps before reading earlier reviews.
+Retrieve review bodies, every paginated thread and nested reply, and conversation
+comments. Verify prior findings against the candidate; distinguish independently
+found issues from those found through prior feedback. Deduplicate comments while
+retaining valid unresolved blockers. Partial retrieval or open-thread counts do not
+establish feedback coverage.
 
 ### Phase 2: Mandatory Adversarial Verification
 
-Before assigning blocker status to a candidate, make a separate verification pass
-for that concern. State the strongest plausible author defense, then inspect the
-source that could confirm or refute it. Depending on the concern, this may include
-macro definitions and expansion, runtime control flow, schemas, public contracts,
-tests exercising the path, and peer implementations in the same repository. Treat
-author explanations and tests as evidence to check, not as proof by themselves.
+For each possible blocker, make a separate verification pass. State the strongest
+plausible author defense, then check the source that could confirm or refute it:
+macro expansion, runtime path, schema, contract, tests, or peer implementation as
+relevant. Author explanations and tests are evidence to verify, not proof.
 
 A blocker requires all of the following:
 
-- A specific changed location and reachable trigger.
-- The exact changed code and relevant macro or runtime definition whose behavior,
-  under the described trigger, demonstrably fails, violates a named contract, or
-  produces invalid data.
-- A causal explanation connecting that behavior to a material consequence.
-- Evidence that addresses the strongest plausible defense or establishes why it
-  does not apply.
+- Changed location and reachable trigger.
+- Exact code and relevant macro or runtime definition showing failure, invalid data,
+  or violation of a named contract under that trigger.
+- Causal path to a material consequence.
+- Evidence that refutes or limits the strongest plausible defense.
 
-Do not promote an inference about an unverified consumer, a speculative downstream
-effect, or a stylistic preference to blocker status. If a concern is useful but not
-fully proved, demote it to a non-blocking note or question and name the missing
-evidence. Drop concerns with no useful action or question. If required evidence
-cannot be obtained, leave the path unverified and do not issue a clean approval when
-that gap makes review coverage incomplete.
+An unverified consumer, speculative effect, or style preference is not a blocker.
+Demote useful but unproved concerns to questions or non-blocking notes with the
+missing evidence; drop those with no useful action. An unverified material path
+prevents a clean approval.
 
-Apply the same evidence duty to a cleared path and a proposed correction. Compute
-dates, counts, offsets, or boundaries used in the decision, and trace consumers
-affected by control-flow changes such as null returns, clamps, throws, or fallbacks.
-Show worked values or named consumers in chat when the verdict depends on them, or
-label the path unverified.
+Apply the same evidence bar to cleared paths and corrections. Compute relevant
+dates, counts, offsets, or boundaries; trace consumers affected by null returns,
+clamps, throws, or fallbacks. Show decisive worked values or named consumers in chat,
+or label the path unverified.
 
 ### Phase 3: Calibrated Verdict and Report
 
-Set the baseline to `APPROVE` when review coverage is complete, the implementation
-fits supported repository patterns, relevant checks pass, and no actionable feedback
-remains. Passing tests support this assessment but do not replace source and contract
-verification. Use `COMMENT` for actionable non-blocking feedback and
-`REQUEST_CHANGES` only for verified blockers. Incomplete coverage prevents a clean
-approval.
-
-In the chat report, summarize high-level architectural impact, list verified
-blockers with their failure proof, and place non-blocking observations under Notes /
-Questions. State material verification limits. For GitHub, keep the fixed review-body
-contract and put the investigation report in chat; inline comments must carry the
-verified evidence and consequence. When a small, exact correction is fully supported,
-include a GitHub suggested-change block in the inline comment. Read [GitHub review
-delivery](references/github-review.md) for eligibility and formatting.
+Choose `APPROVE` only with complete coverage, supported repository patterns,
+passing relevant checks, and no actionable feedback. Use `COMMENT` for actionable
+non-blocking feedback and `REQUEST_CHANGES` only for verified blockers. Incomplete
+coverage prevents approval. For GitHub, use the fixed review body, put the
+investigation report in chat, and put finding evidence and consequences inline.
 
 ## Finding Bar and Verdict
 
-Retain a finding only when evidence supports a concrete failure, contract violation,
-or demonstrable maintenance risk introduced or exposed by the change. A maintenance
-risk alone is non-blocking. A blocker must satisfy the Phase 2 proof requirements.
-Include a supported location, trigger, consequence, and evidence. Distinguish
-unrelated existing defects from paths newly activated by the candidate. State required
-behavior or a minimal correction when known; do not invent an implementation.
+Retain only supported failures, contract violations, or demonstrable maintenance
+risks introduced or exposed by the change. Maintenance risk alone is non-blocking.
+Give each finding a location, trigger, consequence, and evidence. Distinguish
+unrelated existing defects from newly activated paths. State required behavior or
+a minimal correction when known; do not invent an implementation.
 
 Use impact to distinguish feedback:
 
@@ -160,35 +133,29 @@ Use impact to distinguish feedback:
 - **Nit:** A minor preference, only when useful or requested.
 - **Question:** Intent or evidence is missing; do not present it as a confirmed defect.
 
-Order feedback by consequence. Do not manufacture nits or enforce a finding count.
-Repository conventions and supported technical facts take precedence over personal
-preferences. File sizes, conditional counts, and abstraction choices are clues to
-investigate, not automatic blockers.
+Order feedback by consequence; do not manufacture nits or enforce a finding count.
+Repository conventions and facts outrank personal preferences. File size,
+conditional count, and abstraction choices are clues, not automatic blockers.
 
-Keep completion separate from findings. Report incomplete coverage explicitly,
-even when no defect was confirmed. For repairs, verify earlier triggers and expand
-coverage when contracts or approach changed. After a repair, inspect its delta and
-search the wider candidate and affected callers for sibling instances of the same
-failure pattern. Material candidate changes invalidate affected prior coverage; an
-aborted or empty independent attempt remains pending.
+Report incomplete coverage even without findings. After repairs, verify earlier
+triggers, inspect the repair delta, and search the wider candidate and callers for
+sibling failures. Changed contracts or approach require expanded coverage. Material
+candidate changes reopen affected review; aborted or empty independent review remains
+pending.
 
 ## Deliver Concise Feedback
 
-Write each finding as one plain paragraph by default: defect, triggering condition,
-impact, evidence, and required behavior or correction. Use supported file links,
-backticks for identifiers, and language-tagged fences only when code helps.
-Omit praise, filler, em dashes, investigation narration, and generic test reminders.
-A test or documentation finding must name the uncovered behavior or incorrect claim
-and its consequence.
+Write findings as one plain paragraph by default: defect, trigger, impact, evidence,
+and required behavior or correction. A test or documentation finding must name the
+uncovered behavior or incorrect claim and its consequence.
 
-For local review reports, always use the Summary, Blockers, and Notes / Questions
-structure, keeping empty sections brief. State incomplete coverage and material
-limits. Omit routine CI recaps.
+In chat, summarize architectural impact, blocker proof, non-blocking Notes /
+Questions, and material limits. For local reports, use Summary, Blockers, and Notes /
+Questions; keep empty sections brief and omit routine CI recaps.
 
-For GitHub reviews, read [GitHub review delivery](references/github-review.md).
-Keep the investigation report in chat and concrete findings inline. Present the
-exact verdict, body, comments, and destinations before posting. Review requests
-do not authorize unseen publication or pending review uploads.
+For GitHub reviews, follow [GitHub review delivery](references/github-review.md)
+for event selection, inline comments, suggested changes, exact body, and publication
+approval. Review requests do not authorize unseen publication or pending uploads.
 
 ## Anti-Rationalization Guardrails
 

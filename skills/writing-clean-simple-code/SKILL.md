@@ -91,9 +91,11 @@ Do not delete an extension point merely because a local search found no caller.
 Avoid defensive code for impossible states, but preserve validation at real trust
 boundaries and explicit handling of reachable failures.
 
-Keep comments that explain reasons, contracts, or workarounds. Remove comments
-that repeat nearby code. Do not replace clear code with dense one-liners, nested
-ternaries, or elaborate fluent chains to make the diff shorter.
+Add a comment only when a reader needs context the code cannot make clear, such as
+a non-obvious reason, contract, or workaround. Keep it brief and specific. Omit
+comments that restate names, steps, or nearby code. Preserve required documentation.
+Do not replace clear code with dense one-liners, nested ternaries, or elaborate
+fluent chains to make the diff shorter.
 
 ## Verify Behavior and Comprehension
 

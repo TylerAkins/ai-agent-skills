@@ -62,38 +62,23 @@ succeeded or amend an earlier commit to recover from a failed attempt.
 After committing, verify the commit contents and working state. Report the actual
 result without implying unrelated working changes were included or removed.
 
-## Evidence Block
+## Verify the Delivery Candidate
 
-Before opening a PR or creating a release tag, run these checks against the exact
-candidate and display a Markdown evidence block containing the revision, working
-directory, each command, actual output, and exit code. Run the commands rather than
-copying example output or treating earlier confidence as evidence.
+Before opening a PR or creating a release tag, identify the exact candidate revision
+and intended destination. Confirm that the candidate contains the intended changes;
+local working changes are not part of a remote PR. Record applicable checks from
+repository instructions and CI with their commands, working directories, actual
+results, and exit codes. Include the executed test count when a test runner applies.
+If a check does not apply, state the reason instead of inventing a passing result.
+Keep detailed command output available, but put only reviewer-relevant results in
+the PR description.
 
-```text
-Evidence
-Candidate: <actual git revision>
-Working directory: <actual path>
-$ git status --porcelain
-<actual output, explicitly label empty output>
-Exit code: <actual code>
-$ <project lint/formatter/typecheck command(s)>
-<actual output>
-Exit code: <actual code>
-$ <project test runner command>
-<actual output and executed test count>
-Exit code: <actual code>
-```
-
-The transition requires empty `git status --porcelain` output, exit code 0 from
-all applicable configured project lint/formatter/type checks, and exit code 0 with
-zero test failures and actual tests executed. Identify commands from repository configuration and CI.
-If a required checker or runner is absent or unavailable, record the missing check
-and leave the gate blocked. Candidate changes invalidate affected evidence.
-
-Preserve unrelated dirty or untracked files. Use a verified clean isolated checkout
-of the candidate when needed; never discard files or create an unauthorized commit
-to make status clean. Record the checkout identity in the block. Passing this gate
-does not authorize commits, PR publication, tagging, or release execution.
+Reuse checks only while they cover the unchanged candidate. A failed or unavailable
+required check blocks delivery unless the user explicitly authorizes proceeding with
+that unmet check. Do not impose a test runner where none applies or require an empty
+working tree when unrelated changes can be safely excluded. Preserve unrelated work;
+use a verified isolated checkout when needed to establish the candidate. This
+verification does not authorize a commit, push, PR, tag, or release.
 
 ## PR Descriptions and Remote Actions
 

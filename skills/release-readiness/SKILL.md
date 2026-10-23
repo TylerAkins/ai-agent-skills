@@ -49,8 +49,13 @@ Use [ci-cd-workflows](../ci-cd-workflows/SKILL.md) for pipeline mechanics,
 [code-review](../code-review/SKILL.md) for required candidate review.
 These procedures support readiness; invoking them does not establish completion.
 
-Record a supported disposition: ready for the identified next stage, blocked by
-named requirements, or incomplete because evidence is unavailable. Keep readiness
+Record the candidate and target, each applicable required gate and its actual
+result, and any missing or failed evidence. Reuse check results only when they cover
+the same candidate and the conditions they claim to verify; rerun affected checks
+after material changes. Apply the project's requirements rather than imposing a
+clean worktree, a test count, or a generic command list on every release. Record a
+supported disposition: ready for the identified next stage, blocked by named
+requirements, or incomplete because evidence is unavailable. Keep readiness
 separate from permission to execute and from final production success.
 
 ## Prepare Rollout and Recovery
@@ -75,39 +80,6 @@ flag disablement, traffic reversal, code rollback, and data restoration or forwa
 repair. Confirm prerequisites, permissions, expected recovery time when measured,
 and irreversible boundaries. Rehearse safely when authorized; label untested procedures.
 Do not claim that reverting a commit or deploying an old binary reverses data changes.
-
-## Evidence Block
-
-Before opening a PR or creating a release tag, run these checks against the exact
-candidate and display a Markdown evidence block containing the revision, working
-directory, each command, actual output, and exit code. Run the commands rather than
-copying example output or treating earlier confidence as evidence.
-
-```text
-Evidence
-Candidate: <actual git revision>
-Working directory: <actual path>
-$ git status --porcelain
-<actual output, explicitly label empty output>
-Exit code: <actual code>
-$ <project linter/typechecker command(s)>
-<actual output>
-Exit code: <actual code>
-$ <project test runner command>
-<actual output and executed test count>
-Exit code: <actual code>
-```
-
-The transition requires empty `git status --porcelain` output, exit code 0 from
-all configured project lint/type checks, and exit code 0 with zero test failures
-and actual tests executed. Identify commands from repository configuration and CI.
-If a required checker or runner is absent or unavailable, record the missing check
-and leave the gate blocked. Candidate changes invalidate affected evidence.
-
-Preserve unrelated dirty or untracked files. Use a verified clean isolated checkout
-of the candidate when needed; never discard files or create an unauthorized commit
-to make status clean. Record the checkout identity in the block. Passing this gate
-does not authorize commits, PR publication, tagging, or release execution.
 
 ## Execute Only the Authorized Stages
 
@@ -139,3 +111,10 @@ evidence and remaining limits. Keep required release notes proportional and accu
 External announcements require approved text and destinations. Git actions and PRs
 use authorized [git-delivery](../git-delivery/SKILL.md). Cleanup of flags or retired
 paths follows its own scope and readiness, not an arbitrary post-launch deadline.
+
+## Anti-Rationalization Guardrails
+
+| Model Rationalization | Enforced Rule |
+| --- | --- |
+| CI passed, so the release is ready. | Tie required checks, reviews, compatibility, and operational evidence to the identified artifact and target stage before declaring readiness. |
+| The deployment job succeeded, so the rollout succeeded. | Verify user exposure and stage health against the agreed criteria before advancing or reporting success. |
