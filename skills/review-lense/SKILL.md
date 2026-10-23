@@ -21,7 +21,7 @@ updating history. Use available GitHub tools or CLI with verified schemas and
 explicit repository/reviewer scope. Do not depend on scripts from another installed
 skill. With no access, use supplied evidence and disclose the reduced scope.
 
-Default to a bounded sample targeting 30 PRs with substantive feedback, searching
+Default to a bounded sample targeting 25 PRs with substantive feedback, searching
 up to 120 candidates unless the user specifies another budget. Count distinct PRs
 and comments separately; boilerplate approvals do not establish a preference.
 Report actual sample size, search coverage, and stop reason. An underfilled sample

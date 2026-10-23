@@ -60,16 +60,14 @@ supporting procedures, not mandatory stages; retain established intent and evide
    consequential decisions, alternatives when useful, risks, and open questions.
 6. Map dependencies and order tasks accordingly. Prefer complete, testable behavior
    slices. Investigate risky unknowns early, before tasks depend on them.
-7. Give each task the information needed to implement and verify it:
-   - Intended outcome and specific acceptance criteria.
-   - Likely files, grounded in repository evidence.
-   - Dependencies and shared interfaces or contractual values.
-   - For stateful behavior, the relevant invariant and transition scenarios, including
-     applicable failure or overlapping-operation cases.
-   - Relevant verification commands, package directories, and observable success criteria.
-   Mark unverified paths, signatures, or commands explicitly. Avoid speculative code
-   bodies and arbitrary task sizes; split tasks when they mix independent outcomes
-   or cannot be verified meaningfully as a unit.
+7. Give each task an outcome, specific acceptance criteria, and verification with
+   observable success. Add grounded file paths, dependencies, shared contracts,
+   and unresolved decisions when they affect execution. For stateful behavior,
+   include the relevant invariant and high-risk transitions. Mark unverified paths,
+   signatures, or commands explicitly. Avoid speculative code bodies and arbitrary
+   task sizes; split tasks when they mix independent outcomes or cannot be verified
+   meaningfully as a unit. For dependent tasks, state the interface or invariant
+   the earlier task must produce and the later task will consume.
 8. Include integration checks and review checkpoints proportional to the risk.
    For changed authorization, cover applicable allow/deny, wrong-user or tenant,
    missing-identity, and preserved behavior. Plan regression sensitivity for bug
@@ -82,46 +80,37 @@ supporting procedures, not mandatory stages; retain established intent and evide
 ### Task Template
 
 Include an execution handoff in the generated plan itself, including native Cursor
-plan artifacts. Do not leave it only in chat or these skill instructions. Name the
-relevant task skills in the plan, link each skill from the plan's location, and state
-which task or decision it governs. Use canonical skill names and repository paths so
-an executor can find the procedure even when the host does not activate it
-automatically. Include only skills that materially apply. If a required skill is not
-available to the executor, the plan must surface that limit rather than imply it was
-used. For saved plans, resolve each Markdown link from the plan file; for chat plans,
-use a Markdown link to the repository-root path, such as
-`skills/<skill-name>/SKILL.md`. Use:
+plan artifacts. Link each materially relevant skill from the plan's location, map
+it to the task or decision it governs, and tell the executor to read it before that
+work. A shared mapping can cover multiple tasks without repeating the same link in
+each one. Use canonical skill names and repository paths; do not rely on host
+discovery or a chat-only reminder. Resolve links from saved plans; for chat plans,
+link a repository-root path such as `skills/<skill-name>/SKILL.md`. Surface an
+unavailable required skill rather than implying it was used. Include this handoff:
 
 > Once implementation is authorized, execute this plan using `implement-plan`,
 > including meaningful verification, final independent `code-review`, and affected
 > checks and independent re-review after material repairs. Commit and push only
 > when explicitly authorized. Report unavailable independent review as incomplete.
 
-Carry any explicit review skip or existing Git authorization into the handoff
-accurately. Include source requirement pointers and the final review/repair tasks
-in the plan so a Build or separate-session executor receives the same contract.
-For each task, instruct the executor to read and follow its linked skills before
-starting that work. Do not rely on a skill alias, host discovery, or a chat-only
-reminder as the handoff. The handoff is an instruction for later execution, not
-permission to start from a planning-only request.
+Carry any explicit review skip or existing Git authorization into the handoff.
+Include source requirement pointers and final review/repair tasks so a Build or
+separate-session executor receives the same contract. The handoff does not authorize
+implementation from a planning-only request.
 
-Use this structure when explicit tasks help. Adapt it to the project's native
-plan format rather than creating a duplicate checklist.
+Use this structure when explicit tasks help. Keep the outcome, acceptance criteria,
+and verification; add files, dependencies, skills, or decisions only when they guide
+execution. Adapt it to the project's native plan format without a duplicate checklist.
 
 ```markdown
 ### Task 1: [Observable outcome]
 
-Approach: [Concrete changes and relevant contracts]
-Files: [Verified paths; label uncertain paths]
-Depends on: [Task IDs or none]
-Skills: [Linked skill name and the task guidance it provides, or none]
+Approach: [Concrete change and relevant contract, if needed]
 
 Acceptance criteria:
 - [ ] [Specific behavior, including relevant boundaries or failure cases]
 
-Verification: [Command and working directory, or manual check]
-Expected result: [What demonstrates success]
-Needs decision: [Unresolved choice and what it blocks, or none]
+Verification: [Command and working directory, or manual check, with expected result]
 ```
 
 ## Reconcile and Deliver

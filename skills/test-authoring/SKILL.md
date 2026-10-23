@@ -28,6 +28,10 @@ examples, or preserved contracts. Do not copy the implementation's formula into
 the expected result. Resolve behavior-changing ambiguity before asserting a guessed
 outcome; continue coverage whose intent is settled.
 
+Before writing a test, name the behavior or defect its assertion would detect and
+the production change that would make it fail. If no meaningful change would fail it,
+strengthen the assertion or choose a different test boundary.
+
 ## Choose the Level That Captures the Behavior
 
 Use the lowest level that meaningfully exercises the requirement:
@@ -79,53 +83,33 @@ Use snapshots only for meaningful, reviewable output contracts. Inspect expected
 changes deliberately; do not regenerate snapshots merely to make failures green.
 Use focused assertions when a broad snapshot hides the behavior of interest.
 
-## Red-Green-Refactor Assertion Gate
+## Establish Evidence for the Requested Coverage
 
-For new behavior and bug repairs, the required state sequence is Red, Green, then
-Refactor. Do not write production implementation before completing Red.
+- For a bug reproduction, use a realistic fixture that distinguishes defective
+  behavior. Run it against the defective version when feasible and confirm the
+  intended assertion fails; syntax, import, or setup failures do not count. A
+  reproduction-only request stops there and does not authorize production repair.
+- When tests accompany an authorized behavior change or fix, prefer observing the
+  intended assertion fail before implementation and pass afterward. If the old
+  version cannot be run safely or meaningfully, record why and use the strongest
+  available baseline or reproduction. Do not claim regression sensitivity that was
+  not observed.
+- For coverage of existing correct behavior, run the test and verify it reaches the
+  intended path and asserts an independently justified result. Use a focused mutation
+  in an isolated copy when a consequential gap remains about whether the test could
+  detect a regression; do not require one for every test-only change.
 
-1. **Red:** Write the behavioral test and run the actual repository test runner
-   against the unchanged implementation. Display the command, working directory,
-   failing assertion output, and nonzero exit code before writing production code.
-   Confirm the failure expresses the requested behavior. Syntax, import, setup,
-   or unrelated failures do not satisfy Red; repair the test setup and rerun.
-2. **Green:** Implement the behavior, run the selected tests and required surrounding
-   checks, and display the actual runner output and exit code 0 with zero failures.
-   Confirm the intended tests executed; zero selected tests cannot satisfy Green.
-3. **Refactor:** Simplify only after Green. Rerun affected tests after refactoring
-   and display the clean output and exit code 0 before declaring completion.
-
-If execution is unavailable, stop dependent implementation and report the gate as
-blocked with the missing prerequisite. Never fabricate output or weaken assertions.
-For coverage of existing correct behavior or behavior-preserving refactoring,
-record a passing baseline and demonstrate regression sensitivity in an isolated
-copy before changing production code. Documentation-only changes use document
-validation rather than an artificial failing behavioral test. A reproduction-only
-request ends at observed Red and does not authorize a production repair.
-
-## Establish Regression Sensitivity
-
-For a bug, build a realistic fixture that distinguishes defective and corrected
-behavior. Observe the expected behavioral assertion fail against the defective version
-before verifying success against the corrected version.
-Syntax errors, import failures, or unrelated mutations do not establish sensitivity.
-
-Use isolated copies or precisely restore only agent-owned edits for before/after
-checks. Never broadly reset or stash mixed user work. For existing correct behavior,
-a test passing immediately can provide useful coverage: verify that it reaches
-the relevant path and would detect a meaningful regression. Demonstrate sensitivity
-with a focused mutation in an isolated copy.
-
-A request to write a reproduction test does not authorize repairing production code.
-If the test is expected to remain failing for a later repair, report the reproduced
-failure accurately rather than weakening its assertion to obtain a green suite.
+Keep before/after conditions comparable. Use isolated copies or restore only
+agent-owned edits; never reset or stash mixed user work. A reproduction test may
+remain failing for a later repair. Report its result without weakening
+the assertion to obtain a green suite.
 
 ## Execute and Report
 
 Run the intended tests and the configured lint, formatter, and type checks for
 affected packages using the shared validation procedure above. Retain command
 results, rerun affected checks after edits, and report unavailable checks as
-incomplete. An intentionally failing reproduction test may remain at observed Red;
+incomplete. An intentionally failing reproduction test may remain failing;
 that exception does not waive lint, formatter, or type checks. Use actual repository
 commands and working directories. Confirm selected tests ran and inspect failures;
 zero selected tests is not verification. Broaden or repeat checks only for material
@@ -146,8 +130,8 @@ do not substitute a declaration of confidence or silently waive a requirement.
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
-| The change is too small to test. | For any behavioral code change, complete the assertion gate before implementation; size does not waive coverage. |
+| The change is too small to test. | Choose meaningful behavioral coverage for a code change; size does not establish that the affected behavior is safe. |
 | I verified the behavior mentally. | Run the actual test runner and retain its output. Reasoning cannot satisfy an execution gate. |
-| Mocking is too hard. | Use real collaborators or a suitable integration boundary. Do not mock the behavior under test or waive the gate because setup is difficult. |
-| I will write tests after implementation. | Write and run the behavioral test first. Production implementation cannot begin until Red evidence is recorded. |
+| Mocking is too hard. | Use real collaborators or a suitable integration boundary. Do not mock the behavior under test or claim coverage that was not exercised. |
+| I will call this test regression-sensitive without running the old behavior. | Record the unobserved side of the comparison; a passing new test alone does not prove it would detect the defect. |
 | Test-only changes do not need lint. | Run configured lint, formatter, and type checks for test edits, including intentionally failing reproduction tests. |

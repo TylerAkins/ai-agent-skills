@@ -37,6 +37,10 @@ until it is understood; unrelated authorized investigation can continue.
 Seek the smallest test, script, request, or manual sequence that demonstrates the
 failure. Verify that it exercises the actual affected path and fails for the reported
 reason. Keep its environment and input recorded so before/after checks are comparable.
+Prefer one repeatable command or sequence whose result distinguishes this symptom
+from nearby failures. Tighten it by removing unrelated setup, controlling timing and
+inputs, and asserting the exact wrong outcome. If no local reproduction is possible,
+retain decisive traces or state evidence and state what remains unverified.
 
 Trace the input through the system to locate the first divergence from expected
 behavior. Distinguish UI, API, database, external service, build tooling, and test
