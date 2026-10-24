@@ -4,6 +4,7 @@ param([string]$Fixtures)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $originalCopyfileSetting = $env:COPYFILE_DISABLE
+$originalClaudeConfigDir = $env:CLAUDE_CONFIG_DIR
 $env:COPYFILE_DISABLE = '1'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $temporaryRoot = if ($IsMacOS) { '/private/tmp' } else { [IO.Path]::GetTempPath() }
@@ -23,6 +24,14 @@ function Test-InstallerFailure {
         if ($_.Exception.Message -notlike "*$Expected*") { throw }
     }
     Test-Condition $caught "Expected installer failure: $Expected"
+}
+function Get-TreeSnapshot {
+    param([string]$Path)
+    $prefix = $Path.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    @(Get-ChildItem -LiteralPath $Path -Recurse -File -Force | Sort-Object FullName | ForEach-Object {
+        $relative = $_.FullName.Substring($prefix.Length)
+        "$relative $((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)"
+    })
 }
 try {
     if (-not $Fixtures) {
@@ -74,17 +83,41 @@ try {
         Set-Item -Path "Function:global:$mock" -Value $body
     }
     $testHome = Join-Path $work 'home'
+    $env:CLAUDE_CONFIG_DIR = Join-Path $testHome 'claude profile'
     $projectPath = Join-Path $work 'project with spaces'
     [void][IO.Directory]::CreateDirectory($testHome)
     [void][IO.Directory]::CreateDirectory($projectPath)
     $catalog = Join-Path $testHome '.agents/plugins/marketplace.json'
     [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($catalog))
+    $instructionSentinels = @(
+        (Join-Path $testHome '.cursor/rules/user.mdc'),
+        (Join-Path $testHome '.codex/AGENTS.md'),
+        (Join-Path $testHome '.claude/CLAUDE.md'),
+        (Join-Path $env:CLAUDE_CONFIG_DIR 'CLAUDE.md'),
+        (Join-Path $testHome '.copilot/copilot-instructions.md'),
+        (Join-Path $testHome '.config/opencode/AGENTS.md'),
+        (Join-Path $testHome '.gemini/GEMINI.md'),
+        (Join-Path $testHome '.agents/AGENTS.md')
+    )
+    foreach ($file in $instructionSentinels) {
+        [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($file))
+        Set-Content -LiteralPath $file -Value 'Keep user instructions' -Encoding utf8NoBOM
+    }
     Set-Content -LiteralPath $catalog -Value '{"name":"existing","interface":{"displayName":"Existing"},"createdAt":"2026-10-13T00:00:00+05:30","plugins":[{"name":"other-plugin","source":"./other"}]}' -Encoding utf8NoBOM
-    foreach ($flavor in @('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) {
+    foreach ($flavor in @('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) {
         Write-Output "Testing $flavor."
-        $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
+        $flavorHome = $testHome
+        if ($flavor -eq 'codex-global') {
+            $flavorHome = Join-Path $work 'codex-global-home'
+            [void][IO.Directory]::CreateDirectory($flavorHome)
+            [void][IO.Directory]::CreateDirectory((Join-Path $flavorHome '.codex'))
+            [void][IO.Directory]::CreateDirectory((Join-Path $flavorHome '.agents'))
+            Set-Content -LiteralPath (Join-Path $flavorHome '.codex/AGENTS.md') -Value 'Keep alternate-home instructions' -Encoding utf8NoBOM
+            Set-Content -LiteralPath (Join-Path $flavorHome '.agents/AGENTS.md') -Value 'Keep alternate-home instructions' -Encoding utf8NoBOM
+        }
+        $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $flavorHome }
         if ($flavor -eq 'codex-marketplace') { $options.MarketplaceRoot = Join-Path $work 'marketplace' }
-        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project')) { $options.Project = $projectPath }
+        if ($flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project')) { $options.Project = $projectPath }
         if ($flavor -in @('muse-project', 'antigravity-project')) {
             $options.Project = Join-Path $work "$flavor with spaces"
             [void][IO.Directory]::CreateDirectory($options.Project)
@@ -92,6 +125,14 @@ try {
         & $installer @options
         $skillRoot = switch ($flavor) {
             'copilot-global' { Join-Path $testHome '.copilot/skills' }
+            'cursor-global' { Join-Path $testHome '.cursor/skills' }
+            'codex-global' { Join-Path $flavorHome '.agents/skills' }
+            'claude-global' { Join-Path $env:CLAUDE_CONFIG_DIR 'skills' }
+            'claude-project' { Join-Path $projectPath '.claude/skills' }
+            'copilot-skills' { Join-Path $projectPath '.github/skills' }
+            'codex-skills' { Join-Path $projectPath '.agents/skills' }
+            'opencode-project' { Join-Path $projectPath '.opencode/skills' }
+            'opencode-global' { Join-Path $testHome '.config/opencode/skills' }
             'gemini-project' { Join-Path $projectPath '.gemini/skills' }
             'gemini-global' { Join-Path $testHome '.gemini/skills' }
             'muse-project' { Join-Path $options.Project '.agents/skills' }
@@ -100,6 +141,15 @@ try {
             'antigravity-global' { Join-Path $testHome '.gemini/config/skills' }
             'antigravity-cli-global' { Join-Path $testHome '.gemini/antigravity-cli/skills' }
             default { $null }
+        }
+        $installRoot = if ($skillRoot) { $skillRoot } else {
+            switch ($flavor) {
+                'cursor' { Join-Path $testHome '.cursor/plugins/local/ai-agent-skills' }
+                'codex-desktop' { Join-Path $testHome '.codex/plugins/ai-agent-skills' }
+                'codex-marketplace' { Join-Path $work 'marketplace/plugins/ai-agent-skills' }
+                'claude' { Join-Path $testHome '.local/share/ai-agent-skills/claude' }
+                'copilot-staging' { Join-Path $testHome '.local/share/ai-agent-skills/copilot' }
+            }
         }
         if ($skillRoot) {
             Test-Condition (Test-Path -LiteralPath (Join-Path $skillRoot 'test-authoring/references/scope-and-state.md')) 'Skill reference missing.'
@@ -110,13 +160,33 @@ try {
         }
         Test-InstallerFailure $options 'Destination exists'
         $options.Action = 'Update'
-        if ($flavor -in @('copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) { $options.Merge = $true }
+        if ($flavor -in @('cursor-global', 'codex-global', 'claude-global', 'claude-project', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global')) { $options.Merge = $true }
         & $installer @options
+        $beforeSnapshot = Get-TreeSnapshot $installRoot
+        & $installer @options
+        $afterSnapshot = Get-TreeSnapshot $installRoot
+        Test-Condition (($beforeSnapshot -join "`n") -eq ($afterSnapshot -join "`n")) 'Repeated update changed installed files.'
         if ($skillRoot) {
             Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'unrelated/file') -Raw).Trim() -eq 'Keep me') 'Merge lost unknown skills.'
             Test-Condition ((Get-Content -LiteralPath (Join-Path $skillRoot 'test-authoring/SKILL.md') -Raw) -match 'name: test-authoring') 'Update did not replace incoming skill.'
         }
+        if ($flavor -eq 'codex-global') {
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $flavorHome '.codex/AGENTS.md') -Raw).Trim() -eq 'Keep alternate-home instructions') 'Global install changed Codex instructions.'
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $flavorHome '.agents/AGENTS.md') -Raw).Trim() -eq 'Keep alternate-home instructions') 'Global install changed shared instructions.'
+        }
     }
+    foreach ($file in $instructionSentinels) {
+        Test-Condition ((Get-Content -LiteralPath $file -Raw).Trim() -eq 'Keep user instructions') "Installer changed user instructions: $file"
+    }
+    $env:CLAUDE_CONFIG_DIR = $null
+    $claudeDefaultOptions = @{ Flavor = 'claude-global'; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
+    & $installer @claudeDefaultOptions
+    $claudeDefaultRoot = Join-Path $testHome '.claude/skills'
+    Test-Condition (Test-Path -LiteralPath (Join-Path $claudeDefaultRoot 'test-authoring/SKILL.md')) 'Claude default global skills path is missing.'
+    $claudeDefaultOptions.Action = 'Update'
+    $claudeDefaultOptions.Merge = $true
+    & $installer @claudeDefaultOptions
+    Test-Condition (Test-Path -LiteralPath (Join-Path $claudeDefaultRoot 'test-authoring/SKILL.md')) 'Claude default global skills path was lost on update.'
     $sharedAssets = Join-Path $work 'shared-assets'
     Copy-Item -LiteralPath $Fixtures -Destination $sharedAssets -Recurse
     $portablePackage = Join-Path $work 'ai-agent-skills-portable'
@@ -273,6 +343,7 @@ try {
     Write-Output 'PowerShell installer flavors, updates, preservation, and failure checks passed.'
 } finally {
     $env:COPYFILE_DISABLE = $originalCopyfileSetting
+    $env:CLAUDE_CONFIG_DIR = $originalClaudeConfigDir
     Remove-Item Function:\Invoke-WebRequest, Function:\Invoke-RestMethod, Function:\Set-Content -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $work -Recurse -Force
 }

@@ -30,9 +30,13 @@ usage() {
 Usage: bash scripts/install-ai-agent-skills.sh [install|update] --flavor NAME [options]
 Flavors:
   cursor             Cursor plugin and routing rule
+  cursor-global      User ~/.cursor/skills
   codex-desktop      Codex plugin and personal marketplace
   codex-marketplace  Codex plugin in --marketplace-root
+  codex-global       User ~/.agents/skills
   claude             Claude Code plugin
+  claude-global      User ~/.claude/skills
+  claude-project     Project .claude/skills (--project required)
   copilot-staging    Portable plugin staging only
   copilot-skills     Project .github/skills (--project required)
   copilot-global     User ~/.copilot/skills

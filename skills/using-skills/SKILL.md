@@ -1,23 +1,23 @@
 ---
 name: using-skills
 description: >-
-  Route any engineering task covered by the ai-agent-skills collection to the right
-  workflow. Use at the start of implementation, planning, testing, debugging, review,
-  delivery, or other listed work, especially when more than one skill may apply.
-  Load only relevant procedures and preserve task authorization.
+  Route ambiguous or multi-workflow engineering requests to the right ai-agent-skills
+  procedures. Use when a task spans several workflows or no single skill clearly
+  applies. For a clear single-skill request, load that skill directly instead.
 ---
 
 # Using Skills
 
-## Route Before Work
+## Choose the Workflow
 
-When this collection is available and the requested engineering work matches a
-listed workflow, use this router before planning, editing, testing, debugging,
-reviewing, or delivering. Match the requested outcome to the routing table, read the
-primary skill's full instructions before acting, and load supporting skills when their
-procedures materially apply. An explicit user skill selection takes precedence as the
-primary workflow; load supporting skills only as needed. Do not read every skill or
-force a full lifecycle.
+Prefer the host's native skill selection. When one skill clearly matches the request,
+load that skill directly and follow its full instructions before acting. Do not load
+this router for a clear single-skill task, read every skill, or force a full lifecycle.
+
+Use this router when the request spans multiple workflows or no single primary skill
+clearly applies. Select the primary workflow from the routing table, then load only
+the supporting procedures that materially apply. An explicit user skill selection
+takes precedence as the primary workflow.
 
 If the collection or a selected skill is unavailable, say so and use a scoped fallback.
 Do not claim to have used a skill based only on its name, description, or a link in a
@@ -82,7 +82,7 @@ with raw intent and the exact candidate; do not create personas merely to route 
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
-| This is a small coding task, so I can skip the router. | If the collection is available and the request matches a listed workflow, route first and read the primary skill before acting. |
+| This request is ambiguous, so I can guess the workflow. | Use this router only when no single skill clearly applies or the request spans workflows. Select a primary skill from the table and load only material supporting procedures. |
 | I know what this skill says from its description or a past task. | Read the current full skill file before relying on its procedure. |
 | A skill name is enough for a later executor to find it. | In generated plans, link applicable skills from the plan's location, map each link to the task it supports, and instruct the executor to read it before starting. |
 | Every plan should list the full skill catalog. | Select only skills that materially apply to the request; omit unrelated skills and their procedures. |

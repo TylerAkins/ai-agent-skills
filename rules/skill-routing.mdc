@@ -3,11 +3,12 @@ description: Select this plugin's engineering workflows and preserve review hist
 alwaysApply: true
 ---
 
-Use the installed ai-agent-skills collection when relevant. Read anti-ai-writing
-before drafting human-facing text. For workflow selection, read using-skills;
-load the applicable procedure rather than every skill. For an accepted Plan-to-Build
-request, use implement-plan, including verification and final independent code-review.
-Use the plan's source requirements and preserve authorization already given.
+Use Cursor's native skill selection for the installed ai-agent-skills collection.
+For a clear match, load the matching skill directly without asking the user to name
+it. Use using-skills only when the request spans workflows or no single skill clearly
+applies. Load only relevant procedures. For an accepted Plan-to-Build request, use
+implement-plan, including verification and final independent code-review. Use the
+plan's source requirements and preserve authorization already given.
 
 Respect repository instructions and task scope. A skill does not authorize new
 external actions. Never dismiss GitHub reviews or approvals or enable automatic

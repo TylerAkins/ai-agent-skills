@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+tree_snapshot() {
+  local root=$1 file
+  find "$root" -type f -print | LC_ALL=C sort | while IFS= read -r file; do
+    shasum -a 256 "$file"
+  done
+}
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 work=$(mktemp -d)
 work=$(cd "$work" && pwd -P)
@@ -32,6 +38,21 @@ export INSTALLER_FIXTURES="$fixtures"
 export PATH="$work/bin:$PATH"
 (cd "$repo_root"; go build -o "$work/skillpack" ./cmd/skillpack)
 export HOME="$work/home"
+export CLAUDE_CONFIG_DIR="$HOME/claude profile"
+instruction_sentinels=(
+  "$HOME/.cursor/rules/user.mdc"
+  "$HOME/.codex/AGENTS.md"
+  "$HOME/.claude/CLAUDE.md"
+  "$CLAUDE_CONFIG_DIR/CLAUDE.md"
+  "$HOME/.copilot/copilot-instructions.md"
+  "$HOME/.config/opencode/AGENTS.md"
+  "$HOME/.gemini/GEMINI.md"
+  "$HOME/.agents/AGENTS.md"
+)
+for file in "${instruction_sentinels[@]}"; do
+  mkdir -p "$(dirname "$file")"
+  printf 'Keep user instructions\n' > "$file"
+done
 installer="$repo_root/scripts/install-ai-agent-skills.sh"
 mkdir -p "$HOME/.agents/plugins"
 printf '%s\n' '{"name":"existing","interface":{"displayName":"Existing"},"plugins":[{"name":"other-plugin","source":"./other"}]}' > "$HOME/.agents/plugins/marketplace.json"
@@ -41,13 +62,21 @@ for option in --flavor --version --project --marketplace-root --ref; do
   fi
   grep -q 'needs a value' "$work/missing-argument.log"
 done
-for flavor in gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
+for flavor in gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global claude-project cursor-global codex-global claude-global; do
   args=(--flavor "$flavor" --dry-run)
   case "$flavor" in *-project) args+=(--project "$work/project") ;; esac
   bash "$installer" "${args[@]}"
 done
-for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copilot-skills copilot-global codex-skills opencode-project opencode-global gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
+for flavor in cursor cursor-global codex-desktop codex-marketplace codex-global claude claude-global claude-project copilot-staging copilot-skills copilot-global codex-skills opencode-project opencode-global gemini-project gemini-global muse-project muse-global antigravity-project antigravity-global antigravity-cli-global; do
   printf 'Testing %s.\n' "$flavor"
+  original_home=$HOME
+  if [ "$flavor" = codex-global ]; then
+    HOME="$work/codex-global-home"
+    mkdir -p "$HOME"
+    mkdir -p "$HOME/.codex" "$HOME/.agents"
+    printf 'Keep alternate-home instructions\n' > "$HOME/.codex/AGENTS.md"
+    printf 'Keep alternate-home instructions\n' > "$HOME/.agents/AGENTS.md"
+  fi
   args=(--flavor "$flavor" --version v1.0.0 --yes)
   case "$flavor" in
     codex-marketplace) args+=(--marketplace-root "$work/marketplace") ;;
@@ -60,6 +89,14 @@ for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copi
   bash "$installer" "${args[@]}"
   case "$flavor" in
     copilot-global) skill_root="$HOME/.copilot/skills" ;;
+    cursor-global) skill_root="$HOME/.cursor/skills" ;;
+    codex-global) skill_root="$HOME/.agents/skills" ;;
+    claude-global) skill_root="$CLAUDE_CONFIG_DIR/skills" ;;
+    claude-project) skill_root="$work/project/.claude/skills" ;;
+    copilot-skills) skill_root="$work/project/.github/skills" ;;
+    codex-skills) skill_root="$work/project/.agents/skills" ;;
+    opencode-project) skill_root="$work/project/.opencode/skills" ;;
+    opencode-global) skill_root="$HOME/.config/opencode/skills" ;;
     gemini-project) skill_root="$work/project/.gemini/skills" ;;
     gemini-global) skill_root="$HOME/.gemini/skills" ;;
     muse-project) skill_root="$work/muse-project/.agents/skills" ;;
@@ -69,6 +106,16 @@ for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copi
     antigravity-cli-global) skill_root="$HOME/.gemini/antigravity-cli/skills" ;;
     *) skill_root= ;;
   esac
+  install_root=$skill_root
+  if [ -z "$install_root" ]; then
+    case "$flavor" in
+      cursor) install_root="$HOME/.cursor/plugins/local/ai-agent-skills" ;;
+      codex-desktop) install_root="$HOME/.codex/plugins/ai-agent-skills" ;;
+      codex-marketplace) install_root="$work/marketplace/plugins/ai-agent-skills" ;;
+      claude) install_root="$HOME/.local/share/ai-agent-skills/claude" ;;
+      copilot-staging) install_root="$HOME/.local/share/ai-agent-skills/copilot" ;;
+    esac
+  fi
   if [ -n "$skill_root" ]; then
     test -f "$skill_root/test-authoring/SKILL.md"
     test -f "$skill_root/test-authoring/references/scope-and-state.md"
@@ -81,16 +128,38 @@ for flavor in cursor codex-desktop codex-marketplace claude copilot-staging copi
     printf 'Existing installation was overwritten without permission.\n' >&2; exit 1
   fi
   case "$flavor" in
-    *-skills|copilot-global|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
+    *-skills|cursor-global|codex-global|claude-global|claude-project|copilot-global|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
     *) bash "$installer" update "${args[@]}" ;;
   esac
+  before_snapshot=$(tree_snapshot "$install_root")
+  case "$flavor" in
+    *-skills|cursor-global|codex-global|claude-global|claude-project|copilot-global|opencode-*|gemini-*|muse-*|antigravity-*) bash "$installer" update "${args[@]}" --merge ;;
+    *) bash "$installer" update "${args[@]}" ;;
+  esac
+  test "$before_snapshot" = "$(tree_snapshot "$install_root")"
   if [ -n "$skill_root" ]; then
     test "$(cat "$skill_root/unrelated/file")" = 'Keep me'
     grep -q 'name: test-authoring' "$skill_root/test-authoring/SKILL.md"
+    test "$(find "$skill_root" -mindepth 1 -maxdepth 1 -type d -name test-authoring | wc -l | tr -d ' ')" = 1
   fi
+  if [ "$flavor" = codex-global ]; then
+    test "$(cat "$HOME/.codex/AGENTS.md")" = 'Keep alternate-home instructions'
+    test "$(cat "$HOME/.agents/AGENTS.md")" = 'Keep alternate-home instructions'
+  fi
+  HOME=$original_home
 done
+for file in "${instruction_sentinels[@]}"; do
+  test "$(cat "$file")" = 'Keep user instructions'
+done
+unset CLAUDE_CONFIG_DIR
+claude_default_root="$HOME/.claude/skills"
+bash "$installer" --flavor claude-global --version v1.0.0 --yes
+test -f "$claude_default_root/test-authoring/SKILL.md"
+bash "$installer" update --flavor claude-global --version v1.0.0 --merge --yes
+test -f "$claude_default_root/test-authoring/SKILL.md"
+export CLAUDE_CONFIG_DIR="$HOME/claude profile"
 jq -e '.name == "existing" and .interface.displayName == "Existing" and ([.plugins[] | select(.name == "other-plugin")] | length == 1) and ([.plugins[] | select(.name == "ai-agent-skills")] | length == 1)' "$HOME/.agents/plugins/marketplace.json" >/dev/null
-mkdir "$work/project/.agents/skills/unrelated"
+mkdir -p "$work/project/.agents/skills/unrelated"
 printf 'Keep me\n' > "$work/project/.agents/skills/unrelated/file"
 bash "$installer" update --flavor codex-skills --project "$work/project" --merge --yes
 test "$(cat "$work/project/.agents/skills/unrelated/file")" = 'Keep me'
@@ -211,4 +280,3 @@ for failure in corrupt duplicate missing-download wrong-root; do
   test "$(cat "$HOME/.local/share/ai-agent-skills/copilot/sentinel")" = 'Preserve selected plugin'
 done
 printf 'All installer flavors, updates, preservation, and failure checks passed.\n'
-
