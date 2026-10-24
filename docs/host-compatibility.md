@@ -1,0 +1,216 @@
+# Host skill compatibility
+
+Reviewed against official host documentation on October 24, 2026. This inventory
+covers the hosts and installation surfaces documented by this repository. Host
+documentation establishes discovery and invocation mechanisms, not that a model
+will always select or follow a skill.
+
+## Inventory and compatibility
+
+| Host and surface | Native skill discovery | Automatic selection | Persistent global instructions | Existing integration | Verified gaps |
+| --- | --- | --- | --- | --- | --- |
+| [Cursor IDE and CLI](https://cursor.com/docs/skills) | Project `.agents/skills`, `.cursor/skills`, `.claude/skills`, and `.codex/skills`; matching user directories under `~`. | Yes. Cursor presents available skills and the agent selects based on context. CLI supports skills and the rules system. | Cursor user rules in Customize; CLI also reads `AGENTS.md` and `CLAUDE.md`. | Cursor plugin bundle with skills, an always-on routing rule, and reviewer agent. Cursor CLI loads local plugins via `--plugin-dir` or its local-plugin settings. | The plugin rule previously routed every covered task through `using-skills`. The native global skill path was not offered by the shell installers; `cursor-global` now provides it without plugin activation. |
+| [Codex CLI, IDE extension, and ChatGPT desktop app](https://developers.openai.com/codex/skills/) | Project `.agents/skills` and user `~/.agents/skills`, plus plugin skills. | Yes. Codex can implicitly invoke skills when the task matches their descriptions. | `~/.codex/AGENTS.md`. | Project skills and a portable plugin with a local marketplace for ChatGPT desktop activation. | No global native-skill flavor existed. The desktop plugin still requires user activation in the app; the installer does not register a CLI marketplace. |
+| [Claude Code CLI and IDE extension](https://code.claude.com/docs/en/skills) | Project `.claude/skills` and user `~/.claude/skills`, or paths under `CLAUDE_CONFIG_DIR`, plus plugin skills. | Yes. Claude can load a skill automatically when relevant to its description. | `~/.claude/CLAUDE.md`, relocated under `CLAUDE_CONFIG_DIR` when set. | A Claude plugin bundle staged outside native skill directories and launched with `--plugin-dir`. | That plugin flag loads the plugin for one session only. Native persistent global and project skill installs were not offered. The old hard-coded global path would miss custom `CLAUDE_CONFIG_DIR` profiles. Direct installation also shadows Claude's bundled `/code-review` skill, while `/review` remains an alias. |
+| [GitHub Copilot app, CLI, IDEs, cloud agent, and code review](https://docs.github.com/en/copilot/concepts/customizations/agent-skills) | Project `.github/skills`, `.claude/skills`, or `.agents/skills`; personal `~/.copilot/skills` or `~/.agents/skills`. Surface support varies. | Yes. Copilot decides from the request and skill description. | The CLI supports `~/.copilot/copilot-instructions.md`; repository instructions are available on supported surfaces. Personal local skills and instructions do not automatically become cloud-agent resources. | Project and personal skills; optional portable plugin staging only. | Cloud use requires repository-hosted skills. The installer does not create a Copilot plugin marketplace, and staged plugin files alone do not activate a plugin. |
+| [OpenCode CLI, desktop, and IDE integrations](https://opencode.ai/v2/docs/skills/) | Project `.opencode/skills`, `.agents/skills`, and `.claude/skills`; global `~/.config/opencode/skills`, `~/.agents/skills`, and `~/.claude/skills`. | Model-mediated. OpenCode advertises permitted skill descriptions at model steps and exposes a `skill` tool to load a selected skill. | `~/.config/opencode/AGENTS.md`. | Project and global skills-only installs. | No host-level guarantee that the model calls the skill tool. No missing native discovery location was found. The installer intentionally does not edit global instructions because that would duplicate native skill selection. |
+| [Gemini CLI](https://geminicli.com/docs/cli/skills) | Project `.gemini/skills` or `.agents/skills`; user `~/.gemini/skills` or `~/.agents/skills`. | Yes. The model can activate a matching skill through `activate_skill`; the CLI asks the user to approve access to its directory. | `GEMINI.md`, including user-level context. | Project and global skills-only installs. | Skill activation includes a consent step. Google documents a migration path to Antigravity CLI for some Gemini CLI users, so users should follow the surface-specific current path. |
+| [Muse Code CLI](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills) | User `$HOME/.agents/skills` and Muse config skills; project `.agents/skills`, plus compatible Claude and Codex roots. Project skills require workspace trust. | Model-mediated. Muse provides skill descriptions in its catalog and a `read_skill` tool for loading the selected skill. | The cited skill reference does not establish a separate persistent global instruction file. | Project and global `.agents/skills` installs. | Project skills are unavailable in untrusted workspaces. Muse may compress skill descriptions when its catalog limit is reached; the current collection descriptions fit the portable metadata limit, but actual selection remains model-dependent. |
+| [Antigravity app and standalone IDE](https://antigravity.google/docs/skills) | Project `.agents/skills` (legacy `.agent/skills`); global `~/.gemini/config/skills`. The standalone IDE also accepts legacy `~/.gemini/antigravity/skills`. | Yes. The agent reads relevant skills automatically based on the prompt. | Global rules are supported. | Project and app/IDE global skills-only installs. | None in the documented path or package. Invocation is still an agent decision, not an installer guarantee. |
+| [Antigravity CLI](https://antigravity.google/docs/skills) | Project `.agents/skills`; global `~/.gemini/antigravity-cli/skills`. | Yes. The CLI sees skill descriptions and automatically reads a skill it judges relevant. | Global `~/.gemini/GEMINI.md`. | Project and CLI-specific global skills-only installs. | The app/IDE and CLI global directories differ; using the wrong flavor leaves files undiscovered by that surface. |
+| Other [Vercel Skills CLI targets](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) | The external adapter writes to its listed host path; location and surface vary. | Unknown for each product unless covered above. | Not configured by this repository or the Vercel installer. | Optional third-party installation path only. | Host documentation, client differences, and automatic invocation were not audited individually; see the target list below. |
+| [OpenChamber](https://docs.openchamber.dev/skills) | OpenChamber manages personal and project skills and runs OpenCode. The underlying OpenCode server must see the skill files. | Not independently established by OpenChamber's docs. Its documented `$` picker explicitly attaches a skill; automatic use depends on the OpenCode backend and selected model. | OpenChamber agent prompts are configurable; the skill installer does not change them. | No OpenChamber-specific package. OpenCode-compatible project/global skills may be used when visible to its server. | File placement through another installer does not prove that a managed or remote OpenChamber server sees the same filesystem, nor that its model invokes the skill. |
+
+### Distribution mechanisms
+
+The canonical content remains `skills/<name>/SKILL.md` and supporting files.
+Release assets are:
+
+| Release archive | Hosts | Package components |
+| --- | --- | --- |
+| `cursor` | Cursor | Canonical skills, Cursor plugin manifest, routing rule, reviewer agent, license |
+| `claude` | Claude Code | Canonical skills, Claude plugin manifest, reviewer agent, license |
+| `portable` | Codex and Copilot | Canonical skills, portable plugin manifest, license |
+| `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | Canonical skills and license, without a plugin manifest |
+
+The native shell installers provide 21 flavors across these eight host families.
+They add skill files to each host's documented project or global directory. Four
+new native flavors are `cursor-global`, `codex-global`, `claude-global`, and
+`claude-project`. `codex-global` and `muse-global` share `~/.agents/skills`.
+Project `.agents/skills` is also recognized by multiple compatible hosts. The full
+flavor-to-destination list is in the [installer reference](installer-reference.md#options-and-destinations).
+
+The README also offers the third-party [Open Skills CLI](https://github.com/vercel-labs/skills),
+which can install into many additional agent-specific locations. Its supported-agent
+list and behavior belong to that external tool and change independently. Using it
+does not add routing instructions to those agents.
+
+The upstream [supported agents table](https://github.com/vercel-labs/skills/blob/main/docs/agents.md),
+checked on the review date above, also lists these targets. Names already covered in
+the matrix inherit that row only for their documented native behavior; the remaining
+products have not had their own official skill-invocation documentation reviewed in
+this audit. For those targets, discovery, automatic selection, global instructions,
+and surface differences remain unknown. The Vercel adapter path is not evidence of
+automatic invocation.
+
+<details>
+<summary><strong>External installer targets not maintained by this repository</strong></summary>
+
+The paths below are owned by the external adapter. Entries that also appear in the
+main matrix are listed here to make the adapter inventory complete. Path differences
+are not overrides of the host's official documentation.
+
+| Agent | `--agent` | Project path | Global path |
+| --- | --- | --- | --- |
+| AiderDesk | `aider-desk` | `.aider-desk/skills/` | `~/.aider-desk/skills/` |
+| Amp, Replit, Universal | `amp`, `replit`, `universal` | `.agents/skills/` | `~/.config/agents/skills/` |
+| Antigravity | `antigravity` | `.agents/skills/` | `~/.gemini/antigravity/skills/` |
+| Antigravity CLI | `antigravity-cli` | `.agents/skills/` | `~/.gemini/antigravity-cli/skills/` |
+| AstrBot | `astrbot` | `data/skills/` | `~/.astrbot/data/skills/` |
+| Autohand Code CLI | `autohand-code` | `.autohand/skills/` | `~/.autohand/skills/` |
+| Augment | `augment` | `.augment/skills/` | `~/.augment/skills/` |
+| IBM Bob | `bob` | `.bob/skills/` | `~/.bob/skills/` |
+| Claude Code | `claude-code` | `.claude/skills/` | `~/.claude/skills/` |
+| OpenClaw | `openclaw` | `skills/` | `~/.openclaw/skills/` |
+| Cline, Codex, Dexto, fx, Kimi Code CLI, Loaf, Pi, Sarvam Code, Warp, Zed | `cline`, `codex`, `dexto`, `fx`, `kimi-code-cli`, `loaf`, `pi`, `sarvam-code`, `warp`, `zed` | `.agents/skills/` | `~/.agents/skills/` |
+| CodeArts Agent | `codearts-agent` | `.codeartsdoer/skills/` | `~/.codeartsdoer/skills/` |
+| CodeBuddy | `codebuddy` | `.codebuddy/skills/` | `~/.codebuddy/skills/` |
+| Codemaker | `codemaker` | `.codemaker/skills/` | `~/.codemaker/skills/` |
+| Code Studio | `codestudio` | `.codestudio/skills/` | `~/.codestudio/skills/` |
+| Command Code | `command-code` | `.commandcode/skills/` | `~/.commandcode/skills/` |
+| Continue | `continue` | `.continue/skills/` | `~/.continue/skills/` |
+| Cortex Code | `cortex` | `.cortex/skills/` | `~/.snowflake/cortex/skills/` |
+| Crush | `crush` | `.crush/skills/` | `~/.config/crush/skills/` |
+| Cursor | `cursor` | `.agents/skills/` | `~/.cursor/skills/` |
+| Deep Agents | `deepagents` | `.agents/skills/` | `~/.deepagents/agent/skills/` |
+| Devin for Terminal | `devin` | `.devin/skills/` | `~/.config/devin/skills/` |
+| Droid | `droid` | `.agents/skills/` | `~/.factory/skills/` |
+| Eve | `eve` | `agent/skills/` | Project-only |
+| Firebender | `firebender` | `.agents/skills/` | `~/.firebender/skills/` |
+| ForgeCode | `forgecode` | `.forge/skills/` | `~/.forge/skills/` |
+| Gemini CLI | `gemini-cli` | `.agents/skills/` | `~/.gemini/skills/` |
+| GitHub Copilot | `github-copilot` | `.agents/skills/` | `~/.copilot/skills/` |
+| Goose | `goose` | `.goose/skills/` | `~/.config/goose/skills/` |
+| Grok Build | `grok` | `.grok/skills/` | `~/.grok/skills/` |
+| Hermes Agent | `hermes-agent` | `.hermes/skills/` | `~/.hermes/skills/` |
+| inference.sh | `inference-sh` | `.inferencesh/skills/` | `~/.inferencesh/skills/` |
+| Jazz | `jazz` | `.jazz/skills/` | `~/.jazz/skills/` |
+| Junie | `junie` | `.junie/skills/` | `~/.junie/skills/` |
+| iFlow CLI | `iflow-cli` | `.iflow/skills/` | `~/.iflow/skills/` |
+| Kilo Code | `kilo` | `.agents/skills/` | `~/.kilo/skills/` |
+| Kimchi | `kimchi` | `.kimchi/skills/` | `~/.config/kimchi/harness/skills/` |
+| Kiro CLI | `kiro-cli` | `.kiro/skills/` | `~/.kiro/skills/` |
+| Kode | `kode` | `.kode/skills/` | `~/.kode/skills/` |
+| Lingma | `lingma` | `.lingma/skills/` | `~/.lingma/skills/` |
+| MCPJam | `mcpjam` | `.mcpjam/skills/` | `~/.mcpjam/skills/` |
+| MiniMax Code | `minimax-code` | `.minimax/skills/` | `~/.minimax/skills/` |
+| Mistral Vibe | `mistral-vibe` | `.vibe/skills/` | `~/.vibe/skills/` |
+| Moxby | `moxby` | `.moxby/skills/` | `~/.moxby/skills/` |
+| Mux | `mux` | `.mux/skills/` | `~/.mux/skills/` |
+| OpenCode | `opencode` | `.agents/skills/` | `~/.config/opencode/skills/` |
+| OpenHands | `openhands` | `.openhands/skills/` | `~/.openhands/skills/` |
+| Ona | `ona` | `.ona/skills/` | `~/.ona/skills/` |
+| Posit Assistant | `posit-assistant` | `.posit/assistant/skills/` | `~/.posit/assistant/skills/` |
+| Qoder | `qoder` | `.qoder/skills/` | `~/.qoder/skills/` |
+| Qoder CN | `qoder-cn` | `.qoder/skills/` | `~/.qoder-cn/skills/` |
+| Qwen Code | `qwen-code` | `.qwen/skills/` | `~/.qwen/skills/` |
+| Reasonix | `reasonix` | `.reasonix/skills/` | `~/.reasonix/skills/` |
+| Rovo Dev | `rovodev` | `.rovodev/skills/` | `~/.rovodev/skills/` |
+| Roo Code | `roo` | `.roo/skills/` | `~/.roo/skills/` |
+| Tabnine CLI | `tabnine-cli` | `.tabnine/agent/skills/` | `~/.tabnine/agent/skills/` |
+| Terramind | `terramind` | `.terramind/skills/` | `~/.terramind/skills/` |
+| Tinycloud | `tinycloud` | `.tinycloud/skills/` | `~/.tinycloud/skills/` |
+| Trae | `trae` | `.trae/skills/` | `~/.trae/skills/` |
+| Trae CN | `trae-cn` | `.trae/skills/` | `~/.trae-cn/skills/` |
+| Windsurf | `windsurf` | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
+| ZCode | `zcode` | `.zcode/skills/` | `~/.zcode/skills/` |
+| Zencoder, Zenflow | `zencoder`, `zenflow` | `.zencoder/skills/` | `~/.zencoder/skills/` |
+| Neovate | `neovate` | `.neovate/skills/` | `~/.neovate/skills/` |
+| Pochi | `pochi` | `.pochi/skills/` | `~/.pochi/skills/` |
+| PromptScript | `promptscript` | `.agents/skills/` | Project-only |
+| AdaL | `adal` | `.adal/skills/` | `~/.adal/skills/` |
+
+</details>
+
+The Vercel Antigravity adapter's app target is `~/.gemini/antigravity/skills`.
+Google documents `~/.gemini/config/skills` for the Antigravity app and IDE, while
+the IDE accepts the adapter path as a legacy location. The native `antigravity-global`
+flavor targets the documented app/IDE path; use `antigravity-cli-global` for the CLI.
+
+## Routing design and verified gaps
+
+All eight host families document a way for the agent to choose a skill from its
+description, though their tools and user-consent behavior differ. The strongest
+shared architecture is therefore native skill discovery with concise, task-specific
+descriptions. The installer does not claim to enforce invocation.
+
+The source audit found three avoidable gaps:
+
+1. `using-skills` described itself as the entry point for any engineering task and
+   instructed agents to load it before planning, editing, testing, debugging, review,
+   or delivery. That competed with direct native matching and loaded the generic
+   router even for a clear single-skill task. Its trigger and instructions now limit
+   routing to ambiguous or multi-workflow work.
+2. The Cursor plugin's always-on rule had the same blanket router requirement. It now
+   defers clear matches to Cursor's native skill selection and uses the router only
+   for ambiguous or multi-workflow requests.
+3. The Claude native global skill directory followed `~/.claude` literally. Claude
+   Code relocates all of those paths under `CLAUDE_CONFIG_DIR` when that variable is
+   set. The new installer honors that override and retains the default path otherwise.
+
+The Claude plugin path was session-only because the installer stages it for
+`--plugin-dir`. Native `claude-global` and `claude-project` flavors now install to
+Claude Code's persistent skill directories. Cursor CLI and Codex CLI/IDE users also
+now have direct global skill flavors at `~/.cursor/skills` and `~/.agents/skills`;
+their existing plugin and project options remain available.
+
+No global instruction file is installed or modified. Native selection is already
+documented for the supported hosts, while a blanket global router would duplicate
+that entry point, add context to unrelated sessions, and risk conflicting with
+user-defined instructions. Skills-only flavors change only the selected skill
+directory. Existing plugin flavors retain their host-specific behavior, including
+the Codex local marketplace update, and preserve unrelated marketplace entries and
+instruction files.
+
+## Behavioral evidence and limits
+
+Structural package and installer tests verify manifests, paths, skill content,
+merging, backups, marketplace preservation, and user-instruction-file preservation.
+They do not verify that a model selected a skill.
+
+No actual task prompts were run during this audit. Cursor CLI, Codex CLI, and
+OpenCode executables were present, but behavior tests would require an authenticated
+model request. No paid model API was invoked. Claude Code, Copilot, Gemini CLI,
+Antigravity, and Muse executables were unavailable in this environment. OpenChamber
+was not run. These integrations have structural or documentation evidence only.
+
+| Prompt | Expected skill | Observed result |
+| --- | --- | --- |
+| “Review my branch against main.” | `code-review` | Not run |
+| “Find and fix why this function fails.” | `root-cause-debug` | Not run |
+| “Plan the implementation of this feature.” | `agent-planning` | Not run |
+| “Implement the accepted plan.” | `implement-plan` | Not run |
+| “Optimize this slow SQL query.” | `writing-optimized-sql` | Not run |
+| “Write regression tests for this behavior.” | `test-authoring` | Not run |
+| “Explain how this subsystem works.” | `explain-it` | Not run |
+| “What is 17 times 29?” | No skill | Not run |
+
+No multi-model comparison was performed.
+
+To check activation without naming a skill, ask for a task such as “Review my branch
+against main” or “Write regression tests for this behavior.” Inspect the host's
+visible skill/tool activity or skill panel, then verify the workflow's instructions
+were followed. A skills list, successful install, or slash-command entry proves
+discovery only.
+
+## Official references
+
+- [Cursor skills and CLI](https://cursor.com/docs/skills), [CLI use](https://cursor.com/docs/cli/using), [CLI plugin parameters](https://cursor.com/docs/cli/reference/parameters), [CLI plugin changelog](https://cursor.com/docs/cli/changelog)
+- [Codex skills](https://developers.openai.com/codex/skills/), [global instructions](https://developers.openai.com/codex/guides/agents-md)
+- [Claude Code skills](https://code.claude.com/docs/en/skills), [plugin loading](https://code.claude.com/docs/en/plugins/loading), [config directory](https://code.claude.com/docs/en/claude-directory), [environment variables](https://code.claude.com/docs/en/env-vars)
+- [Copilot skills](https://docs.github.com/en/copilot/concepts/customizations/agent-skills), [Copilot CLI instructions](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)
+- [OpenCode skills](https://opencode.ai/v2/docs/skills/), [OpenCode instructions](https://opencode.ai/v2/docs/instructions/)
+- [Gemini CLI skills](https://geminicli.com/docs/cli/skills), [Gemini CLI context](https://geminicli.com/docs/cli/gemini-md/)
+- [Antigravity skills](https://antigravity.google/docs/skills), [Antigravity CLI features](https://antigravity.google/docs/cli/features)
+- [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills)
+- [OpenChamber skills](https://docs.openchamber.dev/skills)

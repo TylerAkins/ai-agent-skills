@@ -20,8 +20,10 @@ still select host-specific destinations and activation steps. The `codex`,
 `copilot`, and `opencode` build targets remain available for existing source-build
 consumers; their contents match `portable`, `portable`, and `skills`, respectively.
 
-Cursor includes a routing rule and reviewer; Claude includes the reviewer.
-The agent requests read-only review through instructions, not a tool sandbox.
+Cursor includes a native-first routing rule and reviewer; Claude includes the
+reviewer. The reviewer requests read-only review through instructions, not a tool
+sandbox. Native skills-only installation options are listed in the
+[host compatibility matrix](host-compatibility.md).
 Codex and Copilot rely on their host's available review/delegation capabilities.
 
 Repository `AGENTS.md`, tooling, credentials, and the `.cursor/skills` discovery
@@ -71,20 +73,20 @@ workflow. Record the host/version, observed results, and missing checks.
 
 ## Skill Activation Limits
 
-Skills are selected from their names and descriptions when a host decides a request
-matches. The `using-skills` description is intended to route work covered by this
-collection to its primary workflow, but skill selection and instruction following
-remain model behavior, not an enforced runtime gate. A link in a plan proves only that
-the executor has a path to the skill. It does not prove the skill was loaded or used.
+Supported hosts expose skill names and descriptions to the agent and document
+model-mediated selection for relevant requests. Selection and instruction following
+remain model behavior, not an enforced runtime gate. Native selection should load a
+clear matching skill directly. `using-skills` is for ambiguous or multi-workflow
+requests, not a mandatory step for every engineering task. A link in a plan proves
+only that the executor has a path to the skill. It does not prove the skill was
+loaded or used.
 
-For projects where a workflow must be considered on every task, configure a short
-always-loaded instruction in that host's supported project or personal instruction
-file. Tell the agent to read `using-skills` first for work covered by this collection,
-then read the selected skill before acting. Keep the detailed procedure in the skill.
+Do not add a persistent router where native selection already covers the same work.
+If an officially documented host lacks native skill selection and a supported
+instruction mechanism can address it, add only a short conditional instruction that
+preserves user-defined settings. Keep detailed procedures in the canonical skills.
 Do not copy this repository's `AGENTS.md` as generic installed instructions. Verify
-the instruction mechanism for the target host and surface, then test a new session by
-asking for work that should trigger a specific skill and checking both skill discovery
-and the agent's actions. This improves activation odds but cannot guarantee compliance.
+the host, surface, and model behavior separately from structural installation tests.
 
 ## Host References and Distribution
 
@@ -96,6 +98,10 @@ and the agent's actions. This improves activation odds but cannot guarantee comp
 - [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/)
 - [Antigravity skills](https://antigravity.google/docs/skills)
 - [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/)
+- [OpenChamber skills](https://docs.openchamber.dev/skills)
+
+See the [host compatibility matrix](host-compatibility.md) for the complete host,
+surface, installation, and invocation audit, including third-party clients.
 
 Packaging and release assets do not create marketplace listings. Cursor submissions
 go through [the publisher form](https://cursor.com/marketplace/publish).

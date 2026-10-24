@@ -12,6 +12,9 @@ Choose a distribution path:
 | Open Skills CLI (`npx skills`) | Node.js/npm and Git; no manual clone | Skill folders and supporting resources for supported agents |
 | Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing/reviewer configuration where supported |
 
+See the [host compatibility matrix](docs/host-compatibility.md) for native skill
+discovery, automatic selection, app/CLI differences, and verified limitations.
+
 ### Open Skills CLI
 
 Run from your target project directory:
@@ -37,7 +40,8 @@ Skills link to other skills in this collection. Install the collection when you
 need those workflows; a single skill retains its own `references/` resources but
 does not install sibling skills automatically. See the
 [Open Skills CLI documentation](https://github.com/vercel-labs/skills) for supported
-agents, global installation, and updates.
+agents, global installation, and updates. The CLI distributes files; whether a
+host selects a skill automatically depends on that host's native behavior.
 
 ### Native Shell Installers
 
@@ -92,10 +96,34 @@ bash scripts/install-ai-agent-skills.sh --flavor cursor
 Run **Developer: Reload Window** from Cursor's Command Palette
 (`Cmd+Shift+P` on Mac, `Ctrl+Shift+P` on Windows/Linux). Open **Customize** and
 check for **ai-agent-skills**, its skills, routing rule, and reviewer. Start a new
-Agent chat and request `agent-planning`.
+Agent chat and ask for an implementation plan without naming a skill.
 
 Local plugin imports must be allowed by your account/team. A marketplace copy
-with the same name can take precedence. See [Cursor plugins](https://cursor.com/docs/plugins).
+with the same name can take precedence. The plugin rule now defers clear skill matches
+to Cursor's native selection. Cursor CLI also supports loading a local plugin for a
+session:
+
+```sh
+agent --plugin-dir "$HOME/.cursor/plugins/local/ai-agent-skills"
+```
+
+See [Cursor plugins](https://cursor.com/docs/plugins) and the
+[CLI plugin parameters](https://cursor.com/docs/cli/reference/parameters).
+
+### Direct global skills for Cursor IDE or CLI
+
+To install skills in Cursor's native user directory without installing the plugin:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor cursor-global
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor cursor-global
+```
+
+Start a new session and verify the skills in **Customize > Skills** or the CLI's
+skill list. For updates, use `update` / `-Action Update` with `--merge` / `-Merge`.
 
 ### Update
 
@@ -136,12 +164,31 @@ bash scripts/install-ai-agent-skills.sh --flavor codex-desktop
 ### Activate and check
 
 Quit and reopen ChatGPT/Codex. In **Plugins**, select your personal marketplace
-and install **ai-agent-skills**. Start a new chat and request `agent-planning`.
+and install **ai-agent-skills**. Start a new chat and describe the task without
+naming a skill.
 
 The helper installs files in `~/.codex/plugins/ai-agent-skills` and merges an entry
 into `~/.agents/plugins/marketplace.json`, preserving other plugins and metadata.
 You complete activation in the app. It does not register a CLI marketplace.
 See [OpenAI local marketplaces](https://developers.openai.com/plugins/build/plugins).
+
+### Native global skills for Codex CLI and IDE extension
+
+Install directly to Codex's user-level Agent Skills directory:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor codex-global
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor codex-global
+```
+
+Start a new Codex session and describe the task normally. Codex selects matching
+skills from their descriptions. This path is separate from the desktop plugin and
+does not change Codex configuration. For updates, use `update` / `-Action Update`
+with `--merge` / `-Merge`. The shared `~/.agents/skills` directory is also read by
+other compatible hosts.
 
 ### Update
 
@@ -199,9 +246,31 @@ claude --plugin-dir "$HOME/.local/share/ai-agent-skills/claude"
 claude --plugin-dir "$env:USERPROFILE/.local/share/ai-agent-skills/claude"
 ```
 
-Invoke `/ai-agent-skills:agent-planning` in that session. Use `--plugin-dir` when
-launching later sessions too; the helper does not configure a persistent marketplace.
-See [Claude plugins](https://code.claude.com/docs/en/plugins).
+The plugin exposes namespaced skill commands. `--plugin-dir` loads it for that
+session, so pass the flag when launching later sessions too. The helper does not
+configure a persistent marketplace. See [Claude plugins](https://code.claude.com/docs/en/plugins).
+
+### Native personal or project skills
+
+For persistent Claude Code skill directories, use `claude-global` or
+`claude-project` instead of the plugin flavor:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor claude-global
+bash scripts/install-ai-agent-skills.sh --flavor claude-project --project /absolute/path/to/project
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-global
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-project -Project 'C:/path/to/project'
+```
+
+Start a new Claude Code session, check `/skills`, and ask for ordinary work without
+naming a skill. Claude can select skills based on their descriptions. For updates,
+use `update` / `-Action Update` and `--merge` / `-Merge` with the same target. The
+global flavor honors an absolute `CLAUDE_CONFIG_DIR` when it is set.
+The installed `code-review` skill takes the `/code-review` name used by Claude's
+built-in skill; Claude's `/review` alias remains available.
 
 ### Update
 
@@ -244,7 +313,7 @@ bash scripts/install-ai-agent-skills.sh --flavor copilot-global
 The helper installs skills in `~/.copilot/skills` for use across projects.
 
 Open the project in the Copilot app, start a new session, and check
-**Customize > Skills**. Request `agent-planning` in chat. See
+**Customize > Skills**. Ask it to plan a feature without naming a skill. See
 [Copilot app customization](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app).
 
 ### Update
@@ -292,7 +361,8 @@ bash scripts/install-ai-agent-skills.sh --flavor opencode-global
 ### Activate and check
 
 Skills are installed in `~/.config/opencode/skills` for use across your projects.
-Start a new OpenCode session and request `agent-planning`.
+Start a new OpenCode session and ask it to plan a feature without naming a skill.
+The model can load a matching skill through OpenCode's native `skill` tool.
 This is a skills installation. See [OpenCode skills](https://opencode.ai/docs/skills/).
 
 ### Update
@@ -337,7 +407,9 @@ bash scripts/install-ai-agent-skills.sh --flavor gemini-global
 ### Activate and check
 
 Skills are installed in `~/.gemini/skills` for use across projects.
-In Gemini CLI, run `/skills reload` and `/skills list`. Request `agent-planning`. See [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/).
+In Gemini CLI, run `/skills reload` and `/skills list`, then ask it to plan a feature
+without naming a skill. Approve the skill activation prompt when it appears. See
+[Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/).
 
 ### Update
 
@@ -377,7 +449,9 @@ bash scripts/install-ai-agent-skills.sh --flavor muse-global
 
 Skills are installed in `~/.agents/skills` for use across projects.
 In Muse Code, run `/skills reload`, then check `muse skills list` from a terminal.
-Invoke `/agent-planning` in the session. See [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
+Ask it to plan a feature without naming a skill, then inspect whether it used
+`read_skill`. Project skills require a trusted workspace. See
+[Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
 
 ### Update
 
@@ -419,8 +493,9 @@ to `~/.gemini/antigravity-cli/skills`. These are separate installations.
 
 ### Activate and check
 
-Start a new session and invoke `/agent-planning`. In the standalone IDE, inspect
-active skills through the agent side panel's **Customizations** menu. See
+Start a new session and ask it to plan a feature without naming a skill. In the
+standalone IDE, inspect active skills through the agent side panel's
+**Customizations** menu. See
 [Antigravity skill locations and invocation](https://antigravity.google/docs/skills).
 File placement alone does not establish that the host loaded a skill.
 
@@ -460,7 +535,9 @@ conflict handling, manual installation, and recovery.
 
 ## Use
 
-Select a skill in your host or name it in your request:
+Describe the task normally. Hosts that support implicit skill invocation can select
+a matching skill from its description; naming a skill is optional when you want to
+force a particular workflow:
 
 ```text
 Use agent-planning to plan this feature. Do not implement it yet.
@@ -468,9 +545,10 @@ Use code-review to review this branch against main without changing the code.
 Use root-cause-debug to reproduce and fix this failure with regression coverage.
 ```
 
-For a feature that needs a plan, follow this workflow. Cursor is the example host;
-other flavors may use different controls or review tools. Small, understood changes
-can start with the relevant skill directly.
+For a feature that needs a plan, the agent should select `agent-planning`; after
+acceptance, `implement-plan` coordinates implementation and review. Native skills
+make these procedures available, but models decide when to load them. Cursor is the
+example host; other flavors may use different controls or review tools.
 
 ```mermaid
 flowchart TD
@@ -491,10 +569,12 @@ review leaves that gate incomplete. See the [Cursor workflow example](docs/curso
 for prompts, expected results, and recovery steps. The example describes the
 instructed workflow; a live Cursor validation run has not been recorded.
 
-Implementation includes relevant skills, verification, and independent `code-review`
-unless you explicitly skip it. Unavailable review is reported incomplete. If the
-host misses the handoff, request `implement-plan` explicitly. Jira/GitHub connections
-must be configured separately. This is an instructed workflow, not host automation.
+Implementation should include relevant skills, verification, and independent
+`code-review` unless you explicitly skip it. Unavailable review is reported
+incomplete. If the host misses the handoff, name the needed skill as a fallback.
+Jira/GitHub connections must be configured separately. These are model-followed
+workflows, not enforced runtime gates. See the [host compatibility matrix](docs/host-compatibility.md)
+for documented behavior and testing limits.
 
 Build does not authorize commits, pushes, external replies, or deployment.
 GitHub reviews and approvals are never dismissed.
@@ -549,7 +629,7 @@ GitHub reviews and approvals are never dismissed.
 | [anti-ai-writing](skills/anti-ai-writing/SKILL.md) | Concise prose, strict style rules, and publication approval. |
 | [skill-authoring](skills/skill-authoring/SKILL.md) | Author, evaluate, and register engineering skills with verified packages. |
 | [technical-documentation](skills/technical-documentation/SKILL.md) | Write verified guides, references, READMEs, and decision records. |
-| [using-skills](skills/using-skills/SKILL.md) | Route covered work to the right skill before acting. |
+| [using-skills](skills/using-skills/SKILL.md) | Route ambiguous or multi-workflow requests to relevant skills. |
 
 </details>
 

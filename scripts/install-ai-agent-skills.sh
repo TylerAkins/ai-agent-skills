@@ -49,6 +49,7 @@ catalog=
 source_path=
 case "$flavor" in
   cursor) host=cursor; destination="$HOME/.cursor/plugins/local/ai-agent-skills" ;;
+  cursor-global) skills_only=true; host=cursor; destination="$HOME/.cursor/skills" ;;
   codex-desktop)
     host=codex; destination="$HOME/.codex/plugins/ai-agent-skills"
     catalog="$HOME/.agents/plugins/marketplace.json"
@@ -59,10 +60,12 @@ case "$flavor" in
     host=codex; destination="$marketplace_root/plugins/ai-agent-skills"
     catalog="$marketplace_root/.agents/plugins/marketplace.json"
     source_path="./plugins/ai-agent-skills" ;;
+  codex-global) skills_only=true; host=codex; destination="$HOME/.agents/skills" ;;
   claude) host=claude; destination="$HOME/.local/share/ai-agent-skills/claude" ;;
+  claude-global) skills_only=true; host=claude; destination="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills" ;;
   copilot-staging) host=copilot; destination="$HOME/.local/share/ai-agent-skills/copilot" ;;
   copilot-global) skills_only=true; host=copilot; destination="$HOME/.copilot/skills" ;;
-  copilot-skills|codex-skills|opencode-project|gemini-project|muse-project|antigravity-project)
+  copilot-skills|codex-skills|opencode-project|gemini-project|muse-project|antigravity-project|claude-project)
     [ -n "$project" ] || fail "Use --project with the full path to an existing project."
     require_absolute "$project"
     [ -d "$project" ] || fail "Project directory does not exist: $project"
@@ -70,6 +73,7 @@ case "$flavor" in
     case "$flavor" in
       copilot-skills) host=copilot; destination="$project/.github/skills" ;;
       codex-skills) host=codex; destination="$project/.agents/skills" ;;
+      claude-project) host=claude; destination="$project/.claude/skills" ;;
       opencode-project) host=opencode; destination="$project/.opencode/skills" ;;
       gemini-project) host=skills; destination="$project/.gemini/skills" ;;
       muse-project|antigravity-project) host=skills; destination="$project/.agents/skills" ;;
@@ -142,13 +146,20 @@ fi
 printf 'Installed %s at %s.\n' "$flavor" "$destination"
 case "$flavor" in
   cursor) printf 'Reload Cursor (Developer: Reload Window), then check Customize for the plugin and skills.\n' ;;
+  cursor-global) printf 'Start a new Cursor session and check Customize > Skills. Native skill selection applies when relevant.\n' ;;
   codex-desktop) printf 'Quit and reopen ChatGPT/Codex. Open Plugins and install ai-agent-skills from your local marketplace.\n' ;;
   codex-marketplace) printf 'In the app, add a plugin marketplace with this full source path: %s\n' "$marketplace_root" ;;
+  codex-global) printf 'Start a new Codex CLI or IDE session. Codex discovers skills in ~/.agents/skills and selects them when relevant.\n' ;;
   claude) printf 'Launch Claude Code with: claude --plugin-dir "%s"\n' "$destination" ;;
+  claude-global|claude-project) printf 'Start a new Claude Code session and check /skills. Claude selects matching skills automatically.\n' ;;
   copilot-staging) printf 'This stages the bundle only. Copilot needs a marketplace under Customize > Plugins.\nSee https://docs.github.com/en/copilot/concepts/agents/about-plugins\n' ;;
-  antigravity-*) printf 'Start a new Antigravity session and invoke /agent-planning. In the IDE, inspect skills in the Customizations menu.\n' ;;
-  gemini-*) printf 'In Gemini CLI, run /skills reload and /skills list, then request a skill.\n' ;;
+  antigravity-*) printf 'Start a new Antigravity session and describe the task normally. In the IDE, inspect active skills in the Customizations menu.\n' ;;
+  gemini-*) printf 'In Gemini CLI, run /skills reload and /skills list, then describe the task normally and approve skill activation when prompted.\n' ;;
   muse-*) printf 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.\n' ;;
   *) printf 'Start a new host session and check for the installed skills.\n' ;;
 esac
-printf 'For updates, refresh/reinstall the host plugin if its cached copy remains stale.\n'
+if "$skills_only"; then
+  printf 'For updates, use update with --merge (PowerShell: -Action Update -Merge) to preserve unrelated skills.\n'
+else
+  printf 'For updates, refresh/reinstall the host plugin if its cached copy remains stale.\n'
+fi

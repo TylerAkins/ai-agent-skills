@@ -3,7 +3,8 @@
 Follow a planned feature from requirements through implementation, verification,
 and independent review. Cursor is the example host. Other flavors may use different
 controls or review tools while preserving the same skill contracts and authorization
-boundaries. Small, understood changes can start with the relevant skill directly.
+boundaries. Describe ordinary work without naming skills to exercise native automatic
+selection; naming a skill is an optional fallback.
 
 This guide describes the instructed workflow. A live Cursor validation run has not
 been recorded, so it is not yet a verified end-to-end example.
@@ -24,8 +25,8 @@ Jira is optional; reading an issue requires a configured connection.
 In Plan mode, describe the feature and request:
 
 ```text
-Use agent-planning to plan this feature. Include acceptance criteria,
-verification, and the implement-plan handoff. Do not implement yet.
+Plan this feature. Include acceptance criteria, verification, and an implementation
+handoff. Do not implement yet.
 ```
 
 For Jira work, first ask `jira-tickets` to read the issue in intake mode. Supply
@@ -41,8 +42,7 @@ Resolve decisions that would change the intended behavior before dependent work.
 Review the plan, then request Build in the same chat:
 
 ```text
-Implement the accepted plan using implement-plan, including verification
-and final independent code-review.
+Implement the accepted plan, including verification and final independent review.
 ```
 
 If starting a new chat, provide the source requirements, accepted plan, relevant

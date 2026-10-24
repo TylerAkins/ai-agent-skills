@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'codex-desktop', 'codex-marketplace', 'claude', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -99,9 +99,13 @@ function Expand-VerifiedBundle {
 
 $flavors = [ordered]@{
     cursor = @('cursor', '.cursor/plugins/local/ai-agent-skills', $false)
+    'cursor-global' = @('cursor', '.cursor/skills', $true)
     'codex-desktop' = @('codex', '.codex/plugins/ai-agent-skills', $false)
     'codex-marketplace' = @('codex', 'plugins/ai-agent-skills', $false)
+    'codex-global' = @('codex', '.agents/skills', $true)
     claude = @('claude', '.local/share/ai-agent-skills/claude', $false)
+    'claude-global' = @('claude', '.claude/skills', $true)
+    'claude-project' = @('claude', '.claude/skills', $true)
     'copilot-staging' = @('copilot', '.local/share/ai-agent-skills/copilot', $false)
     'copilot-skills' = @('copilot', '.github/skills', $true)
     'copilot-global' = @('copilot', '.copilot/skills', $true)
@@ -129,7 +133,11 @@ if ($Ref -and $Ref -ne 'main') { Test-ReleaseVersion $Ref }
 if ($Ref -and $Version -and $Ref -ne $Version) { throw '-Version and -Ref disagree.' }
 $installRoot = Resolve-InstallPath $HomeDirectory
 $targetHost, $relativePath, $skillsOnly = $flavors[$Flavor]
-if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project')) {
+if ($Flavor -eq 'claude-global' -and $env:CLAUDE_CONFIG_DIR) {
+    $installRoot = Resolve-InstallPath $env:CLAUDE_CONFIG_DIR
+    $relativePath = 'skills'
+}
+if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project')) {
     if (-not $Project) { throw '-Project is required for this flavor.' }
     $installRoot = Resolve-InstallPath $Project
     if (-not (Test-Path -LiteralPath $installRoot -PathType Container)) { throw 'Project directory does not exist.' }
@@ -289,16 +297,23 @@ try {
     Write-Output "Installed $Flavor at $destination."
     switch ($Flavor) {
         'cursor' { Write-Output 'Reload Cursor (Developer: Reload Window), then check Customize.' }
+        'cursor-global' { Write-Output 'Start a new Cursor session and check Customize > Skills. Native skill selection applies when relevant.' }
         'codex-desktop' { Write-Output 'Reopen ChatGPT/Codex. In Plugins, install ai-agent-skills from the personal marketplace.' }
         'codex-marketplace' { Write-Output "Add a plugin marketplace with this full source path: $installRoot" }
+        'codex-global' { Write-Output 'Start a new Codex CLI or IDE session. Codex discovers skills in ~/.agents/skills and selects them when relevant.' }
         'claude' { Write-Output "Launch Claude Code with: claude --plugin-dir `"$destination`"" }
+        { $_ -in @('claude-global', 'claude-project') } { Write-Output 'Start a new Claude Code session and check /skills. Claude selects matching skills automatically.' }
         'copilot-staging' { Write-Output 'Staging only. Copilot needs a marketplace under Customize > Plugins. See https://docs.github.com/en/copilot/concepts/agents/about-plugins' }
-        { $_ -like 'antigravity-*' } { Write-Output 'Start a new Antigravity session and invoke /agent-planning. In the IDE, inspect skills in the Customizations menu.' }
-        { $_ -like 'gemini-*' } { Write-Output 'In Gemini CLI, run /skills reload and /skills list, then request a skill.' }
+        { $_ -like 'antigravity-*' } { Write-Output 'Start a new Antigravity session and describe the task normally. In the IDE, inspect active skills in the Customizations menu.' }
+        { $_ -like 'gemini-*' } { Write-Output 'In Gemini CLI, run /skills reload and /skills list, then describe the task normally and approve skill activation when prompted.' }
         { $_ -like 'muse-*' } { Write-Output 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.' }
         default { Write-Output 'Start a new host session and check for the installed skills.' }
     }
-    Write-Output 'Refresh/reinstall the host plugin if its cached copy remains stale.'
+    if ($skillsOnly) {
+        Write-Output 'For updates, use -Action Update -Merge to preserve unrelated skills.'
+    } else {
+        Write-Output 'Refresh/reinstall the host plugin if its cached copy remains stale.'
+    }
 } finally {
     if ($catalogTemp -and (Test-Path -LiteralPath $catalogTemp)) { Remove-Item -LiteralPath $catalogTemp -Force }
     if ($stage -and (Test-Path -LiteralPath $stage)) { Remove-Item -LiteralPath $stage -Recurse -Force }

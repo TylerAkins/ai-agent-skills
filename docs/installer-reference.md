@@ -76,7 +76,7 @@ bash scripts/install-ai-agent-skills.sh --flavor codex-skills --project /absolut
 ./scripts/install-ai-agent-skills.ps1 -Flavor codex-skills -Project 'C:/path/to/project'
 ```
 
-Start a new Codex session in that project and request a skill. To update, add
+Start a new Codex session in that project and describe the task normally. To update, add
 `update` before `--flavor` in Bash, or `-Action Update` in PowerShell, plus
 `--merge` / `-Merge` to preserve unrelated skills.
 
@@ -97,6 +97,39 @@ replacement, and refresh/reinstall the host's cached plugin if needed.
 </details>
 
 <details>
+<summary><strong>Native global skill directories for Cursor, Codex, and Claude Code</strong></summary>
+
+These flavors install only canonical skills to each host's own discovery path. They
+do not install a plugin or change host instructions/settings.
+
+**Bash**
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor cursor-global
+bash scripts/install-ai-agent-skills.sh --flavor codex-global
+bash scripts/install-ai-agent-skills.sh --flavor claude-global
+bash scripts/install-ai-agent-skills.sh --flavor claude-project --project /absolute/path/to/project
+```
+
+**PowerShell**
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor cursor-global
+./scripts/install-ai-agent-skills.ps1 -Flavor codex-global
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-global
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-project -Project 'C:/path/to/project'
+```
+
+Cursor uses `~/.cursor/skills`, Codex uses `~/.agents/skills`, and Claude Code
+uses `~/.claude/skills` or the project's `.claude/skills`. Claude's global flavor
+honors an absolute `CLAUDE_CONFIG_DIR` when set. Codex's global directory is shared with other
+compatible agents. To update any flavor, use `update` /
+`-Action Update` and `--merge` / `-Merge` with the same target. Start a new session
+or reload skills according to the host's current instructions.
+
+</details>
+
+<details>
 <summary><strong>OpenCode in one project</strong></summary>
 
 ```sh
@@ -107,7 +140,7 @@ bash scripts/install-ai-agent-skills.sh --flavor opencode-project --project /abs
 ./scripts/install-ai-agent-skills.ps1 -Flavor opencode-project -Project 'C:/path/to/project'
 ```
 
-Start a new OpenCode session in that project and request a skill. To update, add
+Start a new OpenCode session in that project and describe the task normally. To update, add
 `update` / `-Action Update` and `--merge` / `-Merge` to the same command.
 
 </details>
@@ -159,7 +192,8 @@ bash scripts/install-ai-agent-skills.sh --flavor antigravity-project --project /
 The app, standalone IDE, and CLI discover project skills in `.agents/skills`.
 This shares a destination with Codex and Muse project flavors. For an existing
 installation, use explicit `--merge` / `-Merge`; for updates, also use `update` /
-`-Action Update`. Start a new Antigravity session and invoke `/agent-planning`.
+`-Action Update`. Start a new Antigravity session and describe the task normally;
+the agent selects matching skills when relevant.
 See [Antigravity skills](https://antigravity.google/docs/skills).
 
 Global installation differs by surface: `antigravity-global` targets the app/IDE,
@@ -237,9 +271,13 @@ an interactive terminal lists the choices and asks you to select one.
 | Flavor | Destination |
 | --- | --- |
 | `cursor` | `~/.cursor/plugins/local/ai-agent-skills` |
+| `cursor-global` | `~/.cursor/skills` |
 | `codex-desktop` | `~/.codex/plugins/ai-agent-skills` |
 | `codex-marketplace` | `$ROOT/plugins/ai-agent-skills` |
+| `codex-global` | `~/.agents/skills` |
 | `claude` | `~/.local/share/ai-agent-skills/claude` |
+| `claude-global` | `~/.claude/skills` or `$CLAUDE_CONFIG_DIR/skills` |
+| `claude-project` | `$PROJECT/.claude/skills` |
 | `copilot-staging` | `~/.local/share/ai-agent-skills/copilot` |
 | `copilot-skills` | `$PROJECT/.github/skills` |
 | `copilot-global` | `~/.copilot/skills` |
@@ -294,6 +332,8 @@ all folders inside this checkout's `skills/` to your project's skills directory:
 | Host | Project directory |
 | --- | --- |
 | Cursor or Codex | `.agents/skills/` |
+| Cursor | `.cursor/skills/` |
+| Claude Code | `.claude/skills/` |
 | Copilot | `.github/skills/` |
 | OpenCode | `.opencode/skills/` |
 | Gemini CLI | `.gemini/skills/` |

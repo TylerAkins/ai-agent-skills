@@ -169,3 +169,42 @@ func TestReferenceLinks(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestRoutingLeavesClearMatchesToNativeSkillSelection(t *testing.T) {
+	root := filepath.Join("..", "..")
+	routerPath := filepath.Join(root, "skills", "using-skills", "SKILL.md")
+	fields, err := metadata(routerPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	description, ok := fields["description"].(string)
+	if !ok || !strings.Contains(description, "For a clear single-skill request, load that skill directly instead.") {
+		t.Fatalf("router description must defer clear matches to direct skill selection: %v", fields["description"])
+	}
+	if strings.Contains(description, "any engineering task") {
+		t.Fatal("router description competes with native selection for every engineering task")
+	}
+	body, err := os.ReadFile(routerPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(body), "If the collection is available and the request matches a listed workflow, route first") {
+		t.Fatal("router guardrail contradicts direct native selection for a clear match")
+	}
+
+	rulePath := filepath.Join(root, "rules", "skill-routing.mdc")
+	rule, err := os.ReadFile(rulePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := strings.Join(strings.Fields(string(rule)), " ")
+	for _, required := range []string{
+		"Use Cursor's native skill selection",
+		"For a clear match, load the matching skill directly",
+		"Use using-skills only when the request spans workflows or no single skill clearly applies",
+	} {
+		if !strings.Contains(text, required) {
+			t.Errorf("Cursor routing rule missing native-first behavior %q", required)
+		}
+	}
+}

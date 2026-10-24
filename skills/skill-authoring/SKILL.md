@@ -1,6 +1,9 @@
 ---
 name: skill-authoring
-description: Design, author, evaluate, and package new engineering skills or refactor existing skills using the destination's conventions and validation requirements.
+description: >-
+  Design, author, evaluate, or package agent skills using the destination's
+  conventions and validation requirements. Use when creating or revising a skill,
+  checking its activation triggers, or preparing a skill package.
 ---
 
 # Skill Authoring
