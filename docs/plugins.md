@@ -1,8 +1,21 @@
 # Packaging Reference
 
-For normal installation, updates, and activation, expand your host in the
-[README](../README.md#install).
+For quick-start installation choices, see the [README](../README.md#install).
+For host activation and update steps, see the [installer reference](installer-reference.md#activate-an-installation).
 This page is for maintainers inspecting or building host packages.
+
+## Implementation map
+
+| Behavior | Source of truth |
+| --- | --- |
+| Package validation and assembly | [Collection packager](../internal/collection/collection.go) |
+| Host-specific agent conversion | [Agent packager](../internal/collection/agents.go) |
+| Packager command options | [skillpack command](../cmd/skillpack/main.go) |
+| Continuous validation | [Validation workflow](../.github/workflows/validate.yml) |
+| Release package targets | [Release workflow](../.github/workflows/release.yml) |
+
+The package tables and commands below describe those files. Update this page when
+their targets or validation behavior changes.
 
 ## Package Contents
 

@@ -5,6 +5,12 @@ skills-only, OpenCode agents, and Codex agents. It creates a GitHub draft releas
 with SHA-256 checksums and the source commit. It does not publish the release or
 submit marketplace listings.
 
+This guide follows [the release workflow](../.github/workflows/release.yml),
+[the validation workflow](../.github/workflows/validate.yml), and the version fields
+in [`plugin.json`](../plugin.json), [`.cursor-plugin/plugin.json`](../.cursor-plugin/plugin.json),
+and [`.claude-plugin/plugin.json`](../.claude-plugin/plugin.json). Check those sources
+when release behavior changes.
+
 ## Before Running
 
 Merge the intended changes through the repository's normal review process.

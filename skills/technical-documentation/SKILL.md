@@ -1,10 +1,9 @@
 ---
 name: technical-documentation
 description: >-
-  Create and maintain accurate READMEs, task guides, API references, explanations,
-  and architecture decision records. Use when documentation is requested or a
-  change affects documented behavior. Verify examples and claims against sources;
-  scale structure to reader needs and preserve decision history.
+  Create and maintain source-derived technical guides, references, explanations,
+  and architecture decision records. Use when repository behavior or technical
+  decisions need documentation. Trace claims to implementation and verify examples.
 ---
 
 # Technical Documentation
@@ -14,6 +13,20 @@ reader, task, destination, source of truth, and requested scope. Inspect existin
 documentation, repository instructions, code, schemas, configuration, and actual
 decisions. Preserve useful unrelated content and the project's conventions.
 
+## Trace the Implementation
+
+Start from the reader's technical question and identify the relevant execution
+path. Inspect entrypoints, callers, configuration, schemas, tests, and error paths
+as needed. Record which repository evidence supports each behavior, default,
+constraint, and failure case. Distinguish observed behavior from inference and
+unresolved behavior. Do not use an old document, plan, comment, or test name as
+proof when the implementation can be inspected.
+
+Write from that evidence. Prefer concise prose around verified facts over prose
+that restates source code. Use exact identifiers, values, paths, and version
+constraints. If the implementation does not establish an answer, say what remains
+unknown rather than filling the gap with an assumption.
+
 ## Choose the Document's Job
 
 Distinguish learning tutorials, task-oriented how-to guides, factual reference,
@@ -21,9 +34,11 @@ and conceptual explanation. Use the form that answers the reader's question;
 link between forms instead of mixing every purpose into one long document.
 Do not create a documentation hierarchy or ADR for a trivial change.
 
-Organize the reader's complete task, not just individual files. Use the README
-for setup, first use, and links to optional detail. Keep a host's installation,
-activation, and updates together. Present supported hosts equally unless a
+Organize the reader's complete technical task, not just individual files. Keep
+project overview and first-use navigation in the README; use
+[readme-design](../readme-design/SKILL.md) when creating or substantially revising
+that entrypoint. Keep a host's installation, activation, and updates together in
+the relevant technical guide. Present supported hosts equally unless a
 recommendation is justified by the user or product requirements.
 
 Make linked references usable directly: their title and filename should describe
@@ -35,7 +50,10 @@ Choose formatting for the renderer. On GitHub, native `<details>` / `<summary>`
 sections can make independent host paths or long optional material easier to scan.
 Use descriptive labels, blank lines around Markdown inside HTML, and complete
 expanded paths. Keep shared prerequisites visible; avoid nested disclosure piles.
-Headings, tables, and lists should help readers navigate or compare.
+Headings, tables, and lists should help readers navigate or compare. Apply
+[GitHub Flavored Markdown guidance](references/github-flavored-markdown.md) when
+the destination is GitHub; use only features that improve the technical reader's
+task and work in the target surface.
 
 For task guides, show prerequisites, ordered actions, expected results, and relevant
 recovery. Label platform-specific commands and placeholders. For reference, state
@@ -63,7 +81,7 @@ descriptive headings, and small examples. Use tables for genuine comparisons and
 lists for steps or parallel items, not a checklist on every page. Explain non-obvious
 reasons, limitations, and failure cases; avoid repeating source code or conversation history.
 
-Document actual public behavior and operational prerequisites, not the original plan.
+Document actual behavior and operational prerequisites, not the original plan.
 Use [api-design](../api-design/SKILL.md) for interface contracts and
 [safe-migrations](../safe-migrations/SKILL.md) for transition instructions when relevant.
 Keep examples realistic and safe, with placeholders clearly identified and no secrets.

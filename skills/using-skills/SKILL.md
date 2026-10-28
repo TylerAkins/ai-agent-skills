@@ -38,7 +38,8 @@ Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting human-facing
 | Design shared contracts | [api-design](../api-design/SKILL.md) |
 | Author, refine, or package agent skills | [skill-authoring](../skill-authoring/SKILL.md) |
 | Explain concepts, code, documents, or decisions simply | [explain-it](../explain-it/SKILL.md) |
-| Write documentation or decision records | [technical-documentation](../technical-documentation/SKILL.md) |
+| Design or substantially revise a README | [readme-design](../readme-design/SKILL.md) |
+| Write source-derived technical guides, references, or decision records | [technical-documentation](../technical-documentation/SKILL.md) |
 | Build or improve UI | [frontend-engineering](../frontend-engineering/SKILL.md) |
 | Review code, plans, or PRs | [code-review](../code-review/SKILL.md) |
 | Address existing PR feedback | [address-feedback](../address-feedback/SKILL.md) |

@@ -1,17 +1,17 @@
 # Cursor Workflow Example
 
-Follow a planned feature from requirements through implementation, verification,
-and independent review. Cursor is the example host. Other flavors may use different
-controls or review tools while preserving the same skill contracts and authorization
-boundaries. Describe ordinary work without naming skills to exercise native automatic
-selection; naming a skill is an optional fallback.
+Use this example to follow a planned change from requirements through implementation,
+verification, and independent review in Cursor. Other hosts may use different controls
+while following the same skill contracts and authorization boundaries.
 
 This guide describes the instructed workflow. A live Cursor validation run has not
 been recorded, so it is not yet a verified end-to-end example.
 
 ## Before You Start
 
-Install and activate the collection using the [Cursor setup instructions](../README.md#cursor).
+Install the collection using the [README's native installer](../README.md#native-shell-installer)
+or the [installer reference](installer-reference.md). Follow the host's activation
+steps in the [compatibility guide](host-compatibility.md).
 Open your target repository in Cursor, check its instructions and existing changes,
 and use a task branch suitable for implementation. Confirm that the installed
 collection exposes its skills, routing rule, and independent reviewer.
@@ -29,12 +29,12 @@ Plan this feature. Include acceptance criteria, verification, and an implementat
 handoff. Do not implement yet.
 ```
 
-For Jira work, first ask `jira-tickets` to read the issue in intake mode. Supply
+For Jira work, first ask [jira-tickets](../skills/jira-tickets/SKILL.md) to read the issue in intake mode. Supply
 the issue's requirements to planning without authorizing tracker writes.
 
 Expect a plan grounded in the repository, with ordered tasks, acceptance criteria,
 verification commands, unresolved decisions, and final independent review. The plan
-itself must carry the `implement-plan` handoff so a later executor receives it.
+itself must carry the [implement-plan](../skills/implement-plan/SKILL.md) handoff so a later executor receives it.
 Resolve decisions that would change the intended behavior before dependent work.
 
 ## 2. Authorize Implementation
@@ -59,7 +59,7 @@ unavailable runner must be reported accurately; neither counts as passing eviden
 
 ## 3. Review and Repair
 
-The implementation workflow requests final independent `code-review` in fresh
+The implementation workflow requests final independent [code-review](../skills/code-review/SKILL.md) in fresh
 context unless you explicitly skip it. The reviewer receives the source requirements,
 repository instructions, comparison base, and exact candidate, including relevant
 working and untracked files. Author reasoning and the plan are not proof of correctness.
@@ -87,7 +87,7 @@ Commit the verified changes, push the branch, and open a PR.
 
 Existing authorization carries forward; an unchanged authorized action does not
 need another confirmation. Build alone does not authorize commits, pushes, external
-replies, or deployment. PR publication follows `git-delivery` and its exact-draft
+replies, or deployment. PR publication follows [git-delivery](../skills/git-delivery/SKILL.md) and its exact-draft
 approval requirements. GitHub reviews and approvals are never dismissed.
 
 ## Verification Record

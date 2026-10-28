@@ -1,7 +1,21 @@
 # Installer Reference
 
-Optional installation modes, version selection, customization conflicts, and recovery.
-The commands below run from a checkout of this repository.
+Use the [README](../README.md#install) for the quick-start choices. This reference
+covers installer options, project installs, updates, customization conflicts, and
+recovery. Commands run from a checkout of this repository.
+
+## Implementation map
+
+| Behavior | Source of truth |
+| --- | --- |
+| Bash flavor selection and command-line options | [Bash installer](../scripts/install-ai-agent-skills.sh) |
+| Windows flavor selection and command-line options | [PowerShell installer](../scripts/install-ai-agent-skills.ps1) |
+| Shared Bash download, validation, and installation operations | [Installer library](../scripts/lib/install.sh) |
+| Package contents and link validation | [Skill packager](../internal/collection/collection.go) |
+| Release archive names and checksums | [Release workflow](../.github/workflows/release.yml) |
+
+When these instructions conflict with the implementation, follow the current
+scripts and update this reference at the same time as the behavior change.
 
 ## Prerequisites and Checkout
 
@@ -61,6 +75,45 @@ An ordinary install refuses an existing target without an explicit mode. Plugin
 need a mode.
 Backups remain in `.ai-agent-skills-backups/backup.*` beside the installation parent.
 Compare or restore the printed backup, and remove it yourself when no longer useful.
+
+## Activate an Installation
+
+Installing files does not activate every host the same way. Use the row for the
+flavor you installed:
+
+| Flavor | Activation |
+| --- | --- |
+| `cursor` | Reload the window. In **Customize**, check for the plugin, skills, routing rule, and agents. Local plugin imports must be allowed by your account or team. |
+| `cursor-global` | Start a new Cursor session and check **Customize > Skills**. For Cursor CLI, check its skill list. |
+| `codex-desktop` | Quit and reopen ChatGPT/Codex. In **Plugins**, select the personal marketplace and install `ai-agent-skills`. |
+| `codex-global` | Start a new Codex session. Skills are in the shared `~/.agents/skills` directory. |
+| `claude` | Launch Claude Code with the installed plugin directory using the command below. Pass `--plugin-dir` for later sessions too. |
+| `claude-global` or `claude-project` | Start a new session and check `/skills`. The global flavor honors an absolute `CLAUDE_CONFIG_DIR` when set. |
+| `copilot-global` or `copilot-skills` | Open the project in the Copilot app, start a session, and check **Customize > Skills**. Personal local skills do not automatically reach the cloud agent. |
+| `opencode-global` or `opencode-project` | Start a new OpenCode session in the relevant project or user configuration. |
+| `gemini-global` or `gemini-project` | Run `/skills reload` and `/skills list`; approve the skill activation prompt when it appears. |
+| `muse-global` or `muse-project` | Run `/skills reload`, then `muse skills list`. Project skills require a trusted workspace. |
+| `antigravity-global` | Start a new app/IDE session and check the agent panel's **Customizations** menu. |
+| `antigravity-project` | Start a new session in the target app, IDE, or CLI. The app/IDE exposes active skills in the agent panel's **Customizations** menu. |
+| `antigravity-cli-global` | Start a new CLI session. This flavor uses the CLI's skill directory, separate from the app/IDE directory. |
+
+For the Claude Code plugin, run from a shell:
+
+```sh
+claude --plugin-dir "$HOME/.local/share/ai-agent-skills/claude"
+```
+
+On Windows PowerShell:
+
+```powershell
+claude --plugin-dir "$env:USERPROFILE/.local/share/ai-agent-skills/claude"
+```
+
+Cursor CLI can load the installed plugin for a session with:
+
+```sh
+agent --plugin-dir "$HOME/.cursor/plugins/local/ai-agent-skills"
+```
 
 ## Alternate Installations
 
@@ -227,7 +280,7 @@ Both hosts use the `ai-agent-skills-skills` release archive. Releases predating
 this archive cannot supply these flavors. Use a release containing it, explicit
 source mode after the change reaches remote `main`, or manual installation from
 a local checkout. Global flavors and their activation
-steps are in the [README](../README.md#install).
+steps are in the [README](../README.md#native-shell-installer).
 
 </details>
 
@@ -251,7 +304,8 @@ See [Antigravity skills](https://antigravity.google/docs/skills).
 
 Global installation differs by surface: `antigravity-global` targets the app/IDE,
 while `antigravity-cli-global` targets the CLI. See the
-[README](../README.md#antigravity) for global install and update commands.
+[README](../README.md#native-shell-installer) for global install commands. Use
+`update` / `-Action Update` with the same flavor to update it.
 All Antigravity flavors use the shared `ai-agent-skills-skills` archive and need
 a release containing it. Use manual installation for an unpublished local checkout.
 
