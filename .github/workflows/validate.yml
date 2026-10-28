@@ -63,7 +63,7 @@ jobs:
           npx --yes skills@1.7.2 add . --list
       - name: Build and validate host packages
         run: |
-          for host in cursor codex claude copilot opencode skills portable; do
+          for host in cursor codex claude copilot opencode skills portable native-agents; do
             printf '::group::Build %s package\n' "$host"
             go run ./cmd/skillpack -target "$host" -out "$RUNNER_TEMP/$host-package"
             printf '::endgroup::\n'

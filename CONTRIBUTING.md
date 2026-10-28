@@ -32,7 +32,8 @@ go run ./cmd/skillpack
 git diff --check
 ```
 
-For Go tooling or packaging changes, also run:
+For Go tooling or packaging changes, also run these commands from the repository
+root in Bash or PowerShell:
 
 ```sh
 gofmt -w cmd internal
@@ -44,8 +45,11 @@ Build all release targets and legacy host aliases into new scratch directories o
 when packaging changes. Use the commands in [packaging reference](docs/plugins.md).
 For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
 linting. It uses temporary HOME/project directories and generated release fixtures.
-CI runs Bash tests on macOS/Linux and native PowerShell tests on Windows.
-For PowerShell changes, install the pinned analyzer and run:
+CI runs Bash tests on macOS and Linux, and native PowerShell tests on Windows
+(PowerShell 7.4+).
+For PowerShell changes, install the pinned analyzer and run from the repository root:
+
+**Windows (PowerShell 7.4+)**
 
 ```powershell
 Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Repository PSGallery
@@ -64,9 +68,10 @@ CI streams verbose Go test results and groups package output by host. Open the
 running job in GitHub Actions to watch progress; the run summary records its
 revision and result. For CLI monitoring, use `gh run watch <run-id>`.
 
-Keep common installation/package logic in Go where practical and put OS-specific
-wrappers in clearly named platform directories. Add isolated behavioral tests and
-native runner coverage with each platform implementation. The PowerShell checker validates `.ps1` files; ShellCheck does not.
+Keep common installation and package logic in Go where practical, and put
+OS-specific wrappers in clearly named platform directories. Add isolated
+behavioral tests and native runner coverage with each platform implementation.
+The PowerShell checker validates `.ps1` files; ShellCheck does not.
 
 For changed skill behavior, try a representative task in the affected host when
 available. Describe the prompt, observed result, and material limitations.

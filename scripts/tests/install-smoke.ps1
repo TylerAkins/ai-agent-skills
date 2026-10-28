@@ -37,7 +37,7 @@ try {
     if (-not $Fixtures) {
         $Fixtures = Join-Path $work 'assets'
         [void][IO.Directory]::CreateDirectory($Fixtures)
-        foreach ($targetHost in @('cursor', 'codex', 'claude', 'copilot', 'opencode', 'skills')) {
+        foreach ($targetHost in @('cursor', 'codex', 'claude', 'copilot', 'opencode', 'skills', 'native-agents')) {
             Write-Output "Preparing $targetHost test bundle."
             $packageName = "ai-agent-skills-$targetHost"
             Push-Location $repoRoot
@@ -175,22 +175,27 @@ try {
             Test-Condition ((Get-Content -LiteralPath (Join-Path $flavorHome '.agents/AGENTS.md') -Raw).Trim() -eq 'Keep alternate-home instructions') 'Global install changed shared instructions.'
         }
     }
-    foreach ($hostName in @('opencode', 'claude', 'codex')) {
+    foreach ($hostName in @('opencode', 'claude', 'codex', 'cursor', 'copilot', 'gemini', 'antigravity')) {
         foreach ($scope in @('global', 'project')) {
             $flavor = "$hostName-agents-$scope"
             $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
             if ($scope -eq 'project') {
                 $options.Project = $projectPath
-                $root = Join-Path $projectPath ".$hostName/agents"
+                $relative = switch ($hostName) { 'cursor' { '.cursor/agents' } 'copilot' { '.github/agents' } 'gemini' { '.gemini/agents' } 'antigravity' { '.agents/agents' } default { ".$hostName/agents" } }
+                $root = Join-Path $projectPath $relative
             } else {
                 $root = switch ($hostName) {
                     'opencode' { Join-Path $testHome '.config/opencode/agents' }
                     'claude' { Join-Path $env:CLAUDE_CONFIG_DIR 'agents' }
                     'codex' { Join-Path $testHome '.codex/agents' }
+                    'cursor' { Join-Path $testHome '.cursor/agents' }
+                    'copilot' { Join-Path $testHome '.copilot/agents' }
+                    'gemini' { Join-Path $testHome '.gemini/agents' }
+                    'antigravity' { Join-Path $testHome '.gemini/config/agents' }
                 }
             }
             & $installer @options
-            $extension = if ($hostName -eq 'codex') { 'toml' } else { 'md' }
+            $extension = if ($hostName -eq 'codex') { 'toml' } elseif ($hostName -eq 'copilot') { 'agent.md' } else { 'md' }
             foreach ($agentName in @('architecture-advisor', 'dependency-investigator', 'independent-reviewer', 'root-cause-investigator')) {
                 Test-Condition (Test-Path -LiteralPath (Join-Path $root "$agentName.$extension")) "Agent missing: $flavor $agentName"
             }

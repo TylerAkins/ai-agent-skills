@@ -13,7 +13,7 @@ trap 'rm -rf "$work"' EXIT
 fixtures=${1:-"$work/assets"}
 mkdir -p "$fixtures"
 if [ "$#" -eq 0 ]; then
-  for host in cursor codex claude copilot opencode skills; do
+  for host in cursor codex claude copilot opencode skills native-agents; do
     printf 'Preparing %s test bundle.\n' "$host"
     (cd "$repo_root"; go run ./cmd/skillpack -target "$host" -out "$work/ai-agent-skills-$host")
     tar -czf "$fixtures/ai-agent-skills-$host-v1.0.0.tar.gz" -C "$work" "ai-agent-skills-$host"
@@ -176,6 +176,30 @@ for host in opencode claude codex; do
     snapshot=$(tree_snapshot "$root")
     bash "$installer" update "${args[@]}" --merge
     test "$snapshot" = "$(tree_snapshot "$root")"
+  done
+done
+for host in cursor copilot gemini antigravity; do
+  for scope in global project; do
+    flavor="$host-agents-$scope"
+    args=(--flavor "$flavor" --version v1.0.0 --yes)
+    case "$host:$scope" in
+      cursor:global) root="$HOME/.cursor/agents" ;;
+      copilot:global) root="$HOME/.copilot/agents" ;;
+      gemini:global) root="$HOME/.gemini/agents" ;;
+      antigravity:global) root="$HOME/.gemini/config/agents" ;;
+      cursor:project) args+=(--project "$work/project"); root="$work/project/.cursor/agents" ;;
+      copilot:project) args+=(--project "$work/project"); root="$work/project/.github/agents" ;;
+      gemini:project) args+=(--project "$work/project"); root="$work/project/.gemini/agents" ;;
+      antigravity:project) args+=(--project "$work/project"); root="$work/project/.agents/agents" ;;
+    esac
+    bash "$installer" "${args[@]}"
+    extension=md
+    [ "$host" != copilot ] || extension=agent.md
+    for agent in architecture-advisor dependency-investigator independent-reviewer root-cause-investigator; do test -f "$root/$agent.$extension"; done
+    test ! -e "$root/skills"
+    printf 'Keep unrelated agent\n' > "$root/custom.$extension"
+    bash "$installer" update "${args[@]}" --merge
+    test "$(cat "$root/custom.$extension")" = 'Keep unrelated agent'
   done
 done
 for file in "${instruction_sentinels[@]}"; do

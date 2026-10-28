@@ -67,6 +67,14 @@ func readAgents(root string) ([]agentDefinition, error) {
 
 func renderAgent(a agentDefinition, target string) []byte {
 	switch target {
+	case "cursor":
+		return []byte(fmt.Sprintf("---\nname: %s\ndescription: %q\nreadonly: true\n---\n\n%s\n", a.Name, a.Description, a.Body))
+	case "copilot":
+		return []byte(fmt.Sprintf("---\nname: %s\ndescription: %q\ntools: [read, search]\n---\n\n%s\n", a.Name, a.Description, a.Body))
+	case "gemini":
+		return []byte(fmt.Sprintf("---\nname: %s\ndescription: %q\nkind: local\ntools:\n  - read_file\n  - grep_search\n---\n\n%s\n", a.Name, a.Description, a.Body))
+	case "antigravity":
+		return []byte(fmt.Sprintf("---\nname: %s\ndescription: %q\ntools:\n  - view_file\n  - grep_search\nsubagent: true\nmainAgent: false\ncommandExecutionPolicy: sandbox\n---\n\n%s\n", a.Name, a.Description, a.Body))
 	case "opencode":
 		// Last-match-wins permissions block edits and command execution, while
 		// leaving native read, search, web, and skill tools available.
@@ -78,6 +86,86 @@ func renderAgent(a agentDefinition, target string) []byte {
 	default:
 		panic("unsupported agent target")
 	}
+}
+
+func writeAgentSet(root, out, target string) error {
+	agents, err := readAgents(root)
+	if err != nil {
+		return err
+	}
+	formats := []string{target}
+	if target == "native-agents" {
+		formats = []string{"cursor", "copilot", "gemini", "antigravity"}
+	}
+	for _, format := range formats {
+		dir := out
+		if target == "native-agents" {
+			dir = filepath.Join(out, format)
+		}
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+		for _, agent := range agents {
+			ext := ".md"
+			if target == "codex" {
+				ext = ".toml"
+			} else if format == "copilot" {
+				ext = ".agent.md"
+			}
+			if err := os.WriteFile(filepath.Join(dir, agent.Name+ext), renderAgent(agent, format), 0644); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func validateNativeAgentDir(dir, format string) error {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	if len(entries) != len(agentNames) {
+		return fmt.Errorf("expected four %s agents", format)
+	}
+	for _, name := range agentNames {
+		ext := ".md"
+		if format == "copilot" {
+			ext = ".agent.md"
+		}
+		path := filepath.Join(dir, name+ext)
+		fields, err := metadata(path)
+		if err != nil {
+			return err
+		}
+		if fields["name"] != name || fields["description"] == "" {
+			return fmt.Errorf("invalid %s agent %s", format, name)
+		}
+		switch format {
+		case "cursor":
+			if fields["readonly"] != true {
+				return fmt.Errorf("Cursor agent is not read-only: %s", name)
+			}
+		case "copilot":
+			tools, ok := fields["tools"].([]any)
+			if !ok || len(tools) != 2 || tools[0] != "read" || tools[1] != "search" {
+				return fmt.Errorf("Copilot agent has unexpected tools: %s", name)
+			}
+		case "gemini":
+			tools, ok := fields["tools"].([]any)
+			if fields["kind"] != "local" || !ok || len(tools) != 2 || tools[0] != "read_file" || tools[1] != "grep_search" {
+				return fmt.Errorf("Gemini agent has unexpected tools or kind: %s", name)
+			}
+		case "antigravity":
+			tools, ok := fields["tools"].([]any)
+			if fields["subagent"] != true || fields["mainAgent"] != false || fields["commandExecutionPolicy"] != "sandbox" || !ok || len(tools) != 2 || tools[0] != "view_file" || tools[1] != "grep_search" {
+				return fmt.Errorf("Antigravity agent has unexpected capabilities: %s", name)
+			}
+		default:
+			return fmt.Errorf("unknown native agent format %q", format)
+		}
+	}
+	return nil
 }
 
 func validateAdaptedAgents(root, target string) error {

@@ -1,8 +1,21 @@
 # Packaging Reference
 
-For normal installation, updates, and activation, expand your host in the
-[README](../README.md#install).
+For quick-start installation choices, see the [README](../README.md#install).
+For host activation and update steps, see the [installer reference](installer-reference.md#activate-an-installation).
 This page is for maintainers inspecting or building host packages.
+
+## Implementation map
+
+| Behavior | Source of truth |
+| --- | --- |
+| Package validation and assembly | [Collection packager](../internal/collection/collection.go) |
+| Host-specific agent conversion | [Agent packager](../internal/collection/agents.go) |
+| Packager command options | [skillpack command](../cmd/skillpack/main.go) |
+| Continuous validation | [Validation workflow](../.github/workflows/validate.yml) |
+| Release package targets | [Release workflow](../.github/workflows/release.yml) |
+
+The package tables and commands below describe those files. Update this page when
+their targets or validation behavior changes.
 
 ## Package Contents
 
@@ -16,17 +29,18 @@ Every target contains the complete `skills/` collection and supporting resources
 | `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
 | `opencode` | OpenCode native agents | OpenCode Markdown `agents/`, LICENSE; no plugin manifest |
 | `codex` | Codex native agents | Root `plugin.json`, Codex TOML `agents/`, LICENSE |
+| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity native agents | Host-specific subdirectories under `agents/`, LICENSE; no plugin manifest |
 
-The release workflow prepares these six `.tar.gz` archives. Installer flavors
+The release workflow prepares these seven `.tar.gz` archives. Installer flavors
 select host-specific destinations and activation steps. The `copilot` build target
 remains available for older source-build consumers and has the same contents as
 `portable`. The `codex` and `opencode` targets now add native agents to their
 respective skills packages.
 
 Cursor includes a native-first routing rule and four canonical agent prompts;
-Claude includes those prompts with tool allowlists. OpenCode and Codex use
-deterministic host-specific adaptations. Native agent installation and read-only
-limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
+Claude includes those prompts with tool allowlists. OpenCode, Codex, Cursor,
+Copilot, Gemini CLI, and Antigravity use deterministic host-specific adaptations.
+Native agent installation and read-only limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
 
 Repository `AGENTS.md`, tooling, credentials, and the `.cursor/skills` discovery
 symlink are excluded. Do not symlink this checkout into Cursor's local-plugin
@@ -34,7 +48,8 @@ folder; external targets are skipped.
 
 ## Validate and Build
 
-Use the Go version in `go.mod`. From the checkout:
+Use the Go version in [go.mod](../go.mod). Run commands from the repository
+root. The validation commands work in Bash and PowerShell:
 
 ```sh
 go test -race ./...
@@ -42,13 +57,27 @@ go vet ./...
 go run ./cmd/skillpack
 ```
 
-Build into new directories outside the checkout:
+Build into new directories outside the checkout. Include the legacy `copilot`
+alias when checking compatibility for a packaging change.
+
+**macOS / Linux (Bash)**
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor claude portable skills opencode codex; do
-  go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
+for host in cursor claude portable skills opencode codex native-agents copilot; do
+  go run ./cmd/skillpack -target "$host" -out "$package_root/$host" || exit 1
 done
+```
+
+**Windows (PowerShell 7.4+)**
+
+```powershell
+$packageRoot = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString())
+New-Item -ItemType Directory -Path $packageRoot | Out-Null
+foreach ($target in @('cursor', 'claude', 'portable', 'skills', 'opencode', 'codex', 'native-agents', 'copilot')) {
+    go run ./cmd/skillpack -target $target -out (Join-Path $packageRoot $target)
+    if ($LASTEXITCODE -ne 0) { throw "Package build failed: $target" }
+}
 ```
 
 The output directories must not exist. The packager refuses overwrite and validates
@@ -61,17 +90,16 @@ For release assets, use [release preparation](releases.md).
 
 ## Verify in Each Host
 
-Before distributing a changed workflow, test it in the relevant app:
+For a changed skill or agent, choose a representative task that exercises the
+changed behavior in each affected host. Confirm discovery, invoke the workflow,
+and check any linked resources or host-specific controls involved in that task.
+For multi-step workflows, include the relevant handoff, verification, review, and
+authorization boundaries. Do not run unrelated Jira, deployment, or delivery steps
+just to exercise a different workflow.
 
-1. Confirm discovery, explicit invocation, and sibling reference loading.
-2. Read a Jira issue in intake mode without writes.
-3. Generate a plan containing the `implement-plan` handoff.
-4. Implement within authorization, run checks, and obtain fresh independent review.
-5. Verify repair/re-review handling and reporting when review is unavailable.
-6. Confirm commits, pushes, external replies, and deployments require applicable authorization. Reviews must never be dismissed.
-
-File placement and installer tests do not establish that an agent followed the
-workflow. Record the host/version, observed results, and missing checks.
+Record the host and version, prompt, observed result, and missing checks. File
+placement, package validation, and installer tests do not establish that an agent
+followed its instructions.
 
 ## Skill Activation Limits
 
@@ -107,6 +135,6 @@ surface, installation, and invocation audit, including third-party clients.
 
 Packaging and release assets do not create marketplace listings. Cursor submissions
 go through [the publisher form](https://cursor.com/marketplace/publish).
-Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI, Muse Code, and Antigravity consume
-skill folders directly. Publishing/registering a marketplace remains a separate
-authorized action.
+Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI,
+Muse Code, and Antigravity consume skill folders directly. Publishing or registering
+a marketplace remains a separate authorized action.

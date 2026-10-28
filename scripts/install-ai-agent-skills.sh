@@ -46,6 +46,7 @@ if [ -z "$flavor" ]; then
 fi
 skills_only=false
 agents_only=false
+agent_format=
 catalog=
 source_path=
 case "$flavor" in
@@ -83,7 +84,11 @@ case "$flavor" in
   opencode-agents-global) agents_only=true; host=opencode; destination="$HOME/.config/opencode/agents" ;;
   claude-agents-global) agents_only=true; host=claude; destination="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents" ;;
   codex-agents-global) agents_only=true; host=codex; destination="$HOME/.codex/agents" ;;
-  opencode-agents-project|claude-agents-project|codex-agents-project)
+  cursor-agents-global) agents_only=true; host=native-agents; agent_format=cursor; destination="$HOME/.cursor/agents" ;;
+  copilot-agents-global) agents_only=true; host=native-agents; agent_format=copilot; destination="$HOME/.copilot/agents" ;;
+  gemini-agents-global) agents_only=true; host=native-agents; agent_format=gemini; destination="$HOME/.gemini/agents" ;;
+  antigravity-agents-global) agents_only=true; host=native-agents; agent_format=antigravity; destination="$HOME/.gemini/config/agents" ;;
+  opencode-agents-project|claude-agents-project|codex-agents-project|cursor-agents-project|copilot-agents-project|gemini-agents-project|antigravity-agents-project)
     [ -n "$project" ] || fail "Use --project with the full path to an existing project."
     require_absolute "$project"
     [ -d "$project" ] || fail "Project directory does not exist: $project"
@@ -92,6 +97,10 @@ case "$flavor" in
       opencode-*) host=opencode; destination="$project/.opencode/agents" ;;
       claude-*) host=claude; destination="$project/.claude/agents" ;;
       codex-*) host=codex; destination="$project/.codex/agents" ;;
+      cursor-*) host=native-agents; agent_format=cursor; destination="$project/.cursor/agents" ;;
+      copilot-*) host=native-agents; agent_format=copilot; destination="$project/.github/agents" ;;
+      gemini-*) host=native-agents; agent_format=gemini; destination="$project/.gemini/agents" ;;
+      antigravity-*) host=native-agents; agent_format=antigravity; destination="$project/.agents/agents" ;;
     esac ;;
   gemini-global) skills_only=true; host=skills; destination="$HOME/.gemini/skills" ;;
   muse-global) skills_only=true; host=skills; destination="$HOME/.agents/skills" ;;
@@ -137,7 +146,7 @@ if [ -z "$ref" ] && [ -z "$version" ]; then
   valid_version "$version"
 fi
 prepare_bundle
-if "$skills_only"; then payload="$work/package/skills"; elif "$agents_only"; then payload="$work/package/agents"; else payload="$work/package"; fi
+if "$skills_only"; then payload="$work/package/skills"; elif "$agents_only"; then payload="$work/package/agents"; [ -z "$agent_format" ] || payload="$payload/$agent_format"; else payload="$work/package"; fi
 [ -d "$work/package/skills" ] || fail "Bundle is missing skills."
 [ -d "$payload" ] || fail "Bundle is missing selected component: $payload"
 if [ -n "$catalog" ]; then
@@ -160,6 +169,13 @@ if [ -n "$catalog" ]; then
 fi
 printf 'Installed %s at %s.\n' "$flavor" "$destination"
 case "$flavor" in
+  cursor-agents-*) printf 'Start a new Cursor session and look for the specialist in the subagent tools.\n' ;;
+  copilot-agents-*) printf 'Open the Copilot agent picker or ask Copilot to delegate to the named specialist.\n' ;;
+  gemini-agents-*) printf 'In Gemini CLI, run /agents and invoke a specialist with @name.\n' ;;
+  antigravity-agents-*) printf 'In Antigravity, open /agents to find the specialist.\n' ;;
+  opencode-agents-*) printf 'Start a new OpenCode session and ask the parent agent to use the named subagent.\n' ;;
+  claude-agents-*) printf 'Start a new Claude Code session and select the specialist from @agent- autocomplete.\n' ;;
+  codex-agents-*) printf 'Start a new Codex session and request the named specialist.\n' ;;
   cursor) printf 'Reload Cursor (Developer: Reload Window), then check Customize for the plugin and skills.\n' ;;
   cursor-global) printf 'Start a new Cursor session and check Customize > Skills. Native skill selection applies when relevant.\n' ;;
   codex-desktop) printf 'Quit and reopen ChatGPT/Codex. Open Plugins and install ai-agent-skills from your local marketplace.\n' ;;

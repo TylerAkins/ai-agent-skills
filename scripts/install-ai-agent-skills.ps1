@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'opencode-agents-global', 'opencode-agents-project', 'claude-agents-global', 'claude-agents-project', 'codex-agents-global', 'codex-agents-project', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'opencode-agents-global', 'opencode-agents-project', 'claude-agents-global', 'claude-agents-project', 'codex-agents-global', 'codex-agents-project', 'cursor-agents-global', 'cursor-agents-project', 'copilot-agents-global', 'copilot-agents-project', 'gemini-agents-global', 'gemini-agents-project', 'antigravity-agents-global', 'antigravity-agents-project', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -118,6 +118,14 @@ $flavors = [ordered]@{
     'claude-agents-project' = @('claude', '.claude/agents', $false)
     'codex-agents-global' = @('codex', '.codex/agents', $false)
     'codex-agents-project' = @('codex', '.codex/agents', $false)
+    'cursor-agents-global' = @('native-agents', '.cursor/agents', $false)
+    'cursor-agents-project' = @('native-agents', '.cursor/agents', $false)
+    'copilot-agents-global' = @('native-agents', '.copilot/agents', $false)
+    'copilot-agents-project' = @('native-agents', '.github/agents', $false)
+    'gemini-agents-global' = @('native-agents', '.gemini/agents', $false)
+    'gemini-agents-project' = @('native-agents', '.gemini/agents', $false)
+    'antigravity-agents-global' = @('native-agents', '.gemini/config/agents', $false)
+    'antigravity-agents-project' = @('native-agents', '.agents/agents', $false)
     'gemini-project' = @('skills', '.gemini/skills', $true)
     'gemini-global' = @('skills', '.gemini/skills', $true)
     'muse-project' = @('skills', '.agents/skills', $true)
@@ -140,11 +148,12 @@ if ($Ref -and $Version -and $Ref -ne $Version) { throw '-Version and -Ref disagr
 $installRoot = Resolve-InstallPath $HomeDirectory
 $targetHost, $relativePath, $skillsOnly = $flavors[$Flavor]
 $agentsOnly = $Flavor -like '*-agents-*'
+$agentFormat = switch -Regex ($Flavor) { '^cursor-agents-' { 'cursor'; break } '^copilot-agents-' { 'copilot'; break } '^gemini-agents-' { 'gemini'; break } '^antigravity-agents-' { 'antigravity'; break } default { $null } }
 if ($Flavor -in @('claude-global', 'claude-agents-global') -and $env:CLAUDE_CONFIG_DIR) {
     $installRoot = Resolve-InstallPath $env:CLAUDE_CONFIG_DIR
     $relativePath = if ($agentsOnly) { 'agents' } else { 'skills' }
 }
-if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project', 'opencode-agents-project', 'claude-agents-project', 'codex-agents-project')) {
+if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project', 'opencode-agents-project', 'claude-agents-project', 'codex-agents-project', 'cursor-agents-project', 'copilot-agents-project', 'gemini-agents-project', 'antigravity-agents-project')) {
     if (-not $Project) { throw '-Project is required for this flavor.' }
     $installRoot = Resolve-InstallPath $Project
     if (-not (Test-Path -LiteralPath $installRoot -PathType Container)) { throw 'Project directory does not exist.' }
@@ -238,6 +247,7 @@ try {
         [IO.Directory]::Move($extracted, $package)
     }
     $payload = if ($skillsOnly) { Join-Path $package 'skills' } elseif ($agentsOnly) { Join-Path $package 'agents' } else { $package }
+    if ($agentsOnly -and $agentFormat) { $payload = Join-Path $payload $agentFormat }
     if (-not (Test-Path -LiteralPath (Join-Path $package 'skills') -PathType Container)) { throw 'Bundle is missing skills.' }
     if (-not (Test-Path -LiteralPath $payload -PathType Container)) { throw 'Bundle is missing selected component.' }
     if ($catalog) {
@@ -305,6 +315,13 @@ try {
     if ($previous) { Write-Output "Previous files saved at $previous." }
     Write-Output "Installed $Flavor at $destination."
     switch ($Flavor) {
+        { $_ -like 'cursor-agents-*' } { Write-Output 'Start a new Cursor session and look for the specialist in the subagent tools.' }
+        { $_ -like 'copilot-agents-*' } { Write-Output 'Open the Copilot agent picker or ask Copilot to delegate to the named specialist.' }
+        { $_ -like 'gemini-agents-*' } { Write-Output 'In Gemini CLI, run /agents and invoke a specialist with @name.' }
+        { $_ -like 'antigravity-agents-*' } { Write-Output 'In Antigravity, open /agents to find the specialist.' }
+        { $_ -like 'opencode-agents-*' } { Write-Output 'Start a new OpenCode session and ask the parent agent to use the named subagent.' }
+        { $_ -like 'claude-agents-*' } { Write-Output 'Start a new Claude Code session and select the specialist from @agent- autocomplete.' }
+        { $_ -like 'codex-agents-*' } { Write-Output 'Start a new Codex session and request the named specialist.' }
         'cursor' { Write-Output 'Reload Cursor (Developer: Reload Window), then check Customize.' }
         'cursor-global' { Write-Output 'Start a new Cursor session and check Customize > Skills. Native skill selection applies when relevant.' }
         'codex-desktop' { Write-Output 'Reopen ChatGPT/Codex. In Plugins, install ai-agent-skills from the personal marketplace.' }
