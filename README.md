@@ -10,7 +10,7 @@ Choose how you want the skills delivered:
 | Method | Best for | Requirements |
 | --- | --- | --- |
 | [Open Skills CLI](#open-skills-cli) | Installing selected skills into a supported coding host | Node.js 22.20+, npm, and Git |
-| [Native shell installer](#native-shell-installer) | Host plugins, native skill directories, and optional subagents | Git and Bash or PowerShell 7.4+ |
+| [Native shell installer](#native-shell-installer) | Host plugins, native skill directories, and optional subagents | Git; Bash on macOS/Linux or PowerShell 7.4+ on Windows |
 | [Manual install](docs/installer-reference.md#source-builds-and-manual-installation) | Copying skills from a local checkout | Git and the host's skill directory |
 
 ### Open Skills CLI
@@ -47,7 +47,7 @@ The shell installer also installs host plugins and native skill directories. It
 can install the four optional subagents separately. Install the target host app
 and Git first. List the available flavors from a repository checkout:
 
-**macOS / Linux**
+**macOS / Linux (Bash)**
 
 ```sh
 git clone https://github.com/TylerAkins/ai-agent-skills.git
@@ -94,9 +94,9 @@ bash scripts/install-ai-agent-skills.sh --flavor cursor
 | Antigravity CLI | `antigravity-cli-global` |
 
 On macOS and Linux, the installer needs Bash, curl, tar, shasum, and jq. On
-Windows, use PowerShell 7.4+. For project installs, updates, agent-only
-flavors, destination details, conflicts, and recovery, see the
-[installer reference](docs/installer-reference.md).
+Windows (PowerShell 7.4+), use the PowerShell installer. For project installs,
+updates, agent-only flavors, destination details, conflicts, and recovery, see
+the [installer reference](docs/installer-reference.md).
 
 After installing, follow the [activation and update steps](docs/installer-reference.md#activate-an-installation).
 The [host compatibility guide](docs/host-compatibility.md) explains discovery

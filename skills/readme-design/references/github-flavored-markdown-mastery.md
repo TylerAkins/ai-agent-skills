@@ -15,7 +15,7 @@ between GitHub surfaces and other Markdown renderers.
 
 ## Other GitHub writing features
 
-Use these only when the README's context calls for them:
+Use these only when the document's task calls for them:
 
 - [Creating diagrams](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams)
 - [Writing mathematical expressions](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)

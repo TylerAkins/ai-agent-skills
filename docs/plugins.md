@@ -74,17 +74,16 @@ For release assets, use [release preparation](releases.md).
 
 ## Verify in Each Host
 
-Before distributing a changed workflow, test it in the relevant app:
+For a changed skill or agent, choose a representative task that exercises the
+changed behavior in each affected host. Confirm discovery, invoke the workflow,
+and check any linked resources or host-specific controls involved in that task.
+For multi-step workflows, include the relevant handoff, verification, review, and
+authorization boundaries. Do not run unrelated Jira, deployment, or delivery steps
+just to exercise a different workflow.
 
-1. Confirm discovery, explicit invocation, and sibling reference loading.
-2. Read a Jira issue in intake mode without writes.
-3. Generate a plan containing the `implement-plan` handoff.
-4. Implement within authorization, run checks, and obtain fresh independent review.
-5. Verify repair/re-review handling and reporting when review is unavailable.
-6. Confirm commits, pushes, external replies, and deployments require applicable authorization. Reviews must never be dismissed.
-
-File placement and installer tests do not establish that an agent followed the
-workflow. Record the host/version, observed results, and missing checks.
+Record the host and version, prompt, observed result, and missing checks. File
+placement, package validation, and installer tests do not establish that an agent
+followed its instructions.
 
 ## Skill Activation Limits
 
@@ -120,6 +119,6 @@ surface, installation, and invocation audit, including third-party clients.
 
 Packaging and release assets do not create marketplace listings. Cursor submissions
 go through [the publisher form](https://cursor.com/marketplace/publish).
-Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI, Muse Code, and Antigravity consume
-skill folders directly. Publishing/registering a marketplace remains a separate
-authorized action.
+Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI,
+Muse Code, and Antigravity consume skill folders directly. Publishing or registering
+a marketplace remains a separate authorized action.

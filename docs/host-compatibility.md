@@ -1,7 +1,7 @@
 # Host Skill Compatibility
 
-Skill inventory reviewed against official host documentation on October 24, 2026;
-subagent formats reviewed October 27, 2026. This inventory covers the hosts and
+Skill inventory and subagent formats reviewed against official host documentation
+on October 28, 2026. This inventory covers the hosts and
 installation surfaces documented by this repository. Host
 documentation establishes discovery and invocation mechanisms, not that a model
 will always select or follow a skill.
@@ -20,16 +20,17 @@ limits of the compatibility evidence.
 | [GitHub Copilot app, CLI, IDEs, cloud agent, and code review](https://docs.github.com/en/copilot/concepts/customizations/agent-skills) | **Native skill discovery:** Project `.github/skills`, `.claude/skills`, or `.agents/skills`; personal `~/.copilot/skills` or `~/.agents/skills`. Surface support varies.<br>**Automatic selection:** Yes. Copilot decides from the request and skill description.<br>**Persistent global instructions:** The CLI supports `~/.copilot/copilot-instructions.md`; repository instructions are available on supported surfaces. Personal local skills and instructions do not automatically become cloud-agent resources.<br>**Existing integration:** Project and personal skills; optional portable plugin staging only.<br>**Verified gaps:** Cloud use requires repository-hosted skills. The installer does not create a Copilot plugin marketplace, and staged plugin files alone do not activate a plugin. |
 | [OpenCode CLI, desktop, and IDE integrations](https://opencode.ai/v2/docs/skills/) | **Native skill discovery:** Project `.opencode/skills`, `.agents/skills`, and `.claude/skills`; global `~/.config/opencode/skills`, `~/.agents/skills`, and `~/.claude/skills`.<br>**Automatic selection:** Model-mediated. OpenCode advertises permitted skill descriptions at model steps and exposes a `skill` tool to load a selected skill.<br>**Persistent global instructions:** `~/.config/opencode/AGENTS.md`.<br>**Existing integration:** Separate project and global skill and agent installs.<br>**Verified gaps:** No host-level guarantee that the model calls the skill tool. The installer intentionally does not edit global instructions. |
 | [Gemini CLI](https://geminicli.com/docs/cli/skills) | **Native skill discovery:** Project `.gemini/skills` or `.agents/skills`; user `~/.gemini/skills` or `~/.agents/skills`.<br>**Automatic selection:** Yes. The model can activate a matching skill through `activate_skill`; the CLI asks the user to approve access to its directory.<br>**Persistent global instructions:** `GEMINI.md`, including user-level context.<br>**Existing integration:** Project and global skills-only installs.<br>**Verified gaps:** Skill activation includes a consent step. Google documents a migration path to Antigravity CLI for some Gemini CLI users, so users should follow the surface-specific current path. |
-| [Muse Code CLI](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills) | **Native skill discovery:** User `$HOME/.agents/skills` and Muse config skills; project `.agents/skills`, plus compatible Claude and Codex roots. Project skills require workspace trust.<br>**Automatic selection:** Model-mediated. Muse provides skill descriptions in its catalog and a `read_skill` tool for loading the selected skill.<br>**Persistent global instructions:** The cited skill reference does not establish a separate persistent global instruction file.<br>**Existing integration:** Project and global `.agents/skills` installs.<br>**Verified gaps:** Project skills are unavailable in untrusted workspaces. Muse may compress skill descriptions when its catalog limit is reached; the current collection descriptions fit the portable metadata limit, but actual selection remains model-dependent. |
+| [Muse Code CLI](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills) | **Native skill discovery:** User `$CONFIG_DIR/skills` (`$XDG_CONFIG_HOME/muse/skills` when set, otherwise `~/.config/muse/skills`), `~/.agents/skills`, and compatible Claude/Codex roots; project `.agents/skills`, `.claude/skills`, and `.codex/skills`. Project skills require workspace trust.<br>**Automatic selection:** Model-mediated. Muse sends skill descriptions in its startup catalog; the model can load a matching skill with `read_skill` or the user can invoke it by name.<br>**Persistent global instructions:** The cited skill reference does not establish a separate persistent global instruction file.<br>**Existing integration:** Project and global `.agents/skills` installs.<br>**Verified gaps:** Project skills are unavailable in untrusted workspaces. Muse Code 1.3.0 documents a 24,000-byte shared catalog budget and description compression; actual selection remains model-dependent. |
 | [Antigravity app and standalone IDE](https://antigravity.google/docs/skills) | **Native skill discovery:** Project `.agents/skills` (legacy `.agent/skills`); global `~/.gemini/config/skills`. The standalone IDE also accepts legacy `~/.gemini/antigravity/skills`.<br>**Automatic selection:** Yes. The agent reads relevant skills automatically based on the prompt.<br>**Persistent global instructions:** Global rules are supported.<br>**Existing integration:** Project and app/IDE global skills-only installs.<br>**Verified gaps:** None in the documented path or package. Invocation is still an agent decision, not an installer guarantee. |
 | [Antigravity CLI](https://antigravity.google/docs/skills) | **Native skill discovery:** Project `.agents/skills`; global `~/.gemini/antigravity-cli/skills`.<br>**Automatic selection:** Yes. The CLI sees skill descriptions and automatically reads a skill it judges relevant.<br>**Persistent global instructions:** Global `~/.gemini/GEMINI.md`.<br>**Existing integration:** Project and CLI-specific global skills-only installs.<br>**Verified gaps:** The app/IDE and CLI global directories differ; using the wrong flavor leaves files undiscovered by that surface. |
 | Other [Vercel Skills CLI targets](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) | **Native skill discovery:** The external adapter writes to its listed host path; location and surface vary.<br>**Automatic selection:** Unknown for each product unless covered above.<br>**Persistent global instructions:** Not configured by this repository or the Vercel installer.<br>**Existing integration:** Optional third-party installation path only.<br>**Verified gaps:** Host documentation, client differences, and automatic invocation were not audited individually; see the target list below. |
-| [OpenChamber](https://docs.openchamber.dev/skills) | **Native skill discovery:** OpenChamber manages personal and project skills and runs OpenCode. The underlying OpenCode server must see the skill files.<br>**Automatic selection:** Not independently established by OpenChamber's docs. Its documented `$` picker explicitly attaches a skill; automatic use depends on the OpenCode backend and selected model.<br>**Persistent global instructions:** OpenChamber agent prompts are configurable; the skill installer does not change them.<br>**Existing integration:** No OpenChamber-specific package. OpenCode-compatible agents and skills may be used when visible to its server.<br>**Verified gaps:** File placement through another installer does not prove that a managed or remote OpenChamber server sees the same filesystem, nor that its model invokes a skill or agent. |
+| [OpenChamber](https://docs.openchamber.dev/skills) | **Native skill discovery:** Skills are managed in Settings > Skills, with personal and project scopes.<br>**Selection:** The documented use is explicit: type `$` and choose a skill to attach it to the chat. The docs do not establish automatic selection.<br>**Existing integration:** No OpenChamber-specific package. Skills created or installed in OpenChamber can be selected in its chat.<br>**Verified gaps:** The docs do not establish that files installed by this repository’s external installer are visible in OpenChamber. |
 ### Distribution mechanisms
 
 The canonical content remains `skills/<name>/SKILL.md` and supporting files.
-The release workflow prepares these archives; the new agent archives are not
-available until a release containing this change is published:
+The release workflow prepares these archives. The current published release is
+[v1.1.0](https://github.com/TylerAkins/ai-agent-skills/releases/tag/v1.1.0); older
+releases may not contain the agent bundles described here:
 
 | Release archive | Hosts | Package components |
 | --- | --- | --- |
@@ -41,7 +42,7 @@ available until a release containing this change is published:
 | `codex` | Codex native agents | Canonical skills, Codex TOML agents, portable plugin manifest, license |
 
 The native shell installers provide 27 flavors across eight host families. The
-six new agent-only flavors install to native global or project agent directories;
+six agent-only flavors install to native global or project agent directories;
 they do not install skills. `codex-global` and `muse-global` share
 `~/.agents/skills`. Project `.agents/skills` is also recognized by multiple
 compatible hosts. See the [full flavor list](installer-reference.md#options-and-destinations).
@@ -55,8 +56,8 @@ the relevant skills separately for native agent-only flavors. The `skills` archi
 remains skills-only for the other hosts. OpenCode agent-only flavors use the new
 `opencode` archive rather than the shared `skills` archive. Codex agent-only
 flavors use the `codex` archive rather than the shared `portable` archive.
-Claude uses the Claude archive. Old releases without the four agent definitions
-cannot install the new agent flavors.
+Claude uses the Claude archive. Releases without the four agent definitions
+cannot install the agent flavors.
 
 | Host | Agent behavior and limits |
 | --- | --- |
@@ -175,47 +176,27 @@ Google documents `~/.gemini/config/skills` for the Antigravity app and IDE, whil
 the IDE accepts the adapter path as a legacy location. The native `antigravity-global`
 flavor targets the documented app/IDE path; use `antigravity-cli-global` for the CLI.
 
-## Routing design and verified gaps
+## Integration boundaries
 
-All eight host families document a way for the agent to choose a skill from its
-description, though their tools and user-consent behavior differ. The strongest
-shared architecture is therefore native skill discovery with concise, task-specific
-descriptions. The installer does not claim to enforce invocation.
+The collection provides host packages and native skill or agent files. Host
+documentation describes discovery and invocation, but selection and instruction
+following remain model behavior. The installer does not promise that a host will
+load or follow a skill.
 
-The source audit found three avoidable gaps:
-
-1. `using-skills` described itself as the entry point for any engineering task and
-   instructed agents to load it before planning, editing, testing, debugging, review,
-   or delivery. That competed with direct native matching and loaded the generic
-   router even for a clear single-skill task. Its trigger and instructions now limit
-   routing to ambiguous or multi-workflow work.
-2. The Cursor plugin's always-on rule had the same blanket router requirement. It now
-   defers clear matches to Cursor's native skill selection and uses the router only
-   for ambiguous or multi-workflow requests.
-3. The Claude native global skill directory followed `~/.claude` literally. Claude
-   Code relocates all of those paths under `CLAUDE_CONFIG_DIR` when that variable is
-   set. The new installer honors that override and retains the default path otherwise.
-
-The Claude plugin path was session-only because the installer stages it for
-`--plugin-dir`. Native `claude-global` and `claude-project` flavors now install to
-Claude Code's persistent skill directories. Cursor CLI and Codex CLI/IDE users also
-now have direct global skill flavors at `~/.cursor/skills` and `~/.agents/skills`;
-their existing plugin and project options remain available.
-
-No global instruction file is installed or modified. Native selection is already
-documented for the supported hosts, while a blanket global router would duplicate
-that entry point, add context to unrelated sessions, and risk conflicting with
-user-defined instructions. Skills-only flavors change only the selected skill
-directory. Existing plugin flavors retain their host-specific behavior, including
-the Codex local marketplace update, and preserve unrelated marketplace entries and
-instruction files.
+Native skill flavors write only to their documented skill directory. They do not
+edit global instruction files or host settings. Plugin flavors retain their
+host-specific behavior; the Codex local marketplace updater preserves unrelated
+marketplace entries and instruction files. The Claude native global flavors honor
+`CLAUDE_CONFIG_DIR` when set. See the [installer reference](installer-reference.md)
+for exact destinations and the [packaging reference](plugins.md) for package
+contents.
 
 ## Behavioral evidence and limits
 
 Structural package and installer tests verify manifests, paths, skill content,
 agent YAML/TOML parsing, merging, backups, marketplace preservation, and
 user-instruction-file preservation. In an isolated project, a local OpenCode v2
-`--standalone` API request registered all four new agents as subagents with
+`--standalone` API request registered all four packaged agents as subagents with
 edit/shell/subagent denials. This establishes OpenCode registration, not a
 model's delegation or skill use.
 

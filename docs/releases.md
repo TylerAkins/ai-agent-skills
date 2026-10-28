@@ -54,9 +54,10 @@ tests and vet, validates the collection, and packages all six distribution
 targets. A separate job uploads artifacts and uses `contents: write` to create
 tag `v{version}` at that commit (if needed) and a draft GitHub release.
 
-If a draft for that tag already exists, or a published release already exists,
-the workflow fails instead of overwriting assets. Delete the draft or publish it
-before preparing another run for the same version.
+If any release for that tag already exists, the workflow fails instead of
+overwriting it. If a failed run left a draft, inspect and delete that draft before
+retrying. A published release cannot be reused for another run; bump all three
+manifest versions to create a new tag.
 
 Download and inspect the draft's bundles. On Linux, verify downloads with:
 
@@ -75,6 +76,6 @@ failed or partial attempt before retrying.
 ## Dependency Maintenance
 
 Dependabot checks Go modules and GitHub Actions weekly and assigns update PRs to
-`TylerAkins`. The configuration takes effect on the default branch. Security
-alerts and automatic security-update PRs are enabled separately in repository settings.
-Updates still require review and checks; no auto-merge or review dismissal is configured.
+`TylerAkins`, as configured in [dependabot.yml](../.github/dependabot.yml). The
+configuration takes effect on the default branch. Repository security alerts and
+automatic security-update settings are managed separately from this file.
