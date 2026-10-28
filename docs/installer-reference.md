@@ -351,11 +351,27 @@ To refresh staged files, use `update` / `-Action Update` and confirm replacement
 
 ## Options and Destinations
 
-PowerShell options mirror the Bash controls: `-Version`, `-FromSource`, `-Ref`,
-`-Project`, `-MarketplaceRoot`, `-Replace`, `-Merge`, `-Yes`, and `-DryRun`.
-Use `-Flavor list` to list choices. `-HomeDirectory` redirects user-level files
-for isolated staging/testing; hosts will not automatically discover that alternate
-profile's personal marketplace.
+The Bash and PowerShell installers use the same flavor names. Their command-line
+forms differ as follows:
+
+| Operation | Bash | PowerShell | Constraint |
+| --- | --- | --- | --- |
+| Choose a flavor | `--flavor NAME` | `-Flavor NAME` | Use `list` to print the supported flavors. |
+| Install or update | Optional `install` or `update` argument | `-Action Install` or `-Action Update` | Defaults to install. |
+| Select a release | `--version TAG` | `-Version TAG` | Use a published `vMAJOR.MINOR.PATCH` tag. |
+| Build from source | `--from-source` | `-FromSource` | Requires Git and stable Go 1.27.1 or newer. |
+| Select a source ref | `--ref REF` | `-Ref REF` | Requires source mode; accepts `main` or a release tag. |
+| Set a project | `--project PATH` | `-Project PATH` | Required for project flavors; path must be absolute and exist. |
+| Set marketplace root | `--marketplace-root PATH` | `-MarketplaceRoot PATH` | Required for `codex-marketplace`; path must be absolute. |
+| Replace destination | `--replace` | `-Replace` | Cannot be combined with merge. |
+| Merge skills or agents | `--merge` | `-Merge` | Skills-only and agents-only flavors. |
+| Confirm without prompt | `--yes` | `-Yes` | Confirms the selected replacement or merge. |
+| Print planned destination | `--dry-run` | `-DryRun` | Does not download or write files. |
+
+PowerShell also accepts `-HomeDirectory` to redirect user-level files for
+isolated staging or testing. Hosts will not automatically discover that alternate
+profile's personal marketplace. Bash accepts `--help` and `-h`; PowerShell accepts
+`-?` to print the current usage text.
 
 ```powershell
 ./scripts/install-ai-agent-skills.ps1 -Flavor cursor -Version v1.0.1

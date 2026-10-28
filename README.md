@@ -63,11 +63,16 @@ Set-Location ai-agent-skills
 ./scripts/install-ai-agent-skills.ps1 -Flavor list
 ```
 
-Choose a flavor and replace `cursor` in these examples:
+Choose a flavor, replace `cursor` with it, and run the matching example for your
+operating system.
+
+**macOS / Linux (Bash)**
 
 ```sh
 bash scripts/install-ai-agent-skills.sh --flavor cursor
 ```
+
+**Windows (PowerShell 7.4+)**
 
 ```powershell
 ./scripts/install-ai-agent-skills.ps1 -Flavor cursor

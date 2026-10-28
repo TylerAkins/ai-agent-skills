@@ -1,15 +1,17 @@
 ---
 name: technical-documentation
 description: >-
-  Create and maintain source-derived technical guides, references, explanations,
-  and architecture decision records. Use when repository behavior or technical
-  decisions need documentation. Trace claims to implementation and verify examples.
+  Create or update persistent technical documentation from repository sources and
+  primary references, including task guides, API or factual references, explanations,
+  and architecture decision records. Use readme-design for project READMEs and
+  explain-it for one-time explanations.
 ---
 
 # Technical Documentation
 
-Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting. Establish the
-reader, task, destination, source of truth, and requested scope. Inspect existing
+Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting. Establish whether
+the request is for persistent documentation or a one-time explanation, then identify
+the reader, task, destination, source of truth, and requested scope. Inspect existing
 documentation, repository instructions, code, schemas, configuration, and actual
 decisions. Preserve useful unrelated content and the project's conventions.
 
@@ -25,7 +27,30 @@ proof when the implementation can be inspected.
 Write from that evidence. Prefer concise prose around verified facts over prose
 that restates source code. Use exact identifiers, values, paths, and version
 constraints. If the implementation does not establish an answer, say what remains
-unknown rather than filling the gap with an assumption.
+unknown rather than filling the gap with an assumption. If a required source or
+environment cannot be checked, hold any dependent claim as unverified; omit it or
+label the limit instead of presenting it as fact.
+
+For a substantial reference or a page spanning several execution paths, add a
+compact source map that connects each major behavior to its implementation and,
+where useful, the command or test that checks it. Keep that map proportional to
+the page; small edits do not need a provenance appendix. When the same inventory,
+default, or version appears in several places, link to its canonical source or
+generate the repeated content from that source when the repository supports it.
+Do not call prose or a table generated unless a maintained generator produces it.
+
+Separate evidence by authority. Repository behavior comes from the current
+implementation and its contracts; tests can reveal expected cases but can also
+be stale. External behavior comes from current primary documentation or a
+normative specification. Runtime observations apply only to the tested revision,
+host, and environment. Record those limits when they matter to the reader.
+
+Document stable user-visible behavior and supported contracts first. Include
+internal control flow only when it helps a maintainer answer a concrete question.
+For change-prone host or dependency behavior, identify the relevant product,
+surface, and version when known, and recheck the primary source when editing that
+claim. Add review dates only when they help maintain a changing inventory; avoid
+dates that make stable repository behavior look temporary.
 
 ## Choose the Document's Job
 
@@ -87,6 +112,17 @@ Use [api-design](../api-design/SKILL.md) for interface contracts and
 Keep examples realistic and safe, with placeholders clearly identified and no secrets.
 Copy technical identifiers, units, paths, and contractual values accurately.
 
+## Anti-Rationalization Guardrails
+
+| Rationalization | Rule |
+| --- | --- |
+| The existing document already explains the behavior. | Trace changed claims to current implementation or primary sources before preserving them. |
+| A test name or passing test proves the whole documented contract. | Inspect the assertion and implementation; describe only the behavior each establishes. |
+| A manually maintained table is quicker than finding its source. | Map it to a canonical source, or generate it when a maintained generation path exists. |
+| Markdown parses, so the page is ready. | Inspect the destination render for the reader's task and disclose renderer limits. |
+| The installer placed files, so the host uses them. | Verify discovery and invocation separately; do not infer model behavior from placement. |
+| Every technical detail makes a reference more complete. | Keep details that answer a reader's task; link to the source for incidental implementation. |
+
 ## Verify With the Reader's Task
 
 Check every local link and referenced file. Verify external facts against primary
@@ -95,17 +131,25 @@ in a safe representative environment when feasible, following the instructions a
 a new reader would. Do not execute production/destructive steps to prove documentation.
 Record untested platforms, prerequisites, and live actions instead of claiming success.
 
-Inspect the rendered result, including navigation, code fences, tables, and media.
-For disclosure sections, check the collapsed page and expand each reader path.
-Check narrow layouts when long commands or tables matter. Source/link checks are
-a fallback, not proof of rendered quality; disclose when visual checks are unavailable.
+Keep verification claims at the level of evidence obtained:
 
-For installation guides, test commands in fresh scratch destinations, preserving
-sibling resources and checking conflict handling. Verify host discovery separately:
-file placement does not prove an agent loaded or followed a skill. Keep verification
-proportional and report untested platforms or live steps. Reconcile the final prose
-with observed behavior after material edits. Change generated documentation at its
-source so the next build does not overwrite the repair.
+1. **Structural:** links, anchors, fenced blocks, frontmatter, and generated package
+   contents resolve or parse. This does not prove that commands work or pages read well.
+2. **Command:** run safe examples from the documented working directory with stated
+   prerequisites. For installers, use a fresh scratch destination and check conflict,
+   merge, backup, and sibling-preservation behavior when those are documented.
+3. **Rendered:** inspect the target renderer for navigation, code, tables, media,
+   disclosure sections in both states, and narrow layouts when relevant. A local
+   reference parser is structural/rendering evidence, not proof of GitHub's exact page.
+4. **Host behavior:** check discovery, activation, or invocation in the named host
+   separately. File placement or a rendered page does not establish model behavior.
+
+Run only the levels needed for the changed claims and reader task. State which level
+was checked and what remains unverified; never let a lower level imply a higher one.
+
+Keep verification proportional and report untested platforms or live steps. Reconcile
+the final prose with observed behavior after material edits. Change generated
+documentation at its source so the next build does not overwrite the repair.
 
 Before delivery, trace one reader's task from entrypoint to success. Remove needless
 jumps, duplicate instructions, missing prerequisites, and misleading labels. For a
