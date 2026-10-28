@@ -55,7 +55,7 @@ cd ai-agent-skills
 bash scripts/install-ai-agent-skills.sh --flavor list
 ```
 
-**Windows, using PowerShell 7.4+**
+**Windows (PowerShell 7.4+)**
 
 ```powershell
 git clone https://github.com/TylerAkins/ai-agent-skills.git
@@ -94,7 +94,7 @@ bash scripts/install-ai-agent-skills.sh --flavor cursor
 | Antigravity CLI | `antigravity-cli-global` |
 
 On macOS and Linux, the installer needs Bash, curl, tar, shasum, and jq. On
-Windows, use PowerShell 7.4 or newer. For project installs, updates, agent-only
+Windows, use PowerShell 7.4+. For project installs, updates, agent-only
 flavors, destination details, conflicts, and recovery, see the
 [installer reference](docs/installer-reference.md).
 
@@ -201,13 +201,3 @@ and the [subagent compatibility guide](docs/host-compatibility.md#specialized-su
 | [Packaging reference](docs/plugins.md) | Package contents, validation, builds, and host checks. |
 | [Release preparation](docs/releases.md) | Drafting and checking a release. |
 | [GitHub Flavored Markdown specification](https://github.github.com/gfm/) | The formal specification for the Markdown dialect GitHub supports. |
-
-## Contributing
-
-Report bugs or request a skill through [GitHub Issues](https://github.com/TylerAkins/ai-agent-skills/issues/new/choose).
-Use [CONTRIBUTING.md](CONTRIBUTING.md) for contribution steps and checks. The
-repository's [AGENTS.md](AGENTS.md) contains maintainer instructions.
-
-## License
-
-[MIT](LICENSE).
