@@ -9,8 +9,14 @@ Choose a distribution path:
 
 | Path | Requirements | Installs |
 | --- | --- | --- |
-| Open Skills CLI (`npx skills`) | Node.js/npm and Git; no manual clone | Skill folders and supporting resources for supported agents |
+| Open Skills CLI (`npx skills`) | Node.js 22.20+/npm and Git; no manual clone | Skill folders and supporting resources for selected coding hosts; no subagent definitions |
 | Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing and optional specialized agents where supported |
+
+For skills, start with the Open Skills CLI. Its agent selection chooses the coding
+host, not the four optional subagents. The Cursor and Claude Code plugins include
+both skills and subagents; the Codex desktop plugin includes skills only. To add
+subagents to a native skills install, use the host's separate agent flavor where
+available.
 
 See the [host compatibility matrix](docs/host-compatibility.md) for native skill
 discovery, automatic selection, app/CLI differences, and verified limitations.
@@ -23,7 +29,7 @@ Run from your target project directory:
 npx skills add TylerAkins/ai-agent-skills
 ```
 
-Select your agents and skills interactively. To list skills or select one by name:
+Select coding hosts and skills interactively. To list skills or select one by name:
 
 ```sh
 npx skills add TylerAkins/ai-agent-skills --list

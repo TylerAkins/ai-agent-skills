@@ -69,8 +69,13 @@ exist; replace the example paths with your own.
 
 ### Specialized agent installations
 
-Use an agent flavor alongside the corresponding skills flavor. New releases contain
-four native subagent definitions per supported host; older archives may not.
+The Open Skills CLI installs skills, not these subagent definitions. Cursor and
+Claude Code plugin installs already include the four agents; the Codex desktop
+plugin does not.
+
+For native installs, use an agent flavor alongside the corresponding skills flavor.
+Releases with agent bundles contain four subagent definitions per supported host;
+older archives may not.
 Substitute `claude` or `codex` for `opencode` in the agent flavor names below.
 Use `claude-project` or `codex-skills` for the corresponding project skills:
 
