@@ -148,6 +148,36 @@ for flavor in cursor cursor-global codex-desktop codex-marketplace codex-global 
   fi
   HOME=$original_home
 done
+for host in opencode claude codex; do
+  for scope in global project; do
+    flavor="$host-agents-$scope"
+    args=(--flavor "$flavor" --version v1.0.0 --yes)
+    if [ "$scope" = project ]; then args+=(--project "$work/project"); root="$work/project/.$host/agents"; else
+      case "$host" in
+        opencode) root="$HOME/.config/opencode/agents" ;;
+        claude) root="$CLAUDE_CONFIG_DIR/agents" ;;
+        codex) root="$HOME/.codex/agents" ;;
+      esac
+    fi
+    bash "$installer" "${args[@]}"
+    extension=md
+    if [ "$host" = codex ]; then extension=toml; fi
+    for agent in architecture-advisor dependency-investigator independent-reviewer root-cause-investigator; do test -f "$root/$agent.$extension"; done
+    test ! -e "$root/skills"
+    printf 'Keep unrelated agent\n' > "$root/custom.$extension"
+    printf 'User modification\n' > "$root/independent-reviewer.$extension"
+    if bash "$installer" update "${args[@]}" > "$work/agent-refusal.log" 2>&1; then
+      printf 'Agent update replaced a custom definition without merge consent.\n' >&2; exit 1
+    fi
+    test "$(cat "$root/independent-reviewer.$extension")" = 'User modification'
+    bash "$installer" update "${args[@]}" --merge
+    test "$(cat "$root/custom.$extension")" = 'Keep unrelated agent'
+    grep -q 'Do not' "$root/independent-reviewer.$extension"
+    snapshot=$(tree_snapshot "$root")
+    bash "$installer" update "${args[@]}" --merge
+    test "$snapshot" = "$(tree_snapshot "$root")"
+  done
+done
 for file in "${instruction_sentinels[@]}"; do
   test "$(cat "$file")" = 'Keep user instructions'
 done

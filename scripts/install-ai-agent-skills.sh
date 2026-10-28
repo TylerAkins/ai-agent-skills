@@ -45,6 +45,7 @@ if [ -z "$flavor" ]; then
   read -r flavor
 fi
 skills_only=false
+agents_only=false
 catalog=
 source_path=
 case "$flavor" in
@@ -79,6 +80,19 @@ case "$flavor" in
       muse-project|antigravity-project) host=skills; destination="$project/.agents/skills" ;;
     esac ;;
   opencode-global) skills_only=true; host=opencode; destination="$HOME/.config/opencode/skills" ;;
+  opencode-agents-global) agents_only=true; host=opencode; destination="$HOME/.config/opencode/agents" ;;
+  claude-agents-global) agents_only=true; host=claude; destination="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents" ;;
+  codex-agents-global) agents_only=true; host=codex; destination="$HOME/.codex/agents" ;;
+  opencode-agents-project|claude-agents-project|codex-agents-project)
+    [ -n "$project" ] || fail "Use --project with the full path to an existing project."
+    require_absolute "$project"
+    [ -d "$project" ] || fail "Project directory does not exist: $project"
+    agents_only=true
+    case "$flavor" in
+      opencode-*) host=opencode; destination="$project/.opencode/agents" ;;
+      claude-*) host=claude; destination="$project/.claude/agents" ;;
+      codex-*) host=codex; destination="$project/.codex/agents" ;;
+    esac ;;
   gemini-global) skills_only=true; host=skills; destination="$HOME/.gemini/skills" ;;
   muse-global) skills_only=true; host=skills; destination="$HOME/.agents/skills" ;;
   antigravity-global) skills_only=true; host=skills; destination="$HOME/.gemini/config/skills" ;;
@@ -93,9 +107,9 @@ if [ -n "$ref" ]; then
   [ "$ref" = main ] || valid_version "$ref"
   [ -z "$version" ] || [ "$version" = "$ref" ] || fail "--version and --ref disagree."
 fi
-[ "$mode" != merge ] || "$skills_only" || fail "--merge applies only to skills-only flavors."
+[ "$mode" != merge ] || "$skills_only" || "$agents_only" || fail "--merge applies only to skills-only or agents-only flavors."
 # Updates to shared skills still require an explicit replacement/merge decision.
-if [ "$action" = update ] && ! "$skills_only" && [ -z "$mode" ]; then mode=replace; fi
+if [ "$action" = update ] && ! "$skills_only" && ! "$agents_only" && [ -z "$mode" ]; then mode=replace; fi
 check_path "$destination"
 [ -z "$catalog" ] || check_path "$catalog"
 if [ -e "$destination" ]; then
@@ -123,8 +137,9 @@ if [ -z "$ref" ] && [ -z "$version" ]; then
   valid_version "$version"
 fi
 prepare_bundle
-if "$skills_only"; then payload="$work/package/skills"; else payload="$work/package"; fi
-[ -d "$payload" ] || fail "Bundle is missing skills."
+if "$skills_only"; then payload="$work/package/skills"; elif "$agents_only"; then payload="$work/package/agents"; else payload="$work/package"; fi
+[ -d "$work/package/skills" ] || fail "Bundle is missing skills."
+[ -d "$payload" ] || fail "Bundle is missing selected component: $payload"
 if [ -n "$catalog" ]; then
   prepare_catalog
   mkdir -p "$(dirname "$catalog")"
@@ -158,8 +173,8 @@ case "$flavor" in
   muse-*) printf 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.\n' ;;
   *) printf 'Start a new host session and check for the installed skills.\n' ;;
 esac
-if "$skills_only"; then
-  printf 'For updates, use update with --merge (PowerShell: -Action Update -Merge) to preserve unrelated skills.\n'
+if "$skills_only" || "$agents_only"; then
+  printf 'For updates, use update with --merge (PowerShell: -Action Update -Merge) to preserve unrelated files. Incoming names are replaced; the previous directory is backed up.\n'
 else
   printf 'For updates, refresh/reinstall the host plugin if its cached copy remains stale.\n'
 fi

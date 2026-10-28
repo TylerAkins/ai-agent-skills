@@ -14,17 +14,19 @@ Every target contains the complete `skills/` collection and supporting resources
 | `claude` | Claude Code | `.claude-plugin/plugin.json`, `agents/`, LICENSE |
 | `portable` | Codex, Copilot | Root `plugin.json`, LICENSE |
 | `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
+| `opencode` | OpenCode native agents | OpenCode Markdown `agents/`, LICENSE; no plugin manifest |
+| `codex` | Codex native agents | Root `plugin.json`, Codex TOML `agents/`, LICENSE |
 
-The release workflow publishes these four `.tar.gz` archives. Installer flavors
-still select host-specific destinations and activation steps. The `codex`,
-`copilot`, and `opencode` build targets remain available for existing source-build
-consumers; their contents match `portable`, `portable`, and `skills`, respectively.
+The release workflow prepares these six `.tar.gz` archives. Installer flavors
+select host-specific destinations and activation steps. The `copilot` build target
+remains available for older source-build consumers and has the same contents as
+`portable`. The `codex` and `opencode` targets now add native agents to their
+respective skills packages.
 
-Cursor includes a native-first routing rule and reviewer; Claude includes the
-reviewer. The reviewer requests read-only review through instructions, not a tool
-sandbox. Native skills-only installation options are listed in the
-[host compatibility matrix](host-compatibility.md).
-Codex and Copilot rely on their host's available review/delegation capabilities.
+Cursor includes a native-first routing rule and four canonical agent prompts;
+Claude includes those prompts with tool allowlists. OpenCode and Codex use
+deterministic host-specific adaptations. Native agent installation and read-only
+limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
 
 Repository `AGENTS.md`, tooling, credentials, and the `.cursor/skills` discovery
 symlink are excluded. Do not symlink this checkout into Cursor's local-plugin
@@ -44,14 +46,14 @@ Build into new directories outside the checkout:
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor claude portable skills; do
+for host in cursor claude portable skills opencode codex; do
   go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
 done
 ```
 
 The output directories must not exist. The packager refuses overwrite and validates
-each generated package. Checks cover our metadata, local links, inventories, and
-package contracts, not complete host schema or behavioral validation.
+each generated package. Checks cover metadata, local links, inventories, package
+contracts, and parser-backed agent formats, not live delegation.
 
 For a temporary source checkout and local installation, use
 [installer source mode](installer-reference.md#source-builds-and-manual-installation).

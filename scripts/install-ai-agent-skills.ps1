@@ -10,7 +10,7 @@ backups. No execution policy, shell profile, or host activation is changed.
 [CmdletBinding()]
 param(
     [ValidateSet('Install', 'Update')][string]$Action = 'Install',
-    [ValidateSet('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
+    [ValidateSet('cursor', 'cursor-global', 'codex-desktop', 'codex-marketplace', 'codex-global', 'claude', 'claude-global', 'claude-project', 'copilot-staging', 'copilot-skills', 'copilot-global', 'codex-skills', 'opencode-project', 'opencode-global', 'opencode-agents-global', 'opencode-agents-project', 'claude-agents-global', 'claude-agents-project', 'codex-agents-global', 'codex-agents-project', 'gemini-project', 'gemini-global', 'muse-project', 'muse-global', 'antigravity-project', 'antigravity-global', 'antigravity-cli-global', 'list')][string]$Flavor,
     [string]$Version,
     [switch]$FromSource,
     [string]$Ref,
@@ -112,6 +112,12 @@ $flavors = [ordered]@{
     'codex-skills' = @('codex', '.agents/skills', $true)
     'opencode-project' = @('opencode', '.opencode/skills', $true)
     'opencode-global' = @('opencode', '.config/opencode/skills', $true)
+    'opencode-agents-global' = @('opencode', '.config/opencode/agents', $false)
+    'opencode-agents-project' = @('opencode', '.opencode/agents', $false)
+    'claude-agents-global' = @('claude', '.claude/agents', $false)
+    'claude-agents-project' = @('claude', '.claude/agents', $false)
+    'codex-agents-global' = @('codex', '.codex/agents', $false)
+    'codex-agents-project' = @('codex', '.codex/agents', $false)
     'gemini-project' = @('skills', '.gemini/skills', $true)
     'gemini-global' = @('skills', '.gemini/skills', $true)
     'muse-project' = @('skills', '.agents/skills', $true)
@@ -133,11 +139,12 @@ if ($Ref -and $Ref -ne 'main') { Test-ReleaseVersion $Ref }
 if ($Ref -and $Version -and $Ref -ne $Version) { throw '-Version and -Ref disagree.' }
 $installRoot = Resolve-InstallPath $HomeDirectory
 $targetHost, $relativePath, $skillsOnly = $flavors[$Flavor]
-if ($Flavor -eq 'claude-global' -and $env:CLAUDE_CONFIG_DIR) {
+$agentsOnly = $Flavor -like '*-agents-*'
+if ($Flavor -in @('claude-global', 'claude-agents-global') -and $env:CLAUDE_CONFIG_DIR) {
     $installRoot = Resolve-InstallPath $env:CLAUDE_CONFIG_DIR
-    $relativePath = 'skills'
+    $relativePath = if ($agentsOnly) { 'agents' } else { 'skills' }
 }
-if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project')) {
+if ($Flavor -in @('copilot-skills', 'codex-skills', 'opencode-project', 'gemini-project', 'muse-project', 'antigravity-project', 'claude-project', 'opencode-agents-project', 'claude-agents-project', 'codex-agents-project')) {
     if (-not $Project) { throw '-Project is required for this flavor.' }
     $installRoot = Resolve-InstallPath $Project
     if (-not (Test-Path -LiteralPath $installRoot -PathType Container)) { throw 'Project directory does not exist.' }
@@ -156,8 +163,8 @@ if ($Flavor -eq 'codex-desktop') {
     $catalog = Resolve-InstallPath (Join-Path $installRoot '.agents/plugins/marketplace.json')
     $sourcePath = './plugins/ai-agent-skills'
 }
-if ($Merge -and -not $skillsOnly) { throw '-Merge applies only to skills-only flavors.' }
-if ($Action -eq 'Update' -and -not $skillsOnly -and -not $Merge) { $Replace = $true }
+if ($Merge -and -not $skillsOnly -and -not $agentsOnly) { throw '-Merge applies only to skills-only or agents-only flavors.' }
+if ($Action -eq 'Update' -and -not $skillsOnly -and -not $agentsOnly -and -not $Merge) { $Replace = $true }
 $hadDestination = Test-Path -LiteralPath $destination
 if ($hadDestination) {
     if (-not (Test-Path -LiteralPath $destination -PathType Container)) { throw 'Destination is not a directory.' }
@@ -207,6 +214,7 @@ try {
             'opencode' { 'skills' }
             default { $targetHost }
         }
+        if ($agentsOnly) { $preferredHost = $targetHost }
         $preferredName = "ai-agent-skills-$preferredHost-$Version.tar.gz"
         $archiveHost = $targetHost
         if (@($lines | Where-Object {
@@ -229,8 +237,9 @@ try {
         $extracted = Expand-VerifiedBundle (Join-Path $work $archiveName) $archiveHost $work
         [IO.Directory]::Move($extracted, $package)
     }
-    $payload = if ($skillsOnly) { Join-Path $package 'skills' } else { $package }
+    $payload = if ($skillsOnly) { Join-Path $package 'skills' } elseif ($agentsOnly) { Join-Path $package 'agents' } else { $package }
     if (-not (Test-Path -LiteralPath (Join-Path $package 'skills') -PathType Container)) { throw 'Bundle is missing skills.' }
+    if (-not (Test-Path -LiteralPath $payload -PathType Container)) { throw 'Bundle is missing selected component.' }
     if ($catalog) {
         if (Test-Path -LiteralPath $catalog) {
             $data = [System.Text.Json.Nodes.JsonNode]::Parse((Get-Content -LiteralPath $catalog -Raw))
@@ -271,7 +280,7 @@ try {
         $reparse = Get-ChildItem -LiteralPath $destination -Recurse -Force | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }
         if ($reparse) { throw 'Refusing to merge skills containing links/junctions.' }
         Copy-Item -LiteralPath $destination -Destination $candidate -Recurse -Force
-        foreach ($item in Get-ChildItem -LiteralPath $payload -Directory -Force) {
+        foreach ($item in Get-ChildItem -LiteralPath $payload -Force) {
             $existing = Join-Path $candidate $item.Name
             if (Test-Path -LiteralPath $existing) { Remove-Item -LiteralPath $existing -Recurse -Force }
             Copy-Item -LiteralPath $item.FullName -Destination $candidate -Recurse -Force
@@ -309,8 +318,8 @@ try {
         { $_ -like 'muse-*' } { Write-Output 'In Muse Code, run /skills reload. Use muse skills list to check discovery; project skills require a trusted workspace.' }
         default { Write-Output 'Start a new host session and check for the installed skills.' }
     }
-    if ($skillsOnly) {
-        Write-Output 'For updates, use -Action Update -Merge to preserve unrelated skills.'
+    if ($skillsOnly -or $agentsOnly) {
+        Write-Output 'For updates, use -Action Update -Merge to preserve unrelated files. Incoming names are replaced; the previous directory is backed up.'
     } else {
         Write-Output 'Refresh/reinstall the host plugin if its cached copy remains stale.'
     }

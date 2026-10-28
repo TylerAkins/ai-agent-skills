@@ -9,8 +9,14 @@ Choose a distribution path:
 
 | Path | Requirements | Installs |
 | --- | --- | --- |
-| Open Skills CLI (`npx skills`) | Node.js/npm and Git; no manual clone | Skill folders and supporting resources for supported agents |
-| Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing/reviewer configuration where supported |
+| [Open Skills CLI (`npx skills`)](#open-skills-cli) | Node.js 22.20+/npm and Git; no manual clone | Skill folders and supporting resources for selected coding hosts; no subagent definitions |
+| [Native shell installers](#native-shell-installers) | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing and optional specialized agents where supported |
+
+For skills, start with the Open Skills CLI. Its agent selection chooses the coding
+host, not the four optional subagents. The Cursor and Claude Code plugins include
+both skills and subagents; the Codex desktop plugin includes skills only. To add
+subagents to a native skills install, use the host's separate agent flavor where
+available.
 
 See the [host compatibility matrix](docs/host-compatibility.md) for native skill
 discovery, automatic selection, app/CLI differences, and verified limitations.
@@ -23,7 +29,7 @@ Run from your target project directory:
 npx skills add TylerAkins/ai-agent-skills
 ```
 
-Select your agents and skills interactively. To list skills or select one by name:
+Select coding hosts and skills interactively. To list skills or select one by name:
 
 ```sh
 npx skills add TylerAkins/ai-agent-skills --list
@@ -71,9 +77,12 @@ git clone https://github.com/TylerAkins/ai-agent-skills.git
 Set-Location ai-agent-skills
 ```
 
-For an existing checkout, skip cloning. Before updating, run `git pull --ff-only`
-once, then use your host's update command below. Skills-only updates use merge to
-preserve unrelated skill folders; plugin updates replace the plugin with a backup.
+For an existing checkout, skip cloning. Before updating from a published release,
+run `git pull --ff-only` once, then use your host's update command below. Skills-only
+and agent-only updates use merge to preserve unrelated files; plugin updates replace
+the plugin with a backup. If you have uncommitted changes, do not pull over them.
+The new agent-only flavors require a published release containing the agent
+bundles; older releases cannot install them.
 
 <a id="cursor"></a>
 <details>
@@ -95,7 +104,7 @@ bash scripts/install-ai-agent-skills.sh --flavor cursor
 
 Run **Developer: Reload Window** from Cursor's Command Palette
 (`Cmd+Shift+P` on Mac, `Ctrl+Shift+P` on Windows/Linux). Open **Customize** and
-check for **ai-agent-skills**, its skills, routing rule, and reviewer. Start a new
+check for **ai-agent-skills**, its skills, routing rule, and four agents. Start a new
 Agent chat and ask for an implementation plan without naming a skill.
 
 Local plugin imports must be allowed by your account/team. A marketplace copy
@@ -190,7 +199,26 @@ does not change Codex configuration. For updates, use `update` / `-Action Update
 with `--merge` / `-Merge`. The shared `~/.agents/skills` directory is also read by
 other compatible hosts.
 
-### Update
+### Optional native subagents
+
+For the four investigation agents, install the native skills above and the agent
+definitions separately. The desktop plugin alone does not install native Codex agents.
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor codex-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor codex-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor codex-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor codex-agents-global -Merge
+```
+
+For project-scoped definitions, use `codex-agents-project` with `--project` /
+`-Project` and install project skills with `codex-skills`. See
+[agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update desktop plugin
 
 Run from this checkout:
 
@@ -272,7 +300,26 @@ global flavor honors an absolute `CLAUDE_CONFIG_DIR` when it is set.
 The installed `code-review` skill takes the `/code-review` name used by Claude's
 built-in skill; Claude's `/review` alias remains available.
 
-### Update
+### Optional native subagents
+
+The Claude plugin already includes the four investigation agents. For persistent
+native agents instead, install the skills above and add the agent definitions:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor claude-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor claude-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor claude-agents-global -Merge
+```
+
+For project scope, use `claude-agents-project` with `--project` / `-Project`
+alongside `claude-project` skills. The global agent flavor honors
+`CLAUDE_CONFIG_DIR`. See [agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update plugin
 
 Run from this checkout:
 
@@ -363,9 +410,28 @@ bash scripts/install-ai-agent-skills.sh --flavor opencode-global
 Skills are installed in `~/.config/opencode/skills` for use across your projects.
 Start a new OpenCode session and ask it to plan a feature without naming a skill.
 The model can load a matching skill through OpenCode's native `skill` tool.
-This is a skills installation. See [OpenCode skills](https://opencode.ai/docs/skills/).
+This is a skills installation. See [OpenCode V2 skills](https://opencode.ai/v2/docs/skills/).
 
-### Update
+### Optional native subagents
+
+Install the four investigation agents separately from the skills above:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-global -Merge
+```
+
+For project scope, use `opencode-agents-project` with `--project` / `-Project`
+alongside `opencode-project` skills. OpenChamber uses agents on its connected
+OpenCode server, which may have a different filesystem. See
+[agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update skills
 
 Run from this checkout:
 
@@ -533,11 +599,28 @@ existing files. Updates can replace local customizations. See
 [installer controls and troubleshooting](docs/installer-reference.md) for pinned versions,
 conflict handling, manual installation, and recovery.
 
+## Specialized subagents
+
+Four optional read-only agents handle focused investigation: `independent-reviewer`
+reviews changes, `root-cause-investigator` diagnoses failures,
+`dependency-investigator` checks external contracts, and `architecture-advisor`
+compares designs. Ask your main agent, for example: “Use the independent-reviewer
+subagent to review my changes against main.” Automatic delegation depends on the
+host and model.
+
+Cursor and Claude Code plugins include these agents; the Codex desktop plugin and
+`npx skills add` do not. For native installs, see
+[agent installation and updates](docs/installer-reference.md#specialized-agent-installations).
+For host support, discovery, and troubleshooting, see
+[subagent compatibility](docs/host-compatibility.md#specialized-subagents).
+
 ## Use
 
-Describe the task normally. Hosts that support implicit skill invocation can select
-a matching skill from its description; naming a skill is optional when you want to
-force a particular workflow:
+<details>
+<summary><strong>Using the skills</strong></summary>
+
+Describe the task normally. Hosts with automatic skill selection may load a matching
+skill; name one explicitly when you need a particular workflow:
 
 ```text
 Use agent-planning to plan this feature. Do not implement it yet.
@@ -545,39 +628,15 @@ Use code-review to review this branch against main without changing the code.
 Use root-cause-debug to reproduce and fix this failure with regression coverage.
 ```
 
-For a feature that needs a plan, the agent should select `agent-planning`; after
-acceptance, `implement-plan` coordinates implementation and review. Native skills
-make these procedures available, but models decide when to load them. Cursor is the
-example host; other flavors may use different controls or review tools.
+For a planned feature, use `agent-planning` first and `implement-plan` after
+accepting the plan. Implementation includes verification and independent review;
+if review is unavailable, report it as incomplete. These are model-followed
+instructions, not enforced gates. Building does not authorize commits, pushes,
+external replies, or deployment. See the [Cursor workflow example](docs/cursor-workflow.md)
+for a full walkthrough and the [host compatibility matrix](docs/host-compatibility.md)
+for host-specific behavior and limits.
 
-```mermaid
-flowchart TD
-    A["Describe the change<br/>Optional: read a Jira issue"] --> B["Plan<br/>agent-planning"]
-    B --> C["Review the plan and authorize implementation"]
-    C --> D["Build<br/>implement-plan"]
-    D --> E["Verify behavior<br/>Tests and relevant checks"]
-    E --> F["Independent review<br/>code-review"]
-    F --> G{"Changes required?"}
-    G -->|Yes| H["Repair and rerun affected checks"]
-    H --> F
-    G -->|No| I["Report the result and verification limits"]
-    I --> J["When authorized: commit, push, or open a PR"]
-```
-
-Failed checks require investigation before advancing. Unavailable independent
-review leaves that gate incomplete. See the [Cursor workflow example](docs/cursor-workflow.md)
-for prompts, expected results, and recovery steps. The example describes the
-instructed workflow; a live Cursor validation run has not been recorded.
-
-Implementation should include relevant skills, verification, and independent
-`code-review` unless you explicitly skip it. Unavailable review is reported
-incomplete. If the host misses the handoff, name the needed skill as a fallback.
-Jira/GitHub connections must be configured separately. These are model-followed
-workflows, not enforced runtime gates. See the [host compatibility matrix](docs/host-compatibility.md)
-for documented behavior and testing limits.
-
-Build does not authorize commits, pushes, external replies, or deployment.
-GitHub reviews and approvals are never dismissed.
+</details>
 
 ## Skills
 

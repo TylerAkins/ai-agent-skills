@@ -18,10 +18,12 @@ func fixture(t *testing.T) string {
 		"skills/demo/references/details.md": "# Details\nUse the real reference.\n",
 		"skills/using-skills/SKILL.md":      "---\nname: using-skills\ndescription: Route tasks.\n---\nRead [demo](../demo/SKILL.md).\n",
 		"rules/routing.mdc":                 "---\ndescription: Route tasks.\nalwaysApply: true\n---\nUse demo.\n",
-		"agents/reviewer.md":                "---\nname: reviewer\ndescription: Review code.\n---\nRemain read-only.\n",
 		"README.md":                         "[demo](skills/demo/SKILL.md)\n[router](skills/using-skills/SKILL.md)\n",
 		"AGENTS.md":                         "# Instructions\n",
 		"LICENSE":                           "MIT\n",
+	}
+	for _, name := range agentNames {
+		files["agents/"+name+".md"] = "---\nname: " + name + "\ndescription: Inspect without changing files.\ntools: Read, Grep, Glob, Skill\n---\nDo not edit.\n"
 	}
 	for p, s := range files {
 		path := filepath.Join(root, p)
@@ -65,11 +67,11 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 			}
 			expected := map[string][]string{
 				"cursor":   {".cursor-plugin", "LICENSE", "agents", "rules", "skills"},
-				"codex":    {"LICENSE", "plugin.json", "skills"},
+				"codex":    {"LICENSE", "agents", "plugin.json", "skills"},
 				"copilot":  {"LICENSE", "plugin.json", "skills"},
 				"portable": {"LICENSE", "plugin.json", "skills"},
 				"claude":   {".claude-plugin", "LICENSE", "agents", "skills"},
-				"opencode": {"LICENSE", "skills"},
+				"opencode": {"LICENSE", "agents", "skills"},
 				"skills":   {"LICENSE", "skills"},
 			}
 			entries, err := os.ReadDir(out)
@@ -87,6 +89,103 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 				t.Fatal("overwrote existing output")
 			}
 		})
+	}
+}
+
+func TestAgentAdaptersPreserveCanonicalInstructions(t *testing.T) {
+	root := filepath.Join("..", "..")
+	agents, err := readAgents(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	required := map[string][]string{
+		"independent-reviewer":    {"code-review", "anti-ai-writing"},
+		"root-cause-investigator": {"root-cause-debug", "anti-ai-writing"},
+	}
+	for _, agent := range agents {
+		if needs, ok := required[agent.Name]; ok && strings.Join(agent.Skills, ",") != strings.Join(needs, ",") {
+			t.Errorf("%s does not request its required skill dependencies: %v", agent.Name, agent.Skills)
+		}
+	}
+	for _, target := range []string{"opencode", "codex"} {
+		out := filepath.Join(t.TempDir(), target)
+		if err := Build(root, out, target); err != nil {
+			t.Fatal(err)
+		}
+		for _, agent := range agents {
+			ext := ".md"
+			if target != "opencode" {
+				ext = ".toml"
+			}
+			b, err := os.ReadFile(filepath.Join(out, "agents", agent.Name+ext))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(b) != string(renderAgent(agent, target)) {
+				t.Fatalf("%s %s drifted from canonical definition", target, agent.Name)
+			}
+		}
+	}
+}
+
+func TestBuildAcceptsCRLFAgents(t *testing.T) {
+	root := fixture(t)
+	for _, name := range agentNames {
+		path := filepath.Join(root, "agents", name+".md")
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(strings.ReplaceAll(string(b), "\n", "\r\n")), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, target := range []string{"cursor", "claude", "opencode", "codex"} {
+		t.Run(target, func(t *testing.T) {
+			if err := Build(root, filepath.Join(t.TempDir(), "package"), target); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestRejectWeakAdaptedAgent(t *testing.T) {
+	for _, target := range []string{"opencode", "codex"} {
+		root := fixture(t)
+		out := filepath.Join(t.TempDir(), "package")
+		if err := Build(root, out, target); err != nil {
+			t.Fatal(err)
+		}
+		ext, old, replacement := ".md", "effect: deny", "effect: allow"
+		if target == "codex" {
+			ext, old, replacement = ".toml", "shell_tool = false", "shell_tool = true"
+		}
+		path := filepath.Join(out, "agents", "independent-reviewer"+ext)
+		b, _ := os.ReadFile(path)
+		os.WriteFile(path, []byte(strings.Replace(string(b), old, replacement, 1)), 0644)
+		if _, err := Validate(out, target); err == nil {
+			t.Fatalf("accepted weak %s agent permissions", target)
+		}
+	}
+}
+
+func TestAgentFlavorsMatchAcrossInstallers(t *testing.T) {
+	root := filepath.Join("..", "..", "scripts")
+	bash, err := os.ReadFile(filepath.Join(root, "install-ai-agent-skills.sh"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	powershell, err := os.ReadFile(filepath.Join(root, "install-ai-agent-skills.ps1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, host := range []string{"opencode", "claude", "codex"} {
+		for _, scope := range []string{"global", "project"} {
+			name := host + "-agents-" + scope
+			if !strings.Contains(string(bash), name) || !strings.Contains(string(powershell), "'"+name+"'") {
+				t.Errorf("installer flavor drift: %s", name)
+			}
+		}
 	}
 }
 
@@ -114,6 +213,11 @@ func TestRejectInvalidCollection(t *testing.T) {
 		"inventory omission": func(r string) { os.WriteFile(filepath.Join(r, "README.md"), []byte("# Empty\n"), 0644) },
 		"escaping link": func(r string) {
 			os.WriteFile(filepath.Join(r, "skills/demo/references/details.md"), []byte("[outside](../../../../outside.md)\n"), 0644)
+		},
+		"agent model pin": func(r string) {
+			p := filepath.Join(r, "agents", "independent-reviewer.md")
+			b, _ := os.ReadFile(p)
+			os.WriteFile(p, []byte(strings.Replace(string(b), "tools:", "model: pinned/model\ntools:", 1)), 0644)
 		},
 	}
 	for name, mutate := range cases {
