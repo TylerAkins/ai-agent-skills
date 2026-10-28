@@ -43,6 +43,12 @@ Flavors:
   codex-skills       Project .agents/skills (--project required)
   opencode-project   Project .opencode/skills (--project required)
   opencode-global    User ~/.config/opencode/skills
+  opencode-agents-global   User ~/.config/opencode/agents
+  opencode-agents-project  Project .opencode/agents (--project required)
+  claude-agents-global     User ~/.claude/agents (or CLAUDE_CONFIG_DIR)
+  claude-agents-project    Project .claude/agents (--project required)
+  codex-agents-global      User ~/.codex/agents
+  codex-agents-project     Project .codex/agents (--project required)
   gemini-project     Project .gemini/skills (--project required)
   gemini-global      User ~/.gemini/skills
   muse-project       Project .agents/skills (--project required)
@@ -58,7 +64,7 @@ Options:
   --project PATH     Existing project, absolute path
   --marketplace-root PATH  Local Codex marketplace, absolute path
   --replace          Replace the selected directory; keep a backup
-  --merge            Replace incoming skill folders, preserve unknown folders
+  --merge            Replace incoming skill folders or agent files, preserve unknown files
   --yes              Confirm replacement without prompting
   --dry-run          Show destinations without downloads or writes
 HELP
@@ -88,6 +94,7 @@ prepare_bundle() {
     opencode) preferred=skills ;;
     *) preferred=$host ;;
   esac
+  if "$agents_only"; then preferred=$host; fi
   archive="ai-agent-skills-$preferred-$version.tar.gz"
   if awk -v file="$archive" '$2 == file || $2 == "./" file {found=1} END {exit !found}' "$work/SHA256SUMS"; then
     archive_host=$preferred
@@ -147,9 +154,10 @@ install_payload() {
   install_stage=$stage
   # Build a complete candidate on the destination filesystem before replacing anything.
   if [ "$mode" = merge ] && [ -d "$destination" ]; then
+    if [ -n "$(find "$destination" -type l -print -quit)" ]; then fail "Refusing to merge a directory containing links."; fi
     cp -R "$destination" "$stage/content"
     for item in "$payload"/*; do
-      [ -d "$item" ] || continue
+      [ -e "$item" ] || continue
       rm -rf "$stage/content/$(basename "$item")"
       cp -R "$item" "$stage/content/"
     done

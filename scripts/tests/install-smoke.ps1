@@ -175,6 +175,39 @@ try {
             Test-Condition ((Get-Content -LiteralPath (Join-Path $flavorHome '.agents/AGENTS.md') -Raw).Trim() -eq 'Keep alternate-home instructions') 'Global install changed shared instructions.'
         }
     }
+    foreach ($hostName in @('opencode', 'claude', 'codex')) {
+        foreach ($scope in @('global', 'project')) {
+            $flavor = "$hostName-agents-$scope"
+            $options = @{ Flavor = $flavor; Version = 'v1.0.1'; Yes = $true; HomeDirectory = $testHome }
+            if ($scope -eq 'project') {
+                $options.Project = $projectPath
+                $root = Join-Path $projectPath ".$hostName/agents"
+            } else {
+                $root = switch ($hostName) {
+                    'opencode' { Join-Path $testHome '.config/opencode/agents' }
+                    'claude' { Join-Path $env:CLAUDE_CONFIG_DIR 'agents' }
+                    'codex' { Join-Path $testHome '.codex/agents' }
+                }
+            }
+            & $installer @options
+            $extension = if ($hostName -eq 'codex') { 'toml' } else { 'md' }
+            foreach ($agentName in @('architecture-advisor', 'dependency-investigator', 'independent-reviewer', 'root-cause-investigator')) {
+                Test-Condition (Test-Path -LiteralPath (Join-Path $root "$agentName.$extension")) "Agent missing: $flavor $agentName"
+            }
+            Set-Content -LiteralPath (Join-Path $root "custom.$extension") -Value 'Keep unrelated agent' -Encoding utf8NoBOM
+            Set-Content -LiteralPath (Join-Path $root "independent-reviewer.$extension") -Value 'User modification' -Encoding utf8NoBOM
+            $options.Action = 'Update'
+            Test-InstallerFailure $options 'Destination exists'
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $root "independent-reviewer.$extension") -Raw).Trim() -eq 'User modification') 'Refused update lost a user modification.'
+            $options.Merge = $true
+            & $installer @options
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $root "custom.$extension") -Raw).Trim() -eq 'Keep unrelated agent') 'Merge lost a custom agent.'
+            Test-Condition ((Get-Content -LiteralPath (Join-Path $root "independent-reviewer.$extension") -Raw) -match 'Do not') 'Merge did not update incoming agent.'
+            $beforeSnapshot = Get-TreeSnapshot $root
+            & $installer @options
+            Test-Condition (($beforeSnapshot -join "`n") -eq ((Get-TreeSnapshot $root) -join "`n")) 'Repeated agent update changed files.'
+        }
+    }
     foreach ($file in $instructionSentinels) {
         Test-Condition ((Get-Content -LiteralPath $file -Raw).Trim() -eq 'Keep user instructions') "Installer changed user instructions: $file"
     }

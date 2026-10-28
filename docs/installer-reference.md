@@ -30,8 +30,10 @@ Already cloned? Open that checkout and run `git pull --ff-only` instead.
 ## Shared Release Archives
 
 The installer uses the release's `SHA256SUMS` to choose its archive. Codex/Copilot
-prefer `portable`; OpenCode prefers `skills`. When those shared names are absent,
-it selects the legacy host archive. All other hosts retain their archive selection.
+skills and plugin flavors prefer `portable`; OpenCode skills flavors prefer `skills`.
+Agent-only flavors select their host archive: `codex`, `opencode`, or `claude`.
+When a shared archive is absent, skills and plugin flavors select the legacy host
+archive. Other hosts retain their archive selection.
 Download, checksum, and archive-validation failures stop before replacement;
 there is no fallback after a listed shared archive fails.
 
@@ -47,21 +49,67 @@ path. Failed downloads/checksums leave the installation unchanged; a failed Code
 catalog commit restores the previous plugin. Pulling the repo gets installer fixes;
 the default install/update still fetches the latest stable published release.
 
-For existing skills-only destinations, choose `--merge` (`-Merge` in PowerShell)
-or `--replace` (`-Replace`). Merge replaces incoming skill folders and preserves
-unknown folders. Replace replaces the whole destination, including unrelated skills.
+For existing skills-only or agents-only destinations, choose `--merge` (`-Merge`
+in PowerShell) or `--replace` (`-Replace`). Merge replaces incoming skill folders
+or agent files and preserves unrelated entries. Replace replaces the whole
+destination, including unrelated files.
 Both can replace local customizations within their scope. Use `--yes` / `-Yes` only
 to confirm the selected operation without a prompt.
 
 An ordinary install refuses an existing target without an explicit mode. Plugin
-`update` selects replacement automatically; skills-only updates need a mode.
+`update` selects replacement automatically; skills-only and agents-only updates
+need a mode.
 Backups remain in `.ai-agent-skills-backups/backup.*` beside the installation parent.
 Compare or restore the printed backup, and remove it yourself when no longer useful.
 
 ## Alternate Installations
 
-Run these from the checkout prepared above.
-Project directories must already exist. Replace the example paths with your own.
+Run these from the checkout prepared above. Project directories must already
+exist; replace the example paths with your own.
+
+### Specialized agent installations
+
+Use an agent flavor alongside the corresponding skills flavor. New releases contain
+four native subagent definitions per supported host; older archives may not.
+Substitute `claude` or `codex` for `opencode` in the agent flavor names below.
+Use `claude-project` or `codex-skills` for the corresponding project skills:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-global
+bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-project --project /absolute/path/to/project
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-global --merge
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-project --project /absolute/path/to/project --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-global
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-project -Project 'C:/path/to/project'
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-global -Merge
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-project -Project 'C:/path/to/project' -Merge
+```
+
+| Host | Global agents | Project agents | Matching skill flavors |
+| --- | --- | --- | --- |
+| OpenCode v2 and connected OpenChamber | `~/.config/opencode/agents` | `.opencode/agents` | `opencode-global`, `opencode-project` |
+| Claude Code | `~/.claude/agents` or `$CLAUDE_CONFIG_DIR/agents` | `.claude/agents` | `claude-global`, `claude-project` (or the `claude` plugin) |
+| Codex | `~/.codex/agents` | `.codex/agents` | `codex-global`, `codex-skills` |
+
+Agent-only installs touch only the selected `agents` directory. An existing
+directory requires explicit `--merge` / `-Merge` or `--replace` / `-Replace`,
+even on updates. Merge preserves unknown files but replaces the four same-named
+definitions. Compare locally modified definitions before consenting. Every
+replacement saves a backup. Do not use replace if the directory has unrelated
+agents. Plugin updates use the existing whole-plugin replacement and backup
+policy; native skills-only installs remain skills-only.
+
+Verify agent registration in the host after installation. In the project, run
+`opencode --standalone api get /api/agent`; check `@agent-` autocomplete and
+the delegation trace in Claude Code, or inspect Codex agent activity after an
+explicit request. For OpenChamber, use the OpenCode server's filesystem and
+location, especially for remote servers.
+Listing an agent establishes discovery; only a visible delegation establishes
+invocation. Neither proves skill use. See
+[host differences](host-compatibility.md#specialized-subagents).
 
 <details>
 <summary><strong>Codex project skills or a separate marketplace</strong></summary>
@@ -275,15 +323,21 @@ an interactive terminal lists the choices and asks you to select one.
 | `codex-desktop` | `~/.codex/plugins/ai-agent-skills` |
 | `codex-marketplace` | `$ROOT/plugins/ai-agent-skills` |
 | `codex-global` | `~/.agents/skills` |
+| `codex-agents-global` | `~/.codex/agents` |
+| `codex-agents-project` | `$PROJECT/.codex/agents` |
 | `claude` | `~/.local/share/ai-agent-skills/claude` |
 | `claude-global` | `~/.claude/skills` or `$CLAUDE_CONFIG_DIR/skills` |
 | `claude-project` | `$PROJECT/.claude/skills` |
+| `claude-agents-global` | `~/.claude/agents` or `$CLAUDE_CONFIG_DIR/agents` |
+| `claude-agents-project` | `$PROJECT/.claude/agents` |
 | `copilot-staging` | `~/.local/share/ai-agent-skills/copilot` |
 | `copilot-skills` | `$PROJECT/.github/skills` |
 | `copilot-global` | `~/.copilot/skills` |
 | `codex-skills` | `$PROJECT/.agents/skills` |
 | `opencode-project` | `$PROJECT/.opencode/skills` |
 | `opencode-global` | `~/.config/opencode/skills` |
+| `opencode-agents-global` | `~/.config/opencode/agents` |
+| `opencode-agents-project` | `$PROJECT/.opencode/agents` |
 | `gemini-project` | `$PROJECT/.gemini/skills` |
 | `gemini-global` | `~/.gemini/skills` |
 | `muse-project` | `$PROJECT/.agents/skills` |

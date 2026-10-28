@@ -10,7 +10,7 @@ Choose a distribution path:
 | Path | Requirements | Installs |
 | --- | --- | --- |
 | Open Skills CLI (`npx skills`) | Node.js/npm and Git; no manual clone | Skill folders and supporting resources for supported agents |
-| Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing/reviewer configuration where supported |
+| Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing and optional specialized agents where supported |
 
 See the [host compatibility matrix](docs/host-compatibility.md) for native skill
 discovery, automatic selection, app/CLI differences, and verified limitations.
@@ -71,9 +71,12 @@ git clone https://github.com/TylerAkins/ai-agent-skills.git
 Set-Location ai-agent-skills
 ```
 
-For an existing checkout, skip cloning. Before updating, run `git pull --ff-only`
-once, then use your host's update command below. Skills-only updates use merge to
-preserve unrelated skill folders; plugin updates replace the plugin with a backup.
+For an existing checkout, skip cloning. Before updating from a published release,
+run `git pull --ff-only` once, then use your host's update command below. Skills-only
+and agent-only updates use merge to preserve unrelated files; plugin updates replace
+the plugin with a backup. If you have uncommitted changes, do not pull over them.
+The new agent-only flavors require a published release containing the agent
+bundles; older releases cannot install them.
 
 <a id="cursor"></a>
 <details>
@@ -95,7 +98,7 @@ bash scripts/install-ai-agent-skills.sh --flavor cursor
 
 Run **Developer: Reload Window** from Cursor's Command Palette
 (`Cmd+Shift+P` on Mac, `Ctrl+Shift+P` on Windows/Linux). Open **Customize** and
-check for **ai-agent-skills**, its skills, routing rule, and reviewer. Start a new
+check for **ai-agent-skills**, its skills, routing rule, and four agents. Start a new
 Agent chat and ask for an implementation plan without naming a skill.
 
 Local plugin imports must be allowed by your account/team. A marketplace copy
@@ -190,7 +193,26 @@ does not change Codex configuration. For updates, use `update` / `-Action Update
 with `--merge` / `-Merge`. The shared `~/.agents/skills` directory is also read by
 other compatible hosts.
 
-### Update
+### Optional native subagents
+
+For the four investigation agents, install the native skills above and the agent
+definitions separately. The desktop plugin alone does not install native Codex agents.
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor codex-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor codex-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor codex-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor codex-agents-global -Merge
+```
+
+For project-scoped definitions, use `codex-agents-project` with `--project` /
+`-Project` and install project skills with `codex-skills`. See
+[agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update desktop plugin
 
 Run from this checkout:
 
@@ -272,7 +294,26 @@ global flavor honors an absolute `CLAUDE_CONFIG_DIR` when it is set.
 The installed `code-review` skill takes the `/code-review` name used by Claude's
 built-in skill; Claude's `/review` alias remains available.
 
-### Update
+### Optional native subagents
+
+The Claude plugin already includes the four investigation agents. For persistent
+native agents instead, install the skills above and add the agent definitions:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor claude-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor claude-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor claude-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor claude-agents-global -Merge
+```
+
+For project scope, use `claude-agents-project` with `--project` / `-Project`
+alongside `claude-project` skills. The global agent flavor honors
+`CLAUDE_CONFIG_DIR`. See [agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update plugin
 
 Run from this checkout:
 
@@ -363,9 +404,28 @@ bash scripts/install-ai-agent-skills.sh --flavor opencode-global
 Skills are installed in `~/.config/opencode/skills` for use across your projects.
 Start a new OpenCode session and ask it to plan a feature without naming a skill.
 The model can load a matching skill through OpenCode's native `skill` tool.
-This is a skills installation. See [OpenCode skills](https://opencode.ai/docs/skills/).
+This is a skills installation. See [OpenCode V2 skills](https://opencode.ai/v2/docs/skills/).
 
-### Update
+### Optional native subagents
+
+Install the four investigation agents separately from the skills above:
+
+```sh
+bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-global
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-global --merge
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-global
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-global -Merge
+```
+
+For project scope, use `opencode-agents-project` with `--project` / `-Project`
+alongside `opencode-project` skills. OpenChamber uses agents on its connected
+OpenCode server, which may have a different filesystem. See
+[agent paths and update policy](docs/installer-reference.md#specialized-agent-installations).
+
+### Update skills
 
 Run from this checkout:
 
@@ -532,6 +592,31 @@ Release installs use checksum-verified bundles and retain backups when replacing
 existing files. Updates can replace local customizations. See
 [installer controls and troubleshooting](docs/installer-reference.md) for pinned versions,
 conflict handling, manual installation, and recovery.
+
+## Specialized subagents
+
+Four optional investigation agents, designed to remain read-only, ship with this collection:
+`independent-reviewer` (reviews an exact candidate), `root-cause-investigator`
+(diagnoses failures), `dependency-investigator` (checks external contracts),
+and `architecture-advisor` (compares design options). The optional agent
+commands are alongside each host's skill commands above. Agent files do not
+install or activate skills. An existing agent directory requires an explicit
+merge or replace choice, including on updates. Merge preserves unrelated files,
+replaces the four incoming definitions, and backs up the previous directory;
+review local edits to those definitions first. `--from-source --ref main` uses
+remote `main`, not uncommitted files from this checkout.
+
+Ask the parent agent: “Use the independent-reviewer subagent to review my
+changes against main.” Replace the name with any of the other three for their
+respective tasks. In the project, `opencode --standalone api get /api/agent`
+lists agents for that location (a shared server may use another active location);
+in Claude Code, check `@agent-` autocomplete and the delegation trace; Codex
+shows agent activity in its client when delegated. Automatic delegation
+is a model decision, not an installation guarantee. OpenChamber uses its
+connected OpenCode runtime: install agents and skills where that server sees
+them, then inspect its available agents before delegating. See
+[agent compatibility and troubleshooting](docs/host-compatibility.md#specialized-subagents)
+and [agent installation paths](docs/installer-reference.md#specialized-agent-installations).
 
 ## Use
 

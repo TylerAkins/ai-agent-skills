@@ -198,6 +198,9 @@ func Validate(root, target string) ([]string, error) {
 			components = append(components, "agents")
 		}
 	}
+	if target == "opencode" || target == "codex" {
+		components = append(components, "agents")
+	}
 	for _, component := range components {
 		if err = safeFiles(filepath.Join(root, component)); err != nil {
 			return nil, err
@@ -243,7 +246,7 @@ func Validate(root, target string) ([]string, error) {
 					return err
 				}
 			}
-			if component == "agents" || component == "rules" {
+			if (component == "agents" && (target == "source" || target == "cursor" || target == "claude" || target == "opencode")) || component == "rules" {
 				fields, err := metadata(path)
 				if err != nil {
 					return err
@@ -256,7 +259,7 @@ func Validate(root, target string) ([]string, error) {
 						return fmt.Errorf("%s: invalid alwaysApply", path)
 					}
 				}
-				if component == "agents" {
+				if component == "agents" && target != "opencode" {
 					if name, ok := fields["name"].(string); !ok || !nameRE.MatchString(name) {
 						return fmt.Errorf("%s: invalid agent name", path)
 					}
@@ -269,6 +272,9 @@ func Validate(root, target string) ([]string, error) {
 		}
 	}
 	if target == "source" {
+		if _, err := readAgents(root); err != nil {
+			return nil, err
+		}
 		for _, p := range []string{"README.md", "AGENTS.md"} {
 			if err = links(root, filepath.Join(root, p)); err != nil {
 				return nil, err
@@ -289,6 +295,11 @@ func Validate(root, target string) ([]string, error) {
 			if name != "using-skills" && !strings.Contains(string(router), "../"+name+"/SKILL.md") {
 				return nil, fmt.Errorf("router missing skill %s", name)
 			}
+		}
+	}
+	if target == "opencode" || target == "codex" {
+		if err := validateAdaptedAgents(root, target); err != nil {
+			return nil, err
 		}
 	}
 	sort.Strings(names)
@@ -349,7 +360,29 @@ func Build(root, out, target string) error {
 	if target == "opencode" || target == "skills" {
 		components = []string{"skills", "LICENSE"}
 	}
+	if target == "opencode" || target == "codex" {
+		components = append(components, "agents")
+	}
 	for _, component := range components {
+		if component == "agents" && (target == "opencode" || target == "codex") {
+			agents, err := readAgents(absRoot)
+			if err != nil {
+				return err
+			}
+			if err := os.MkdirAll(filepath.Join(absOut, component), 0755); err != nil {
+				return err
+			}
+			for _, agent := range agents {
+				ext := ".md"
+				if target != "opencode" {
+					ext = ".toml"
+				}
+				if err := os.WriteFile(filepath.Join(absOut, component, agent.Name+ext), renderAgent(agent, target), 0644); err != nil {
+					return err
+				}
+			}
+			continue
+		}
 		base := filepath.Join(absRoot, component)
 		if err = safeFiles(base); err != nil {
 			return err

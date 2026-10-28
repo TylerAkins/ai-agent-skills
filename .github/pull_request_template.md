@@ -1,9 +1,24 @@
-## Summary
+## TL;DR
 
-<!-- Explain the problem and resulting behavior. Link a related issue if applicable. -->
+<!-- High-level bullets: resulting behavior and why it matters. Add as many as needed; avoid a file-by-file changelog. Link a related issue if applicable. -->
 
 ## Validation
 
-<!-- Describe meaningful checks performed and any material limits, including untested hosts. -->
+<!-- List checks actually run and their results. If none ran, say so plainly. -->
+
+<!-- Optional: for a material caveat, add a brief visible alert here:
+> [!NOTE]
+> Describe the caveat.
+Use [!WARNING] only for a genuine blocker or significant risk.
+-->
+
+<!-- Optional: remove the comment markers and replace the placeholder only when implementation context helps review.
+<details>
+<summary>Implementation details</summary>
+
+[Decisions, tradeoffs, or migration notes.]
+
+</details>
+-->
 
 AI assistance: <!-- Tool and model when known, "model unknown" when unavailable, or "None". -->
