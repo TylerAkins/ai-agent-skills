@@ -9,8 +9,8 @@ Choose a distribution path:
 
 | Path | Requirements | Installs |
 | --- | --- | --- |
-| Open Skills CLI (`npx skills`) | Node.js 22.20+/npm and Git; no manual clone | Skill folders and supporting resources for selected coding hosts; no subagent definitions |
-| Native shell installers | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing and optional specialized agents where supported |
+| [Open Skills CLI (`npx skills`)](#open-skills-cli) | Node.js 22.20+/npm and Git; no manual clone | Skill folders and supporting resources for selected coding hosts; no subagent definitions |
+| [Native shell installers](#native-shell-installers) | Bash and platform tools, or PowerShell; no Node.js or Go | Release bundles, including host routing and optional specialized agents where supported |
 
 For skills, start with the Open Skills CLI. Its agent selection chooses the coding
 host, not the four optional subagents. The Cursor and Claude Code plugins include
