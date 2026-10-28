@@ -135,6 +135,7 @@ jobs:
           | skills | OpenCode, Gemini CLI, Muse Code, Antigravity |
           | opencode | OpenCode native agents and skills |
           | codex | Codex native agents and skills |
+          | native-agents | Cursor, Copilot, Gemini CLI, and Antigravity native agents and skills |
 
           Update your installer checkout before using this release. Older installers expect separate Codex, Copilot, and OpenCode archives. Updated installers also support legacy releases.
           EOF

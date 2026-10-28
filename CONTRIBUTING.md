@@ -32,7 +32,8 @@ go run ./cmd/skillpack
 git diff --check
 ```
 
-For Go tooling or packaging changes, also run:
+For Go tooling or packaging changes, also run these commands from the repository
+root in Bash or PowerShell:
 
 ```sh
 gofmt -w cmd internal
@@ -46,7 +47,9 @@ For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
 linting. It uses temporary HOME/project directories and generated release fixtures.
 CI runs Bash tests on macOS and Linux, and native PowerShell tests on Windows
 (PowerShell 7.4+).
-For PowerShell changes, install the pinned analyzer and run:
+For PowerShell changes, install the pinned analyzer and run from the repository root:
+
+**Windows (PowerShell 7.4+)**
 
 ```powershell
 Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Repository PSGallery

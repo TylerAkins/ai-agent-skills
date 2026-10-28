@@ -61,14 +61,26 @@ overwriting it. If a failed run left a draft, inspect and delete that draft befo
 retrying. A published release cannot be reused for another run; bump all three
 manifest versions to create a new tag.
 
-Download and inspect the draft's bundles. On Linux, verify downloads with:
+Download the draft's archives, `SOURCE_COMMIT`, and `SHA256SUMS` into one
+directory. Open a shell in that directory and verify their checksums.
+
+**Linux (Bash)**
 
 ```sh
 sha256sum --check SHA256SUMS
 ```
 
-On macOS, use `shasum -a 256 --check SHA256SUMS`. Keep all downloaded files in the
-same directory. Checksums detect changed bytes; they are not signed provenance.
+**macOS (Bash)**
+
+```sh
+shasum -a 256 --check SHA256SUMS
+```
+
+Both commands must report every listed file as OK. On Windows (PowerShell 7.4+),
+use `Get-FileHash -Algorithm SHA256` for each downloaded archive and `SOURCE_COMMIT`,
+and compare the hashes to `SHA256SUMS`. A missing file or mismatched hash leaves
+verification incomplete. Checksums detect changed bytes; they are not signed
+provenance.
 
 Review the source commit, host results, and release notes before publishing the
 draft through GitHub. Publishing is a separate authorized action. The workflow

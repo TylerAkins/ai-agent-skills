@@ -50,9 +50,11 @@ decisions, and authorization already given. If the host misses the handoff, name
 `implement-plan` explicitly.
 
 Expect scoped implementation and evidence from the actual repository checks.
-For behavioral code changes, the workflow requires an observed failing behavioral
-assertion before production implementation, followed by passing checks and affected
-checks after refactoring. Documentation-only changes use document validation.
+For new behavior or bug repairs, prefer a focused test that fails on the unchanged
+implementation and passes after the change. If that baseline cannot run safely or
+meaningfully, record why and choose the strongest available before/after evidence
+before editing. Refactoring uses passing baseline checks; documentation changes
+use document validation. See the [behavioral evidence contract](../skills/implement-plan/SKILL.md#establish-behavioral-evidence).
 
 If a check fails, investigate the cause before advancing. An unrelated failure or
 unavailable runner must be reported accurately; neither counts as passing evidence.

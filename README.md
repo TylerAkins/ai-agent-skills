@@ -29,12 +29,10 @@ npx skills add TylerAkins/ai-agent-skills --list
 npx skills add TylerAkins/ai-agent-skills --skill test-authoring
 ```
 
-Install globally, update project skills, or update global skills with:
+For skills available across projects, install globally:
 
 ```sh
 npx skills add TylerAkins/ai-agent-skills -g
-npx skills update -p
-npx skills update -g
 ```
 
 This CLI installs skills and supporting resources. It does not install this
@@ -42,9 +40,15 @@ collection's optional subagents. The CLI chooses the host; the host decides
 whether to select a skill automatically. See the [Open Skills CLI documentation](https://github.com/vercel-labs/skills)
 for its supported hosts and options.
 
-Run `npx skills update -p` to update project skills, or
-`npx skills update -g` to update global skills. To add skills introduced since
-the last install, run `npx skills add TylerAkins/ai-agent-skills` again and
+To update an existing CLI installation:
+
+| Installation scope | Update command |
+| --- | --- |
+| Current project | `npx skills update -p` |
+| All projects for your user | `npx skills update -g` |
+
+To add skills introduced since the last install, run
+`npx skills add TylerAkins/ai-agent-skills` again and
 select the skills you want.
 
 ### Native shell installer
@@ -111,21 +115,24 @@ or followed a skill.
 
 #### Update a native installation
 
-Run the installer again with `update` and the same flavor and project path.
+The examples below update the `cursor` plugin installed above. Replace `cursor`
+with your installed flavor. Run the installer with `update` and the same project
+path when applicable.
 Use `--merge` / `-Merge` for skills and agents so unrelated files are kept;
 incoming names are refreshed and a backup is created. Plugin updates use the
-plugin replacement flow and also create a backup.
+plugin replacement flow and also create a backup. For example, updating
+`cursor-global` requires `--merge` in Bash or `-Merge` in PowerShell.
 
 **macOS / Linux (Bash)**
 
 ```sh
-bash scripts/install-ai-agent-skills.sh update --flavor cursor-global --merge
+bash scripts/install-ai-agent-skills.sh update --flavor cursor
 ```
 
 **Windows (PowerShell 7.4+)**
 
 ```powershell
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor-global -Merge
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor
 ```
 
 For a project flavor, repeat the same `--project` / `-Project` path used during

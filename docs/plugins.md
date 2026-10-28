@@ -29,7 +29,7 @@ Every target contains the complete `skills/` collection and supporting resources
 | `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
 | `opencode` | OpenCode native agents | OpenCode Markdown `agents/`, LICENSE; no plugin manifest |
 | `codex` | Codex native agents | Root `plugin.json`, Codex TOML `agents/`, LICENSE |
-| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity native agents | Canonical-format subdirectories under `agents/`, LICENSE; no plugin manifest |
+| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity native agents | Host-specific subdirectories under `agents/`, LICENSE; no plugin manifest |
 
 The release workflow prepares these seven `.tar.gz` archives. Installer flavors
 select host-specific destinations and activation steps. The `copilot` build target
@@ -48,7 +48,8 @@ folder; external targets are skipped.
 
 ## Validate and Build
 
-Use the Go version in `go.mod`. From the checkout:
+Use the Go version in [go.mod](../go.mod). Run commands from the repository
+root. The validation commands work in Bash and PowerShell:
 
 ```sh
 go test -race ./...
@@ -56,13 +57,27 @@ go vet ./...
 go run ./cmd/skillpack
 ```
 
-Build into new directories outside the checkout:
+Build into new directories outside the checkout. Include the legacy `copilot`
+alias when checking compatibility for a packaging change.
+
+**macOS / Linux (Bash)**
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor claude portable skills opencode codex native-agents; do
-  go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
+for host in cursor claude portable skills opencode codex native-agents copilot; do
+  go run ./cmd/skillpack -target "$host" -out "$package_root/$host" || exit 1
 done
+```
+
+**Windows (PowerShell 7.4+)**
+
+```powershell
+$packageRoot = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString())
+New-Item -ItemType Directory -Path $packageRoot | Out-Null
+foreach ($target in @('cursor', 'claude', 'portable', 'skills', 'opencode', 'codex', 'native-agents', 'copilot')) {
+    go run ./cmd/skillpack -target $target -out (Join-Path $packageRoot $target)
+    if ($LASTEXITCODE -ne 0) { throw "Package build failed: $target" }
+}
 ```
 
 The output directories must not exist. The packager refuses overwrite and validates

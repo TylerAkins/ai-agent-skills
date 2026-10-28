@@ -4,6 +4,13 @@ Use the [README](../README.md#install) for the quick-start choices. This referen
 covers installer options, project installs, updates, customization conflicts, and
 recovery. Commands run from a checkout of this repository.
 
+For a specific task, jump to [activation](#activate-an-installation),
+[agent installation](#specialized-agent-installations),
+[installation alternatives](#alternate-installations),
+[options and destinations](#options-and-destinations),
+[source and manual installs](#source-builds-and-manual-installation), or
+[recovery and uninstall](#troubleshooting-and-uninstall).
+
 ## Implementation map
 
 | Behavior | Source of truth |
@@ -98,7 +105,9 @@ flavor you installed:
 | `antigravity-project` | Start a new session in the target app, IDE, or CLI. The app/IDE exposes active skills in the agent panel's **Customizations** menu. |
 | `antigravity-cli-global` | Start a new CLI session. This flavor uses the CLI's skill directory, separate from the app/IDE directory. |
 
-For the Claude Code plugin, run from a shell:
+For the Claude Code plugin:
+
+**macOS / Linux (Bash)**
 
 ```sh
 claude --plugin-dir "$HOME/.local/share/ai-agent-skills/claude"
@@ -112,8 +121,16 @@ claude --plugin-dir "$env:USERPROFILE/.local/share/ai-agent-skills/claude"
 
 Cursor CLI can load the installed plugin for a session with:
 
+**macOS / Linux (Bash)**
+
 ```sh
 agent --plugin-dir "$HOME/.cursor/plugins/local/ai-agent-skills"
+```
+
+**Windows (PowerShell 7.4+)**
+
+```powershell
+agent --plugin-dir "$env:USERPROFILE/.cursor/plugins/local/ai-agent-skills"
 ```
 
 ## Alternate Installations
@@ -131,8 +148,10 @@ For native installs, use an agent flavor alongside the corresponding skills flav
 Releases with agent bundles contain four subagent definitions per supported host;
 older archives may not. Cursor, Copilot, Gemini CLI, and Antigravity use the
 `native-agents` archive and their host-specific Markdown frontmatter.
-Substitute `claude` or `codex` for `opencode` in the agent flavor names below.
-Use `claude-project` or `codex-skills` for the corresponding project skills:
+The examples use OpenCode. For another host, replace the flavor with its
+`<host>-agents-global` or `<host>-agents-project` entry in the
+[destination table](#options-and-destinations). Install the matching skills from
+the table below as well:
 
 **macOS / Linux (Bash)**
 
@@ -224,7 +243,7 @@ replacement, and refresh/reinstall the host's cached plugin if needed.
 </details>
 
 <details>
-<summary><strong>Native global skill directories for Cursor, Codex, and Claude Code</strong></summary>
+<summary><strong>Native skills for Cursor, Codex, and Claude Code</strong></summary>
 
 These flavors install only canonical skills to each host's own discovery path. They
 do not install a plugin or change host instructions/settings.
@@ -339,8 +358,9 @@ Global installation differs by surface: `antigravity-global` targets the app/IDE
 while `antigravity-cli-global` targets the CLI. See the
 [README](../README.md#native-shell-installer) for global install commands. Use
 `update` / `-Action Update` with the same flavor to update it.
-All Antigravity flavors use the shared `ai-agent-skills-skills` archive. An
-unpublished local checkout can be installed with manual installation or source mode.
+Antigravity skill flavors use the shared `ai-agent-skills-skills` archive; agent
+flavors use `ai-agent-skills-native-agents`. Use manual installation for an
+unpublished local checkout. Source mode builds a remote release tag or `main`.
 
 </details>
 
@@ -536,7 +556,7 @@ See [Cursor skills](https://cursor.com/docs/skills) and
 | PowerShell version is too old | Open PowerShell 7.4+ (`pwsh`), rather than Windows PowerShell 5.1. |
 | Windows execution policy blocks the script | Check your device/organization policy. The helper does not change execution policy. |
 | jq is missing | Install it, for example with `brew install jq` on Mac, then retry. |
-| Destination exists | Use `update`; skills-only flavors also need `--merge` or `--replace`. |
+| Destination exists | Use `update` / `-Action Update`. Skills-only and agents-only flavors also need `--merge` / `-Merge` or `--replace` / `-Replace`. |
 | Cursor plugin is missing | Reload and check local-import policy or marketplace precedence. |
 | Old skills are still loaded | Refresh/reinstall the cached plugin, reopen the app, and start a new session. |
 | Download fails | Check connectivity, rate limits, and published assets. Try a known `--version`. |
@@ -548,5 +568,6 @@ publish listings or create a Copilot marketplace.
 
 To uninstall, disable/uninstall the host plugin, then remove only its destination
 from the table. For Codex, also remove its `ai-agent-skills` marketplace entry while
-preserving other plugins. For merged skills, remove only this collection's folders;
-deleting the whole skills directory would delete unrelated skills too.
+preserving other plugins. For merged skills, remove only this collection's folders.
+For agent-only installs, remove only the four installed agent files. Preserve unrelated skills and agents
+in shared directories.
