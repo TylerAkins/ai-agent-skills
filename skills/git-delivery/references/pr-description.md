@@ -1,5 +1,14 @@
 # PR Descriptions
 
+## GitHub Markdown
+
+PR titles and descriptions render on GitHub. Use GitHub Flavored Markdown (GFM)
+and consult the [GFM specification](https://github.github.com/gfm/) for standard
+syntax and [GitHub's writing and formatting guidance](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+for GitHub-specific features such as alerts. Keep formatting proportional to the
+review task. Use alerts only for caveats that skimming reviewers need to notice,
+and choose the alert type according to its meaning and severity.
+
 ## Gather Evidence
 
 Read the repository's actual PR template and applicable title/body instructions.
