@@ -159,7 +159,7 @@ func Validate(root, target string) ([]string, error) {
 		mpath = ".claude-plugin/plugin.json"
 	}
 	var m Manifest
-	if target != "opencode" && target != "skills" {
+	if target != "opencode" && target != "skills" && target != "native-agents" {
 		m, err = manifest(root, mpath)
 		if err != nil {
 			return nil, err
@@ -199,6 +199,9 @@ func Validate(root, target string) ([]string, error) {
 		}
 	}
 	if target == "opencode" || target == "codex" {
+		components = append(components, "agents")
+	}
+	if target == "native-agents" {
 		components = append(components, "agents")
 	}
 	for _, component := range components {
@@ -302,6 +305,18 @@ func Validate(root, target string) ([]string, error) {
 			return nil, err
 		}
 	}
+	if target == "cursor" {
+		if err := validateNativeAgentDir(filepath.Join(root, "agents"), "cursor"); err != nil {
+			return nil, err
+		}
+	}
+	if target == "native-agents" {
+		for _, format := range []string{"cursor", "copilot", "gemini", "antigravity"} {
+			if err := validateNativeAgentDir(filepath.Join(root, "agents", format), format); err != nil {
+				return nil, err
+			}
+		}
+	}
 	sort.Strings(names)
 	return names, nil
 }
@@ -360,26 +375,16 @@ func Build(root, out, target string) error {
 	if target == "opencode" || target == "skills" {
 		components = []string{"skills", "LICENSE"}
 	}
+	if target == "native-agents" {
+		components = []string{"skills", "LICENSE", "agents"}
+	}
 	if target == "opencode" || target == "codex" {
 		components = append(components, "agents")
 	}
 	for _, component := range components {
-		if component == "agents" && (target == "opencode" || target == "codex") {
-			agents, err := readAgents(absRoot)
-			if err != nil {
+		if component == "agents" && (target == "cursor" || target == "opencode" || target == "codex" || target == "native-agents") {
+			if err := writeAgentSet(absRoot, filepath.Join(absOut, component), target); err != nil {
 				return err
-			}
-			if err := os.MkdirAll(filepath.Join(absOut, component), 0755); err != nil {
-				return err
-			}
-			for _, agent := range agents {
-				ext := ".md"
-				if target != "opencode" {
-					ext = ".toml"
-				}
-				if err := os.WriteFile(filepath.Join(absOut, component, agent.Name+ext), renderAgent(agent, target), 0644); err != nil {
-					return err
-				}
 			}
 			continue
 		}
@@ -418,7 +423,7 @@ func Build(root, out, target string) error {
 
 func packageTarget(target string) bool {
 	switch target {
-	case "cursor", "codex", "claude", "copilot", "opencode", "skills", "portable":
+	case "cursor", "codex", "claude", "copilot", "opencode", "skills", "portable", "native-agents":
 		return true
 	}
 	return false

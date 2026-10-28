@@ -29,11 +29,12 @@ npx skills add TylerAkins/ai-agent-skills --list
 npx skills add TylerAkins/ai-agent-skills --skill test-authoring
 ```
 
-Install globally or update an existing installation with:
+Install globally, update project skills, or update global skills with:
 
 ```sh
 npx skills add TylerAkins/ai-agent-skills -g
-npx skills update
+npx skills update -p
+npx skills update -g
 ```
 
 This CLI installs skills and supporting resources. It does not install this
@@ -41,11 +42,16 @@ collection's optional subagents. The CLI chooses the host; the host decides
 whether to select a skill automatically. See the [Open Skills CLI documentation](https://github.com/vercel-labs/skills)
 for its supported hosts and options.
 
+Run `npx skills update -p` to update project skills, or
+`npx skills update -g` to update global skills. To add skills introduced since
+the last install, run `npx skills add TylerAkins/ai-agent-skills` again and
+select the skills you want.
+
 ### Native shell installer
 
-The shell installer also installs host plugins and native skill directories. It
-can install the four optional subagents separately. Install the target host app
-and Git first. List the available flavors from a repository checkout:
+The shell installer also installs host plugins, native skill directories, and
+optional subagents. Install the target host app and Git first. List the available
+flavors from a repository checkout:
 
 **macOS / Linux (Bash)**
 
@@ -103,6 +109,30 @@ The [host compatibility guide](docs/host-compatibility.md) explains discovery
 behavior and its limits. File placement alone does not prove that a host loaded
 or followed a skill.
 
+#### Update a native installation
+
+Run the installer again with `update` and the same flavor and project path.
+Use `--merge` / `-Merge` for skills and agents so unrelated files are kept;
+incoming names are refreshed and a backup is created. Plugin updates use the
+plugin replacement flow and also create a backup.
+
+**macOS / Linux (Bash)**
+
+```sh
+bash scripts/install-ai-agent-skills.sh update --flavor cursor-global --merge
+```
+
+**Windows (PowerShell 7.4+)**
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor-global -Merge
+```
+
+For a project flavor, repeat the same `--project` / `-Project` path used during
+installation. To update the installer in a local checkout, run `git pull --ff-only`
+there. `--from-source` / `-FromSource` builds a temporary checkout from the
+selected release; add `--ref main` / `-Ref main` to build current main.
+
 ## Use the skills
 
 Describe the task normally. Hosts with native selection can load a matching skill;
@@ -132,9 +162,25 @@ Ask the main agent to use one, for example: “Use the independent-reviewer to
 review my changes against main.” The host and model decide whether to delegate.
 
 Cursor and Claude Code plugins include these agents. Codex desktop and the Open
-Skills CLI do not. Native installs require a separate agent flavor. See
+Skills CLI do not. Native agent formats are available for Codex, OpenCode,
+Cursor, GitHub Copilot, Gemini CLI, and Antigravity. Muse Code supports runtime
+delegation, but its current documentation does not define persistent custom
+agent files. Native installs require a separate agent flavor. See
 [agent installation](docs/installer-reference.md#specialized-agent-installations)
 and the [subagent compatibility guide](docs/host-compatibility.md#specialized-subagents).
+
+| Host | Global agent flavor | Project agent flavor |
+| --- | --- | --- |
+| Cursor | `cursor-agents-global` | `cursor-agents-project` |
+| GitHub Copilot CLI / repository agents | `copilot-agents-global` | `copilot-agents-project` |
+| Gemini CLI | `gemini-agents-global` | `gemini-agents-project` |
+| Antigravity | `antigravity-agents-global` | `antigravity-agents-project` |
+| OpenCode | `opencode-agents-global` | `opencode-agents-project` |
+| Claude Code | `claude-agents-global` | `claude-agents-project` |
+| Codex | `codex-agents-global` | `codex-agents-project` |
+
+Install the matching skills separately. For project flavors, pass the same
+project path on macOS/Linux with `--project` or Windows with `-Project`.
 
 ## Browse the skills
 

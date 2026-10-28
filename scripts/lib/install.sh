@@ -49,6 +49,14 @@ Flavors:
   claude-agents-project    Project .claude/agents (--project required)
   codex-agents-global      User ~/.codex/agents
   codex-agents-project     Project .codex/agents (--project required)
+  cursor-agents-global    User ~/.cursor/agents
+  cursor-agents-project   Project .cursor/agents (--project required)
+  copilot-agents-global   User ~/.copilot/agents
+  copilot-agents-project  Project .github/agents (--project required)
+  gemini-agents-global    User ~/.gemini/agents
+  gemini-agents-project   Project .gemini/agents (--project required)
+  antigravity-agents-global  User ~/.gemini/config/agents
+  antigravity-agents-project Project .agents/agents (--project required)
   gemini-project     Project .gemini/skills (--project required)
   gemini-global      User ~/.gemini/skills
   muse-project       Project .agents/skills (--project required)

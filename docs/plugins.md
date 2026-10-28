@@ -29,17 +29,18 @@ Every target contains the complete `skills/` collection and supporting resources
 | `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
 | `opencode` | OpenCode native agents | OpenCode Markdown `agents/`, LICENSE; no plugin manifest |
 | `codex` | Codex native agents | Root `plugin.json`, Codex TOML `agents/`, LICENSE |
+| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity native agents | Canonical-format subdirectories under `agents/`, LICENSE; no plugin manifest |
 
-The release workflow prepares these six `.tar.gz` archives. Installer flavors
+The release workflow prepares these seven `.tar.gz` archives. Installer flavors
 select host-specific destinations and activation steps. The `copilot` build target
 remains available for older source-build consumers and has the same contents as
 `portable`. The `codex` and `opencode` targets now add native agents to their
 respective skills packages.
 
 Cursor includes a native-first routing rule and four canonical agent prompts;
-Claude includes those prompts with tool allowlists. OpenCode and Codex use
-deterministic host-specific adaptations. Native agent installation and read-only
-limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
+Claude includes those prompts with tool allowlists. OpenCode, Codex, Cursor,
+Copilot, Gemini CLI, and Antigravity use deterministic host-specific adaptations.
+Native agent installation and read-only limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
 
 Repository `AGENTS.md`, tooling, credentials, and the `.cursor/skills` discovery
 symlink are excluded. Do not symlink this checkout into Cursor's local-plugin
@@ -59,7 +60,7 @@ Build into new directories outside the checkout:
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor claude portable skills opencode codex; do
+for host in cursor claude portable skills opencode codex native-agents; do
   go run ./cmd/skillpack -target "$host" -out "$package_root/$host"
 done
 ```

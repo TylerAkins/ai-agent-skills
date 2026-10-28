@@ -39,7 +39,7 @@ func fixture(t *testing.T) string {
 
 func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 	root := fixture(t)
-	for _, target := range []string{"cursor", "codex", "claude", "copilot", "opencode", "skills", "portable"} {
+	for _, target := range []string{"cursor", "codex", "claude", "copilot", "opencode", "skills", "portable", "native-agents"} {
 		t.Run(target, func(t *testing.T) {
 			out := filepath.Join(t.TempDir(), "package")
 			if err := Build(root, out, target); err != nil {
@@ -62,17 +62,21 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 			if target == "claude" || target == "opencode" || target == "skills" {
 				absent = "plugin.json"
 			}
+			if target == "native-agents" {
+				absent = "plugin.json"
+			}
 			if _, err := os.Stat(filepath.Join(out, absent)); !os.IsNotExist(err) {
 				t.Fatal("mixed host formats")
 			}
 			expected := map[string][]string{
-				"cursor":   {".cursor-plugin", "LICENSE", "agents", "rules", "skills"},
-				"codex":    {"LICENSE", "agents", "plugin.json", "skills"},
-				"copilot":  {"LICENSE", "plugin.json", "skills"},
-				"portable": {"LICENSE", "plugin.json", "skills"},
-				"claude":   {".claude-plugin", "LICENSE", "agents", "skills"},
-				"opencode": {"LICENSE", "agents", "skills"},
-				"skills":   {"LICENSE", "skills"},
+				"cursor":        {".cursor-plugin", "LICENSE", "agents", "rules", "skills"},
+				"codex":         {"LICENSE", "agents", "plugin.json", "skills"},
+				"copilot":       {"LICENSE", "plugin.json", "skills"},
+				"portable":      {"LICENSE", "plugin.json", "skills"},
+				"claude":        {".claude-plugin", "LICENSE", "agents", "skills"},
+				"opencode":      {"LICENSE", "agents", "skills"},
+				"skills":        {"LICENSE", "skills"},
+				"native-agents": {"LICENSE", "agents", "skills"},
 			}
 			entries, err := os.ReadDir(out)
 			if err != nil {
@@ -126,6 +130,26 @@ func TestAgentAdaptersPreserveCanonicalInstructions(t *testing.T) {
 			}
 		}
 	}
+	out := filepath.Join(t.TempDir(), "native-agents")
+	if err := Build(root, out, "native-agents"); err != nil {
+		t.Fatal(err)
+	}
+	for _, format := range []string{"cursor", "copilot", "gemini", "antigravity"} {
+		for _, agent := range agents {
+			ext := ".md"
+			if format == "copilot" {
+				ext = ".agent.md"
+			}
+			path := filepath.Join(out, "agents", format, agent.Name+ext)
+			b, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(b) != string(renderAgent(agent, format)) {
+				t.Fatalf("%s %s drifted from canonical definition", format, agent.Name)
+			}
+		}
+	}
 }
 
 func TestBuildAcceptsCRLFAgents(t *testing.T) {
@@ -140,7 +164,7 @@ func TestBuildAcceptsCRLFAgents(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	for _, target := range []string{"cursor", "claude", "opencode", "codex"} {
+	for _, target := range []string{"cursor", "claude", "opencode", "codex", "native-agents"} {
 		t.Run(target, func(t *testing.T) {
 			if err := Build(root, filepath.Join(t.TempDir(), "package"), target); err != nil {
 				t.Fatal(err)
@@ -179,7 +203,7 @@ func TestAgentFlavorsMatchAcrossInstallers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, host := range []string{"opencode", "claude", "codex"} {
+	for _, host := range []string{"opencode", "claude", "codex", "cursor", "copilot", "gemini", "antigravity"} {
 		for _, scope := range []string{"global", "project"} {
 			name := host + "-agents-" + scope
 			if !strings.Contains(string(bash), name) || !strings.Contains(string(powershell), "'"+name+"'") {

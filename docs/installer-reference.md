@@ -45,7 +45,8 @@ Already cloned? Open that checkout and run `git pull --ff-only` instead.
 
 The installer uses the release's `SHA256SUMS` to choose its archive. Codex/Copilot
 skills and plugin flavors prefer `portable`; OpenCode skills flavors prefer `skills`.
-Agent-only flavors select their host archive: `codex`, `opencode`, or `claude`.
+Agent-only flavors select their host archive: `codex`, `opencode`, `claude`, or
+`native-agents` (Cursor, Copilot, Gemini CLI, and Antigravity).
 When a shared archive is absent, skills and plugin flavors select the legacy host
 archive. Other hosts retain their archive selection.
 Download, checksum, and archive-validation failures stop before replacement;
@@ -128,7 +129,8 @@ plugin does not.
 
 For native installs, use an agent flavor alongside the corresponding skills flavor.
 Releases with agent bundles contain four subagent definitions per supported host;
-older archives may not.
+older archives may not. Cursor, Copilot, Gemini CLI, and Antigravity use the
+`native-agents` archive and their host-specific Markdown frontmatter.
 Substitute `claude` or `codex` for `opencode` in the agent flavor names below.
 Use `claude-project` or `codex-skills` for the corresponding project skills:
 
@@ -155,6 +157,10 @@ bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-project 
 | OpenCode v2 and connected OpenChamber | `~/.config/opencode/agents` | `.opencode/agents` | `opencode-global`, `opencode-project` |
 | Claude Code | `~/.claude/agents` or `$CLAUDE_CONFIG_DIR/agents` | `.claude/agents` | `claude-global`, `claude-project` (or the `claude` plugin) |
 | Codex | `~/.codex/agents` | `.codex/agents` | `codex-global`, `codex-skills` |
+| Cursor | `~/.cursor/agents` | `.cursor/agents` | `cursor-global`, `cursor` |
+| GitHub Copilot CLI personal / repository agents | `~/.copilot/agents` | `.github/agents` | `copilot-global`, `copilot-skills` |
+| Gemini CLI | `~/.gemini/agents` | `.gemini/agents` | `gemini-global`, `gemini-project` |
+| Antigravity app/IDE | `~/.gemini/config/agents` | `.agents/agents` | `antigravity-global`, `antigravity-project` |
 
 Agent-only installs touch only the selected `agents` directory. An existing
 directory requires explicit `--merge` / `-Merge` or `--replace` / `-Replace`,
@@ -164,9 +170,12 @@ replacement saves a backup. Do not use replace if the directory has unrelated
 agents. Plugin updates use the existing whole-plugin replacement and backup
 policy; native skills-only installs remain skills-only.
 
-Verify agent registration in the host after installation. In the project, run
-`opencode --standalone api get /api/agent`; check `@agent-` autocomplete and
-the delegation trace in Claude Code, or inspect Codex agent activity after an
+Verify agent registration in the host after installation. In Gemini CLI, inspect
+`/agents` or invoke the agent with `@name`; in Antigravity, open `/agents`. Cursor
+shows subagents in its agent tools. In Copilot, select the profile from its agent
+picker or request delegation. In the project, run
+`opencode --standalone api get /api/agent`; check `@agent-` autocomplete and the
+delegation trace in Claude Code, or inspect Codex agent activity after an
 explicit request. For OpenChamber, use the OpenCode server's filesystem and
 location, especially for remote servers.
 Listing an agent establishes discovery; only a visible delegation establishes
@@ -436,6 +445,14 @@ an interactive terminal lists the choices and asks you to select one.
 | `codex-global` | `~/.agents/skills` |
 | `codex-agents-global` | `~/.codex/agents` |
 | `codex-agents-project` | `$PROJECT/.codex/agents` |
+| `cursor-agents-global` | `~/.cursor/agents` |
+| `cursor-agents-project` | `$PROJECT/.cursor/agents` |
+| `copilot-agents-global` | `~/.copilot/agents` |
+| `copilot-agents-project` | `$PROJECT/.github/agents` |
+| `gemini-agents-global` | `~/.gemini/agents` |
+| `gemini-agents-project` | `$PROJECT/.gemini/agents` |
+| `antigravity-agents-global` | `~/.gemini/config/agents` |
+| `antigravity-agents-project` | `$PROJECT/.agents/agents` |
 | `claude` | `~/.local/share/ai-agent-skills/claude` |
 | `claude-global` | `~/.claude/skills` or `$CLAUDE_CONFIG_DIR/skills` |
 | `claude-project` | `$PROJECT/.claude/skills` |

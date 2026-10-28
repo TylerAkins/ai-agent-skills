@@ -40,9 +40,10 @@ releases may not contain the agent bundles described here:
 | `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | Canonical skills and license, without a plugin manifest |
 | `opencode` | OpenCode native agents | Canonical skills, OpenCode Markdown agents, license |
 | `codex` | Codex native agents | Canonical skills, Codex TOML agents, portable plugin manifest, license |
+| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity | Canonical skills, four host-adapted agent sets, license |
 
-The native shell installers provide 27 flavors across eight host families. The
-six agent-only flavors install to native global or project agent directories;
+The native shell installers provide 35 flavors across eight host families. The
+14 agent-only flavors install to native global or project agent directories;
 they do not install skills. `codex-global` and `muse-global` share
 `~/.agents/skills`. Project `.agents/skills` is also recognized by multiple
 compatible hosts. See the [full flavor list](installer-reference.md#options-and-destinations).
@@ -50,9 +51,10 @@ compatible hosts. See the [full flavor list](installer-reference.md#options-and-
 ## Specialized subagents
 
 The four canonical prompts in `agents/` are the Cursor and Claude plugin agents.
-The packager generates OpenCode v2 Markdown and Codex TOML from those prompts.
-No agent pins a model. They are subagents, not default primary agents. Install
-the relevant skills separately for native agent-only flavors. The `skills` archive
+The packager generates OpenCode v2 Markdown, Codex TOML, Cursor Markdown,
+Copilot `.agent.md`, Gemini CLI Markdown, and Antigravity Markdown from those
+prompts. No agent pins a model. They are subagents, not default primary agents.
+Install the relevant skills separately for native agent-only flavors. The `skills` archive
 remains skills-only for the other hosts. OpenCode agent-only flavors use the new
 `opencode` archive rather than the shared `skills` archive. Codex agent-only
 flavors use the `codex` archive rather than the shared `portable` archive.
@@ -61,10 +63,15 @@ cannot install the agent flavors.
 
 | Host | Agent behavior and limits |
 | --- | --- |
+| [Cursor](https://cursor.com/docs/subagents) | **Discovery:** Global `~/.cursor/agents/*.md`; project `.cursor/agents/*.md`.<br>**Invocation:** Cursor can select a matching subagent; inspect the task/delegation view.<br>**Read-only boundary:** `readonly: true`; tool policy and host behavior still apply. |
+| [GitHub Copilot](https://docs.github.com/en/copilot/concepts/customizations/custom-agents) | **Discovery:** Personal CLI `~/.copilot/agents/*.agent.md`; repository `.github/agents/*.agent.md`.<br>**Invocation:** Select the named profile or ask Copilot to delegate; surfaces and profile properties vary.<br>**Read-only boundary:** `tools: [read, search]`; property enforcement differs by surface. |
+| [Gemini CLI](https://geminicli.com/docs/core/subagents/) | **Discovery:** Global `~/.gemini/agents/*.md`; project `.gemini/agents/*.md`.<br>**Invocation:** Ask for the named specialist or use its `@name` invocation; inspect `/agents`.<br>**Read-only boundary:** `kind: local` with only `read_file` and `grep_search`. |
+| [Antigravity](https://antigravity.google/docs/subagents?tab=cli) | **Discovery:** Global `~/.gemini/config/agents/*.md`; project `.agents/agents/*.md`.<br>**Invocation:** Use the `/agents` panel or let the planner delegate.<br>**Read-only boundary:** `subagent: true`, `mainAgent: false`, file/search tool allowlist, and sandbox command policy. |
 | [OpenCode v2](https://opencode.ai/v2/docs/agents/) | **Discovery and invocation:** Global/project `agents/*.md`, with `mode: subagent`; ask the parent to launch one through its subagent tool, or let the model choose when allowed. `opencode --standalone api get /api/agent` lists registered agents in the current location.<br>**Skill loading:** Prompt explicitly requests the `skill` tool for required skills and dependencies. The agent reports unavailable skills.<br>**Read-only boundary:** Agent rules deny `edit`, `shell`, and further `subagent` calls. Other externally configured tools or parent instructions may require separate controls; restricting shell also prevents local command-based reproduction. |
 | [Claude Code](https://code.claude.com/docs/en/sub-agents) | **Discovery and invocation:** Global/project `agents/*.md` or plugin `agents/`; ask Claude to use a named subagent or select one from `@agent-` autocomplete. A newly created agents directory may require a session restart.<br>**Skill loading:** Reviewer and debugger request preloading of named skills through `skills`; verify they resolved. Advisor and dependency investigator load applicable skills using the Skill tool. Plugin skills may have scoped names.<br>**Read-only boundary:** `tools` allowlist excludes shell, edit, write, and agent-spawn tools. Plugin subagents ignore `permissionMode`; no permission mode is claimed. Other inherited configuration and external tools must be assessed separately. |
 | [Codex](https://developers.openai.com/codex/agent-configuration/subagents) | **Discovery and invocation:** Global/project `.codex/agents/*.toml`; explicitly request a named agent. Agent activity appears in the client. Automatic delegation also depends on instructions and model behavior.<br>**Skill loading:** `developer_instructions` asks agents to load relevant skills and report missing dependencies. No Codex custom-agent skill preloading is assumed.<br>**Read-only boundary:** `features.shell_tool = false` and `features.request_permissions_tool = false` narrow capabilities, but custom agents inherit the parent's sandbox and approvals. The prompt cannot enforce a separate read-only sandbox; verify another read-only inspection tool is available before delegating. |
 | [OpenChamber](https://docs.openchamber.dev/providers/) | **Discovery and invocation:** Uses the connected OpenCode server's agents. Project/global definitions must be visible on that server's filesystem, not just the OpenChamber client.<br>**Skill loading:** Uses the server's OpenCode skill discovery. OpenChamber's `$` picker attaches a skill explicitly; automatic skill use remains model-mediated.<br>**Read-only boundary:** Uses the OpenCode agent rules and the server's effective permissions. OpenChamber's own permission controls do not turn a Codex agent into an OpenCode agent. |
+| [Muse Code](https://dev.meta.ai/docs/muse-code/extending) | **Discovery and invocation:** Runtime delegation is documented, but the reviewed docs do not establish a persistent custom-agent file format. No static agent flavor is offered.<br>**Read-only boundary:** Runtime delegation inherits the available tools and policy; this repository does not install or constrain a Muse subagent definition. |
 
 All four return findings or advice to the caller, never changes or published
 results. A prompt restriction does not constrain unlisted third-party MCP tools

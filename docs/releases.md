@@ -1,7 +1,8 @@
 # Prepare a Release
 
-The release workflow builds six bundles: Cursor, Claude, portable plugin,
-skills-only, OpenCode agents, and Codex agents. It creates a GitHub draft release
+The release workflow builds seven bundles: Cursor, Claude, portable plugin,
+skills-only, OpenCode agents, Codex agents, and native Cursor/Copilot/Gemini CLI/
+Antigravity agents. It creates a GitHub draft release
 with SHA-256 checksums and the source commit. It does not publish the release or
 submit marketplace listings.
 
@@ -30,8 +31,9 @@ Codex and Copilot skill and plugin installs share `ai-agent-skills-portable`.
 OpenCode, Gemini CLI, Muse Code, and Antigravity skill installs share
 `ai-agent-skills-skills`. OpenCode agent-only installs use
 `ai-agent-skills-opencode`; Codex agent-only installs use
-`ai-agent-skills-codex`. Cursor and Claude retain separate archives. Each
-archive uses its package name as its internal root directory.
+`ai-agent-skills-codex`; Cursor, Copilot, Gemini CLI, and Antigravity agent-only
+installs use `ai-agent-skills-native-agents`. Cursor and Claude retain separate
+archives. Each archive uses its package name as its internal root directory.
 
 For skills and plugin flavors, updated installers prefer shared names listed in
 `SHA256SUMS` and select legacy `codex`, `copilot`, or `opencode` archives only when
@@ -50,7 +52,7 @@ targets so updated helpers can still build historical release tags.
 
 On `main`, open Actions, select **Prepare release**, and run the workflow with
 no inputs. The read-only build job reads the manifest version on `main`, runs
-tests and vet, validates the collection, and packages all six distribution
+tests and vet, validates the collection, and packages all seven distribution
 targets. A separate job uploads artifacts and uses `contents: write` to create
 tag `v{version}` at that commit (if needed) and a draft GitHub release.
 
