@@ -128,6 +128,27 @@ func TestAgentAdaptersPreserveCanonicalInstructions(t *testing.T) {
 	}
 }
 
+func TestBuildAcceptsCRLFAgents(t *testing.T) {
+	root := fixture(t)
+	for _, name := range agentNames {
+		path := filepath.Join(root, "agents", name+".md")
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(strings.ReplaceAll(string(b), "\n", "\r\n")), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, target := range []string{"cursor", "claude", "opencode", "codex"} {
+		t.Run(target, func(t *testing.T) {
+			if err := Build(root, filepath.Join(t.TempDir(), "package"), target); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
 func TestRejectWeakAdaptedAgent(t *testing.T) {
 	for _, target := range []string{"opencode", "codex"} {
 		root := fixture(t)

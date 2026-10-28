@@ -601,34 +601,26 @@ conflict handling, manual installation, and recovery.
 
 ## Specialized subagents
 
-Four optional investigation agents, designed to remain read-only, ship with this collection:
-`independent-reviewer` (reviews an exact candidate), `root-cause-investigator`
-(diagnoses failures), `dependency-investigator` (checks external contracts),
-and `architecture-advisor` (compares design options). The optional agent
-commands are alongside each host's skill commands above. Agent files do not
-install or activate skills. An existing agent directory requires an explicit
-merge or replace choice, including on updates. Merge preserves unrelated files,
-replaces the four incoming definitions, and backs up the previous directory;
-review local edits to those definitions first. `--from-source --ref main` uses
-remote `main`, not uncommitted files from this checkout.
+Four optional read-only agents handle focused investigation: `independent-reviewer`
+reviews changes, `root-cause-investigator` diagnoses failures,
+`dependency-investigator` checks external contracts, and `architecture-advisor`
+compares designs. Ask your main agent, for example: “Use the independent-reviewer
+subagent to review my changes against main.” Automatic delegation depends on the
+host and model.
 
-Ask the parent agent: “Use the independent-reviewer subagent to review my
-changes against main.” Replace the name with any of the other three for their
-respective tasks. In the project, `opencode --standalone api get /api/agent`
-lists agents for that location (a shared server may use another active location);
-in Claude Code, check `@agent-` autocomplete and the delegation trace; Codex
-shows agent activity in its client when delegated. Automatic delegation
-is a model decision, not an installation guarantee. OpenChamber uses its
-connected OpenCode runtime: install agents and skills where that server sees
-them, then inspect its available agents before delegating. See
-[agent compatibility and troubleshooting](docs/host-compatibility.md#specialized-subagents)
-and [agent installation paths](docs/installer-reference.md#specialized-agent-installations).
+Cursor and Claude Code plugins include these agents; the Codex desktop plugin and
+`npx skills add` do not. For native installs, see
+[agent installation and updates](docs/installer-reference.md#specialized-agent-installations).
+For host support, discovery, and troubleshooting, see
+[subagent compatibility](docs/host-compatibility.md#specialized-subagents).
 
 ## Use
 
-Describe the task normally. Hosts that support implicit skill invocation can select
-a matching skill from its description; naming a skill is optional when you want to
-force a particular workflow:
+<details>
+<summary><strong>Using the skills</strong></summary>
+
+Describe the task normally. Hosts with automatic skill selection may load a matching
+skill; name one explicitly when you need a particular workflow:
 
 ```text
 Use agent-planning to plan this feature. Do not implement it yet.
@@ -636,39 +628,15 @@ Use code-review to review this branch against main without changing the code.
 Use root-cause-debug to reproduce and fix this failure with regression coverage.
 ```
 
-For a feature that needs a plan, the agent should select `agent-planning`; after
-acceptance, `implement-plan` coordinates implementation and review. Native skills
-make these procedures available, but models decide when to load them. Cursor is the
-example host; other flavors may use different controls or review tools.
+For a planned feature, use `agent-planning` first and `implement-plan` after
+accepting the plan. Implementation includes verification and independent review;
+if review is unavailable, report it as incomplete. These are model-followed
+instructions, not enforced gates. Building does not authorize commits, pushes,
+external replies, or deployment. See the [Cursor workflow example](docs/cursor-workflow.md)
+for a full walkthrough and the [host compatibility matrix](docs/host-compatibility.md)
+for host-specific behavior and limits.
 
-```mermaid
-flowchart TD
-    A["Describe the change<br/>Optional: read a Jira issue"] --> B["Plan<br/>agent-planning"]
-    B --> C["Review the plan and authorize implementation"]
-    C --> D["Build<br/>implement-plan"]
-    D --> E["Verify behavior<br/>Tests and relevant checks"]
-    E --> F["Independent review<br/>code-review"]
-    F --> G{"Changes required?"}
-    G -->|Yes| H["Repair and rerun affected checks"]
-    H --> F
-    G -->|No| I["Report the result and verification limits"]
-    I --> J["When authorized: commit, push, or open a PR"]
-```
-
-Failed checks require investigation before advancing. Unavailable independent
-review leaves that gate incomplete. See the [Cursor workflow example](docs/cursor-workflow.md)
-for prompts, expected results, and recovery steps. The example describes the
-instructed workflow; a live Cursor validation run has not been recorded.
-
-Implementation should include relevant skills, verification, and independent
-`code-review` unless you explicitly skip it. Unavailable review is reported
-incomplete. If the host misses the handoff, name the needed skill as a fallback.
-Jira/GitHub connections must be configured separately. These are model-followed
-workflows, not enforced runtime gates. See the [host compatibility matrix](docs/host-compatibility.md)
-for documented behavior and testing limits.
-
-Build does not authorize commits, pushes, external replies, or deployment.
-GitHub reviews and approvals are never dismissed.
+</details>
 
 ## Skills
 

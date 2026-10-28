@@ -37,7 +37,8 @@ func readAgents(root string) ([]agentDefinition, error) {
 		if err != nil {
 			return nil, err
 		}
-		parts := strings.SplitN(string(b), "\n---\n", 2)
+		content := strings.ReplaceAll(string(b), "\r\n", "\n")
+		parts := strings.SplitN(content, "\n---\n", 2)
 		if len(parts) != 2 || !strings.HasPrefix(parts[0], "---\n") {
 			return nil, fmt.Errorf("%s: invalid frontmatter", path)
 		}

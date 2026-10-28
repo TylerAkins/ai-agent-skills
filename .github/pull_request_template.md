@@ -12,13 +12,4 @@
 Use [!WARNING] only for a genuine blocker or significant risk.
 -->
 
-<!-- Optional: remove the comment markers and replace the placeholder only when implementation context helps review.
-<details>
-<summary>Implementation details</summary>
-
-[Decisions, tradeoffs, or migration notes.]
-
-</details>
--->
-
 AI assistance: <!-- Tool and model when known, "model unknown" when unavailable, or "None". -->
