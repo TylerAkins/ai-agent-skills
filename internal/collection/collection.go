@@ -215,6 +215,9 @@ func Validate(root, target string) ([]string, error) {
 	}
 	names := []string{}
 	for _, entry := range entries {
+		if entry.Name() == ".DS_Store" {
+			continue
+		}
 		if !entry.IsDir() {
 			return nil, fmt.Errorf("unexpected skill entry: %s", entry.Name())
 		}

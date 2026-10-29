@@ -1,6 +1,6 @@
 {
   "name": "ai-agent-skills",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Engineering workflows with scoped routing and independent code review.",
   "author": { "name": "Tyler Akins" },
   "repository": "https://github.com/TylerAkins/ai-agent-skills",
