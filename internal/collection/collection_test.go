@@ -96,6 +96,17 @@ func TestBuildPreservesDependenciesAndSeparatesHosts(t *testing.T) {
 	}
 }
 
+func TestValidateIgnoresDSStoreInSkillsDirectory(t *testing.T) {
+	root := fixture(t)
+	path := filepath.Join(root, "skills", ".DS_Store")
+	if err := os.WriteFile(path, []byte("metadata"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Validate(root, "source"); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestAgentAdaptersPreserveCanonicalInstructions(t *testing.T) {
 	root := filepath.Join("..", "..")
 	agents, err := readAgents(root)

@@ -25,9 +25,6 @@ Without a required template, default to this structure:
 
 - [Resulting behavior and why it matters.]
 
-## Validation
-
-- [Check actually run and its result.]
 ```
 
 Use as many short, high-level TL;DR bullets as the change needs, without a fixed
@@ -39,21 +36,15 @@ changelog. For a tiny change, keep only the structure required by the repository
 template. Template comments are guidance, not PR content: remove unused comments
 and placeholders from the final description.
 
-In Validation, report checks actually run against the final candidate. Use one
-bullet for each distinct result when there are two or more; combine closely related
-checks with the same outcome. Report failed checks honestly. Include a command,
-test count, file name, or function name only when it helps the reviewer understand
-or reproduce the result. Do not copy the detailed evidence block into the PR. If
-no checks ran, say so plainly. Do not inventory unrun checks or put deployment or
-checklist status in Validation.
-
-Keep failed checks and material caveats visible with Validation. State the failure
-and next step plainly; do not describe a failed CI check as merely unverified
-locally. Use an ordinary sentence for a routine limitation. Use a brief GitHub
-alert only when a skimming reviewer must notice the information: `[!NOTE]` for
-important context that is not a blocker, or `[!WARNING]` for a genuine blocker
-or significant risk. Do not use an alert just because a caveat exists, and do
-not repeat the same fact in the bullets:
+Do not add a Validation section by default. GitHub displays PR check results, and
+routine test status usually adds little to the description. Add a concise note only
+when it gives reviewers material context not clear from the checks, such as a
+manual verification step or a relevant limitation. Report failures honestly and
+state the next step plainly. Use an ordinary sentence for routine limitations. Use
+a brief GitHub alert only when a skimming reviewer must notice the information:
+`[!NOTE]` for important context that is not a blocker, or `[!WARNING]` for a
+genuine blocker or significant risk. Do not use an alert just because a caveat
+exists, and do not repeat the same fact in the bullets:
 
 ```markdown
 > [!NOTE]
@@ -73,15 +64,6 @@ code for a relevant example, and links to exact issues or decisions instead of
 repeating background. Do not add these to every PR or use formatting as decoration.
 Do not rely on retired GitHub tasklist blocks; preserve ordinary checkboxes when
 the repository template requires them.
-
-For example, two completed results should scan like this:
-
-```markdown
-## Validation
-
-- `poetry run ruff format --check` and `poetry run ruff check` passed.
-- Targeted package-global tests passed with `poetry run pytest`.
-```
 
 Use checkboxes only for tracked tasks required by the repository template or user.
 Mark a required box only when that task was completed and still applies to the final
