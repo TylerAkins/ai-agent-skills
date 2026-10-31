@@ -84,7 +84,10 @@ verification does not authorize a commit, push, PR, tag, or release.
 
 For titles, descriptions, or PR creation, read
 [PR description guidance](references/pr-description.md). Draft from the final
-candidate and observed verification. Drafting alone does not authorize publication.
+candidate and observed verification. Include a concise Validation section, or the
+repository template's equivalent, summarizing checks and manual flows actually
+verified. Keep detailed runner output in the working record. Drafting alone does
+not authorize publication.
 
 Before an authorized push, verify the branch, remote, destination, and outgoing
 commits. Use a normal push. If rejected, inspect divergence and report the conflict;
@@ -112,6 +115,8 @@ authorization. Never force-push a protected branch without a specific request.
 
 | Model Rationalization | Enforced Rule |
 | --- | --- |
+| GitHub shows passing checks, so I can omit Validation. | Every PR description needs concise validation results or an honest reason validation was not performed. |
+| Detailed test totals make the PR more credible. | Summarize verified behavior and results; include specifics only to explain a material limitation or failure. |
 | The PR already exists, so the validation gate no longer applies. | Validate each commit and push, including updates to existing PRs. |
 | Ruff lint passed, so formatting is covered. | Run the configured formatter check separately when the repository requires it. |
 | The commit hook fixed files, so I can retry immediately. | Inspect hook changes and rerun affected checks before retrying. |

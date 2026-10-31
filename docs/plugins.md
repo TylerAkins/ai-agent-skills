@@ -1,55 +1,37 @@
-# Packaging Reference
+# Packaging reference
 
-For quick-start installation choices, see the [README](../README.md#install).
-For host activation and update steps, see the [installer reference](installer-reference.md#activate-an-installation).
-This page is for maintainers inspecting or building host packages.
+Validate the canonical collection and build host packages without installing them.
+For normal setup, use the [README](../README.md#install); for destination and update
+behavior, use the [installer reference](installer-reference.md).
 
-## Implementation map
+## Package contents
 
-| Behavior | Source of truth |
-| --- | --- |
-| Package validation and assembly | [Collection packager](../internal/collection/collection.go) |
-| Host-specific agent conversion | [Agent packager](../internal/collection/agents.go) |
-| Packager command options | [skillpack command](../cmd/skillpack/main.go) |
-| Continuous validation | [Validation workflow](../.github/workflows/validate.yml) |
-| Release package targets | [Release workflow](../.github/workflows/release.yml) |
+Every target contains the full `skills/` tree with its supporting resources and
+`LICENSE`. Host targets add the following:
 
-The package tables and commands below describe those files. Update this page when
-their targets or validation behavior changes.
-
-## Package Contents
-
-Every target contains the complete `skills/` collection and supporting resources.
-
-| Release target | Hosts | Additional components |
+| Target | Additional contents | Use |
 | --- | --- | --- |
-| `cursor` | Cursor | `.cursor-plugin/plugin.json`, `rules/`, `agents/`, LICENSE |
-| `claude` | Claude Code | `.claude-plugin/plugin.json`, `agents/`, LICENSE |
-| `portable` | Codex, Copilot | Root `plugin.json`, LICENSE |
-| `skills` | OpenCode, Gemini CLI, Muse Code, Antigravity | LICENSE; no plugin manifest |
-| `opencode` | OpenCode native agents | OpenCode Markdown `agents/`, LICENSE; no plugin manifest |
-| `codex` | Codex native agents | Root `plugin.json`, Codex TOML `agents/`, LICENSE |
-| `native-agents` | Cursor, Copilot, Gemini CLI, Antigravity native agents | Host-specific subdirectories under `agents/`, LICENSE; no plugin manifest |
+| `portable` | Root `plugin.json` | Codex desktop and Copilot plugin payloads. |
+| `skills` | None | Skills-only payload for OpenCode, Gemini CLI, Muse Code, and Antigravity. |
+| `claude` | `.claude-plugin/plugin.json`, canonical `agents/` | Claude Code plugin and native agent payload. |
+| `cursor` | `.cursor-plugin/plugin.json`, `rules/`, adapted `agents/` | Cursor plugin with routing and read-only agent declarations. |
+| `codex` | Root `plugin.json`, TOML `agents/` | Codex native agent payload alongside skills. |
+| `opencode` | Markdown `agents/` | OpenCode native agent payload alongside skills. |
+| `native-agents` | Host-specific subdirectories under `agents/` | Cursor, Copilot, Gemini CLI, and Antigravity agents. |
+| `copilot` | Same contents as `portable` | Legacy source-build target; not a separate current release asset. |
 
-The release workflow prepares these seven `.tar.gz` archives. Installer flavors
-select host-specific destinations and activation steps. The `copilot` build target
-remains available for older source-build consumers and has the same contents as
-`portable`. The `codex` and `opencode` targets now add native agents to their
-respective skills packages.
+The release workflow builds seven archives, excluding the legacy `copilot` alias.
+Skill-only installers select only `skills/`; agent-only installers select only the
+matching `agents/` payload. An archive containing both does not mean both are
+installed by every flavor.
 
-Cursor includes a native-first routing rule and four canonical agent prompts;
-Claude includes those prompts with tool allowlists. OpenCode, Codex, Cursor,
-Copilot, Gemini CLI, and Antigravity use deterministic host-specific adaptations.
-Native agent installation and read-only limits are listed in the [host compatibility matrix](host-compatibility.md#specialized-subagents).
+Repository instructions, README/docs, tooling, credentials, and the discovery
+symlink are excluded. Do not install the source checkout as a plugin symlink.
+Keep portable, Claude, and Cursor manifest names and versions aligned.
 
-Repository `AGENTS.md`, tooling, credentials, and the `.cursor/skills` discovery
-symlink are excluded. Do not symlink this checkout into Cursor's local-plugin
-folder; external targets are skipped.
+## Validate and build
 
-## Validate and Build
-
-Use the Go version in [go.mod](../go.mod). Run commands from the repository
-root. The validation commands work in Bash and PowerShell:
+Use the Go version in [go.mod](../go.mod). From the repository root:
 
 ```sh
 go test -race ./...
@@ -57,15 +39,22 @@ go vet ./...
 go run ./cmd/skillpack
 ```
 
-Build into new directories outside the checkout. Include the legacy `copilot`
-alias when checking compatibility for a packaging change.
+The source validator checks skill frontmatter, names, local file links,
+registration in the README/router, manifest consistency, and canonical agent
+contracts. It does not check every heading anchor, render the docs, or exercise a
+host model. See [contributor checks](../CONTRIBUTING.md#validate-your-change) for
+document, installer, shell, and workflow validation.
+
+Build every target into a new directory outside the checkout. Output parents must
+exist; the target output directories must not. The packager refuses overwrite and
+validates each completed package.
 
 **macOS / Linux (Bash)**
 
 ```sh
 package_root=$(mktemp -d)
-for host in cursor claude portable skills opencode codex native-agents copilot; do
-  go run ./cmd/skillpack -target "$host" -out "$package_root/$host" || exit 1
+for target in portable skills claude cursor codex opencode native-agents copilot; do
+  go run ./cmd/skillpack -target "$target" -out "$package_root/$target" || exit 1
 done
 ```
 
@@ -74,67 +63,61 @@ done
 ```powershell
 $packageRoot = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString())
 New-Item -ItemType Directory -Path $packageRoot | Out-Null
-foreach ($target in @('cursor', 'claude', 'portable', 'skills', 'opencode', 'codex', 'native-agents', 'copilot')) {
+foreach ($target in @('portable', 'skills', 'claude', 'cursor', 'codex', 'opencode', 'native-agents', 'copilot')) {
     go run ./cmd/skillpack -target $target -out (Join-Path $packageRoot $target)
     if ($LASTEXITCODE -ne 0) { throw "Package build failed: $target" }
 }
 ```
 
-The output directories must not exist. The packager refuses overwrite and validates
-each generated package. Checks cover metadata, local links, inventories, package
-contracts, and parser-backed agent formats, not live delegation.
+To validate an existing package, pass its root and target without `-out`:
 
-For a temporary source checkout and local installation, use
-[installer source mode](installer-reference.md#source-builds-and-manual-installation).
-For release assets, use [release preparation](releases.md).
+```sh
+go run ./cmd/skillpack -root /absolute/path/to/package -target portable
+```
 
-## Verify in Each Host
+This command inspects the package; it does not install it. For release archives and
+checksums, follow [release preparation](releases.md).
 
-For a changed skill or agent, choose a representative task that exercises the
-changed behavior in each affected host. Confirm discovery, invoke the workflow,
-and check any linked resources or host-specific controls involved in that task.
-For multi-step workflows, include the relevant handoff, verification, review, and
-authorization boundaries. Do not run unrelated Jira, deployment, or delivery steps
-just to exercise a different workflow.
+## Verify in each host
 
-Record the host and version, prompt, observed result, and missing checks. File
-placement, package validation, and installer tests do not establish that an agent
-followed its instructions.
+Choose a representative task for the changed skill or agent. Confirm discovery,
+request the workflow, and inspect the result and visible skill/delegation activity.
+Include handoff, checks, and review when they are part of the workflow. Do not
+exercise unrelated Jira writes, deployment, or delivery just to test discovery.
 
-## Skill Activation Limits
+Record host/version, skill and target revisions, request, observed artifacts,
+actual checks, and missing prerequisites. A package build proves structure; an
+installer test proves file placement; an agent listing proves registration.
+None alone proves the model loaded or followed a skill.
 
-Supported hosts expose skill names and descriptions to the agent and document
-model-mediated selection for relevant requests. Selection and instruction following
-remain model behavior, not an enforced runtime gate. Native selection should load a
-clear matching skill directly. `using-skills` is for ambiguous or multi-workflow
-requests, not a mandatory step for every engineering task. A link in a plan proves
-only that the executor has a path to the skill. It does not prove the skill was
-loaded or used.
+## Skill activation limits
 
-Do not add a persistent router where native selection already covers the same work.
-If an officially documented host lacks native skill selection and a supported
-instruction mechanism can address it, add only a short conditional instruction that
-preserves user-defined settings. Keep detailed procedures in the canonical skills.
-Do not copy this repository's `AGENTS.md` as generic installed instructions. Verify
-the host, surface, and model behavior separately from structural installation tests.
+Hosts can expose names/descriptions for native model selection. Load a clear
+matching skill directly; use `using-skills` for ambiguous or multi-workflow work.
+Selection and instruction following remain model behavior.
 
-## Host References and Distribution
+Do not add persistent routing instructions when native selection already serves
+the same purpose. If a documented host gap needs a supported instruction mechanism,
+keep it conditional and preserve user settings. Never install this repository's
+`AGENTS.md` as global user instructions. A link in a plan gives the executor a
+path to a skill; it is not evidence that the skill ran.
 
-- [Cursor plugins](https://cursor.com/docs/plugins) and [manifest reference](https://cursor.com/docs/reference/plugins)
-- [OpenAI local plugins and marketplaces](https://developers.openai.com/plugins/build/plugins)
-- [Claude plugins](https://code.claude.com/docs/en/plugins) and [manifest reference](https://code.claude.com/docs/en/plugins-reference)
-- [Copilot plugin formats](https://docs.github.com/en/copilot/concepts/agents/about-plugins)
-- [OpenCode skills](https://opencode.ai/docs/skills/)
-- [Gemini CLI skills](https://geminicli.com/docs/cli/using-agent-skills/)
-- [Antigravity skills](https://antigravity.google/docs/skills)
-- [Muse Code skills](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/)
-- [OpenChamber skills](https://docs.openchamber.dev/skills)
+## Distribution and marketplaces
 
-See the [host compatibility matrix](host-compatibility.md) for the complete host,
-surface, installation, and invocation audit, including third-party clients.
+Packages and release assets do not create marketplace listings. The shell helper
+can prepare a local Codex desktop catalog; Copilot staging still needs a separately
+configured marketplace. Publishing/submission is a separately authorized action.
 
-Packaging and release assets do not create marketplace listings. Cursor submissions
-go through [the publisher form](https://cursor.com/marketplace/publish).
-Codex, Claude, and Copilot have separate marketplace formats; OpenCode, Gemini CLI,
-Muse Code, and Antigravity consume skill folders directly. Publishing or registering
-a marketplace remains a separate authorized action.
+Use the [host compatibility guide](host-compatibility.md) for discovery, official
+host references, and native-agent restrictions. Check the target host's current
+manifest requirements before adding another distribution format.
+
+## Implementation map
+
+| Contract | Source |
+| --- | --- |
+| Validation and package assembly | [Collection packager](../internal/collection/collection.go) |
+| Agent adaptation and parser validation | [Agent packager](../internal/collection/agents.go) |
+| CLI options | [skillpack command](../cmd/skillpack/main.go) |
+| Required CI jobs and package builds | [Validation workflow](../.github/workflows/validate.yml) |
+| Archives and release creation | [Release workflow](../.github/workflows/release.yml) |

@@ -7,6 +7,7 @@ earlier commits. Our prose and commands are authored for this repository.
 | Source | Principle used |
 | --- | --- |
 | [GitHub collapsed sections](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-collapsed-sections) | Use native details/summary markup and blank lines so Markdown renders inside each section. |
+| [GitHub documentation-writer](https://github.com/github/awesome-copilot/blob/main/skills/documentation-writer/SKILL.md) | Reviewed October 31, 2026. Adapt its explicit document-type, audience, goal, and scope decisions; retain our source verification and proportional clarification instead of mandatory outline approval. |
 | [Diátaxis](https://diataxis.fr/) | Separate task instructions, reference, explanation, and learning material by reader needs. |
 | [Write the Docs](https://www.writethedocs.org/guide/writing/beginners-guide-to-docs/) | Give first-time readers an installation path and a usable example. |
 | [Addy's README](https://github.com/addyosmani/agent-skills/blob/main/README.md) | Use expandable host sections so readers can focus on their integration. Keep our normal setup, activation, and updates together. |
