@@ -1,55 +1,70 @@
-# Contributing
+# Contribute a change
 
-Keep contributions focused on a concrete engineering task or an observed defect.
-For substantial new skills or workflow changes, open an issue to discuss the use
-case before investing in an implementation. Small fixes can go straight to a PR.
+Keep contributions focused on a concrete task or observed defect. Discuss a
+substantial new skill or workflow in an issue before investing in implementation;
+small fixes can go directly to a PR.
 
-## Make a Change
+## Edit the source
 
 Work on a branch in your clone or fork. Read [repository instructions](AGENTS.md)
-and nearby skills before editing.
+and the relevant skill before editing.
 
-- Edit canonical content in `skills/<name>/SKILL.md`; keep references and resources
-  in that skill's folder. Do not edit installed copies or generated packages.
-- Give each skill a folder-matching `name` and a concise `description` explaining
-  when it applies. Prefer useful decision guidance over generic advice or rigid rituals.
-- Update sibling links, the [routing skill](skills/using-skills/SKILL.md), and the
-  [README](README.md) when adding, renaming, or removing a skill.
-- Preserve authorization boundaries and tested contracts, particularly Jira ADF.
-  Never introduce automatic dismissal of GitHub reviews or approvals.
-- Write original guidance. Attribute external material when used and respect its license.
+- Keep canonical skills in `skills/<name>/SKILL.md`, with owned supporting resources in that folder. Do not edit installed copies or built packages.
+- Use a folder-matching skill name and a concise description explaining when it applies. Follow [skill-authoring](skills/skill-authoring/SKILL.md) for the full contract.
+- Update sibling links, [routing](skills/using-skills/SKILL.md), and the [README](README.md) when adding, renaming, or removing a skill.
+- Preserve authorization boundaries, unrelated work, and tested Jira ADF contracts. Never dismiss GitHub reviews or approvals.
+- Attribute external material and respect its license. Keep examples generic unless a named host is necessary.
 
-For packaging changes, keep manifest names and versions aligned and follow
-[packaging reference](docs/plugins.md). Keep contributor files and repository instructions
-out of installed host packages.
+For README setup edits, cover every installer flavor with install, activation,
+and update commands in a labeled collapsed section, including supported shell
+variants. Verify the inventory against the installer, not an old table.
 
-## Validate
+## Validate your change
 
-Use the Go version declared in `go.mod`. From the repository root, run:
+Use the Go version in [go.mod](go.mod). From the repository root, run source
+validation and whitespace checks for every change:
 
 ```sh
 go run ./cmd/skillpack
 git diff --check
 ```
 
-For Go tooling or packaging changes, also run these commands from the repository
-root in Bash or PowerShell:
+Then select the checks that match the edited artifact:
+
+| Change | Additional verification |
+| --- | --- |
+| Skills | Follow the skill-authoring evaluation gate, including `go test ./...`. Exercise a representative task when a host is available. |
+| README/docs | Verify source-backed commands and claims, local links/anchors, and the rendered reader path. Exercise safe setup commands in scratch destinations. |
+| Go tooling or packaging | Check Go formatting, run race tests and vet, and build every target plus legacy aliases into fresh scratch directories. |
+| Bash installer/scripts | Run ShellCheck and installer smoke tests. |
+| PowerShell | Run the pinned analyzer and native Windows smoke tests. |
+| GitHub Actions | Validate YAML with `actionlint` and run affected local checks. |
+
+**Go/tooling checks**
 
 ```sh
-gofmt -w cmd internal
+gofmt -l cmd internal
 go test -race ./...
 go vet ./...
 ```
 
-Build all release targets and legacy host aliases into new scratch directories outside the checkout
-when packaging changes. Use the commands in [packaging reference](docs/plugins.md).
-For installer changes, run `bash scripts/tests/install-smoke.sh` in addition to
-linting. It uses temporary HOME/project directories and generated release fixtures.
-CI runs Bash tests on macOS and Linux, and native PowerShell tests on Windows
-(PowerShell 7.4+).
-For PowerShell changes, install the pinned analyzer and run from the repository root:
+Formatting output must be empty; format only files you changed. Use the
+[packaging commands](docs/plugins.md#validate-and-build) for builds. Keep manifest
+identity/version aligned across the three manifests. Repository instructions,
+credentials, and discovery symlinks must stay out of packages.
 
-**Windows (PowerShell 7.4+)**
+**Bash checks**
+
+```sh
+bash scripts/ci/check-shell.sh
+bash scripts/tests/install-smoke.sh
+```
+
+Install ShellCheck first. The checker discovers tracked and non-ignored new shell
+scripts; each script needs the correct shebang. Smoke tests use temporary home and
+project directories with generated release fixtures. They do not update live hosts.
+
+**Windows checks (PowerShell 7.4+)**
 
 ```powershell
 Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Repository PSGallery
@@ -57,40 +72,33 @@ pwsh -NoProfile -File scripts/ci/check-powershell.ps1
 pwsh -NoProfile -File scripts/tests/install-smoke.ps1
 ```
 
-The tests use isolated home/project destinations.
+The analyzer handles `.ps1`; ShellCheck does not. Keep platform-specific wrappers
+clearly separated and shared logic in Go where practical. Add isolated behavioral
+coverage and native runners when adding a platform implementation.
 
-For shell scripts, install ShellCheck and run `bash scripts/ci/check-shell.sh`.
-It discovers tracked and non-ignored new `.sh` files, including scripts under future
-platform directories. Declare the interpreter in each script's shebang.
-For workflow changes, validate the GitHub Actions YAML with `actionlint`.
+The [validation workflow](.github/workflows/validate.yml) runs installer checks on
+macOS, Linux, and Windows, then source/package validation. Its Go output is verbose;
+use the running Actions job or `gh run watch <run-id>` to monitor an actual CI run.
+Local results do not establish that CI passed.
 
-CI streams verbose Go test results and groups package output by host. Open the
-running job in GitHub Actions to watch progress; the run summary records its
-revision and result. For CLI monitoring, use `gh run watch <run-id>`.
+For host tests, record the prompt, host/version, revision, visible skill activity,
+result, and limits. File placement and structural checks do not prove selection
+or instruction following. Do not claim checks that were unavailable or unperformed.
 
-Keep common installation and package logic in Go where practical, and put
-OS-specific wrappers in clearly named platform directories. Add isolated
-behavioral tests and native runner coverage with each platform implementation.
-The PowerShell checker validates `.ps1` files; ShellCheck does not.
+## Submit a pull request
 
-For changed skill behavior, try a representative task in the affected host when
-available. Describe the prompt, observed result, and material limitations.
-Structural checks alone do not establish that an agent loaded or followed a skill.
-Do not claim live verification that was not performed.
-
-## Submit a Pull Request
-
-Use a clear title and the [PR template](.github/pull_request_template.md).
-Explain the problem and resulting behavior, link a related issue when one exists,
-and report meaningful verification and remaining limits. Screenshots or brief
-sanitized examples help when they show changed behavior. Avoid repeated summaries
-and generic checklists.
+Use a clear title and the [PR template](.github/pull_request_template.md). Explain
+the concrete problem and resulting behavior. Link a real issue when relevant;
+do not invent one. Include a concise Validation section describing checks and
+manual flows actually verified. Leave detailed runner output out of routine
+bullets and disclose material gaps or failures. Screenshots help when appearance
+is part of the change.
 
 AI-assisted contributions are welcome. Review the complete diff and verify its
-claims before submitting; you remain responsible for the contribution. At the
-bottom of the PR body, name the tool and model used when known, for example
-`AI assistance: Codex, model unknown`. Use `None` when no AI assistance was used.
-No transcript is required, and model names should not be guessed.
+claims before submitting. At the bottom of the PR, name the tool and known model;
+use `model unknown` only when unavailable and `None` when no AI assistance was used.
+No transcript is required. Follow [git-delivery](skills/git-delivery/SKILL.md) for
+authorized Git actions and exact-draft publication gates.
 
-Respond to review feedback with scoped changes. Preserve review history and
-approvals; request another review when needed rather than dismissing stale reviews.
+Address feedback with scoped changes. Preserve review history and request
+re-review when needed instead of dismissing stale reviews or approvals.

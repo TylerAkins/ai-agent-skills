@@ -1,573 +1,255 @@
-# Installer Reference
+# Installer reference
 
-Use the [README](../README.md#install) for the quick-start choices. This reference
-covers installer options, project installs, updates, customization conflicts, and
-recovery. Commands run from a checkout of this repository.
+Use the [README's flavor sections](../README.md#native-shell-installer) for complete
+install, activation, and update commands for all 35 flavors. This reference covers
+options, destinations, conflicts, source builds, and recovery. Run helper commands
+from a checkout of this repository.
 
-For a specific task, jump to [activation](#activate-an-installation),
-[agent installation](#specialized-agent-installations),
-[installation alternatives](#alternate-installations),
-[options and destinations](#options-and-destinations),
-[source and manual installs](#source-builds-and-manual-installation), or
-[recovery and uninstall](#troubleshooting-and-uninstall).
+[Activate](#activate-an-installation) · [Update](#updates-and-customizations) · [Agents](#specialized-agent-installations) · [Options](#options-and-destinations) · [Source/manual](#source-builds-and-manual-installation) · [Recover/remove](#troubleshooting-and-uninstall)
 
-## Implementation map
+## Prerequisites and checkout
 
-| Behavior | Source of truth |
+Install the target host and Git. Release installs require:
+
+| Platform | Runtime and tools |
 | --- | --- |
-| Bash flavor selection and command-line options | [Bash installer](../scripts/install-ai-agent-skills.sh) |
-| Windows flavor selection and command-line options | [PowerShell installer](../scripts/install-ai-agent-skills.ps1) |
-| Shared Bash download, validation, and installation operations | [Installer library](../scripts/lib/install.sh) |
-| Package contents and link validation | [Skill packager](../internal/collection/collection.go) |
-| Release archive names and checksums | [Release workflow](../.github/workflows/release.yml) |
-
-When these instructions conflict with the implementation, follow the current
-scripts and update this reference at the same time as the behavior change.
-
-## Prerequisites and Checkout
-
-Install your host app and Git first. For macOS and Linux, you also need Bash, curl,
-tar, shasum, and jq. On macOS, install jq with `brew install jq` if you use Homebrew;
-on Linux, install missing tools through your package manager. For Windows, use
-[PowerShell 7.4+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows).
-Go is required only for source builds.
-
-**macOS / Linux (Bash)**
+| macOS/Linux | Bash, curl, tar, shasum, and jq. Install missing tools with your package manager. |
+| Windows | PowerShell 7.4+ (`pwsh`). Release mode uses .NET archive APIs and needs neither Bash nor jq. |
 
 ```sh
 git clone https://github.com/TylerAkins/ai-agent-skills.git
 cd ai-agent-skills
 ```
 
-**Windows (PowerShell 7.4+)**
-
-```powershell
-git clone https://github.com/TylerAkins/ai-agent-skills.git
-Set-Location ai-agent-skills
-```
-
-Already cloned? Open that checkout and run `git pull --ff-only` instead.
-
-## Shared Release Archives
-
-The installer uses the release's `SHA256SUMS` to choose its archive. Codex/Copilot
-skills and plugin flavors prefer `portable`; OpenCode skills flavors prefer `skills`.
-Agent-only flavors select their host archive: `codex`, `opencode`, `claude`, or
-`native-agents` (Cursor, Copilot, Gemini CLI, and Antigravity).
-When a shared archive is absent, skills and plugin flavors select the legacy host
-archive. Other hosts retain their archive selection.
-Download, checksum, and archive-validation failures stop before replacement;
-there is no fallback after a listed shared archive fails.
-
-Run `git pull --ff-only` in your installer checkout before consuming consolidated
-releases. Older helpers expect separate Codex, Copilot, and OpenCode archives and
-must be updated or pinned to a compatible older release. Flavor names, destinations,
-merge/replacement controls, and host activation steps remain the same.
-
-## Replacement and Backups
-
-Plugin updates replace the selected directory after confirmation and print the backup
-path. Failed downloads/checksums leave the installation unchanged; a failed Codex
-catalog commit restores the previous plugin. Pulling the repo gets installer fixes;
-the default install/update still fetches the latest stable published release.
-
-For existing skills-only or agents-only destinations, choose `--merge` (`-Merge`
-in PowerShell) or `--replace` (`-Replace`). Merge replaces incoming skill folders
-or agent files and preserves unrelated entries. Replace replaces the whole
-destination, including unrelated files.
-Both can replace local customizations within their scope. Use `--yes` / `-Yes` only
-to confirm the selected operation without a prompt.
-
-An ordinary install refuses an existing target without an explicit mode. Plugin
-`update` selects replacement automatically; skills-only and agents-only updates
-need a mode.
-Backups remain in `.ai-agent-skills-backups/backup.*` beside the installation parent.
-Compare or restore the printed backup, and remove it yourself when no longer useful.
-
-## Activate an Installation
-
-Installing files does not activate every host the same way. Use the row for the
-flavor you installed:
-
-| Flavor | Activation |
-| --- | --- |
-| `cursor` | Reload the window. In **Customize**, check for the plugin, skills, routing rule, and agents. Local plugin imports must be allowed by your account or team. |
-| `cursor-global` | Start a new Cursor session and check **Customize > Skills**. For Cursor CLI, check its skill list. |
-| `codex-desktop` | Quit and reopen ChatGPT/Codex. In **Plugins**, select the personal marketplace and install `ai-agent-skills`. |
-| `codex-global` | Start a new Codex session. Skills are in the shared `~/.agents/skills` directory. |
-| `claude` | Launch Claude Code with the installed plugin directory using the command below. Pass `--plugin-dir` for later sessions too. |
-| `claude-global` or `claude-project` | Start a new session and check `/skills`. The global flavor honors an absolute `CLAUDE_CONFIG_DIR` when set. |
-| `copilot-global` or `copilot-skills` | Open the project in the Copilot app, start a session, and check **Customize > Skills**. Personal local skills do not automatically reach the cloud agent. |
-| `opencode-global` or `opencode-project` | Start a new OpenCode session in the relevant project or user configuration. |
-| `gemini-global` or `gemini-project` | Run `/skills reload` and `/skills list`; approve the skill activation prompt when it appears. |
-| `muse-global` or `muse-project` | Run `/skills reload`, then `muse skills list`. Project skills require a trusted workspace. |
-| `antigravity-global` | Start a new app/IDE session and check the agent panel's **Customizations** menu. |
-| `antigravity-project` | Start a new session in the target app, IDE, or CLI. The app/IDE exposes active skills in the agent panel's **Customizations** menu. |
-| `antigravity-cli-global` | Start a new CLI session. This flavor uses the CLI's skill directory, separate from the app/IDE directory. |
-
-For the Claude Code plugin:
-
-**macOS / Linux (Bash)**
-
-```sh
-claude --plugin-dir "$HOME/.local/share/ai-agent-skills/claude"
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-claude --plugin-dir "$env:USERPROFILE/.local/share/ai-agent-skills/claude"
-```
-
-Cursor CLI can load the installed plugin for a session with:
-
-**macOS / Linux (Bash)**
-
-```sh
-agent --plugin-dir "$HOME/.cursor/plugins/local/ai-agent-skills"
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-agent --plugin-dir "$env:USERPROFILE/.cursor/plugins/local/ai-agent-skills"
-```
-
-## Alternate Installations
-
-Run these from the checkout prepared above. Project directories must already
-exist; replace the example paths with your own.
-
-### Specialized agent installations
-
-The Open Skills CLI installs skills, not these subagent definitions. Cursor and
-Claude Code plugin installs already include the four agents; the Codex desktop
-plugin does not.
-
-For native installs, use an agent flavor alongside the corresponding skills flavor.
-Releases with agent bundles contain four subagent definitions per supported host;
-older archives may not. Cursor, Copilot, Gemini CLI, and Antigravity use the
-`native-agents` archive and their host-specific Markdown frontmatter.
-The examples use OpenCode. For another host, replace the flavor with its
-`<host>-agents-global` or `<host>-agents-project` entry in the
-[destination table](#options-and-destinations). Install the matching skills from
-the table below as well:
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-global
-bash scripts/install-ai-agent-skills.sh --flavor opencode-agents-project --project /absolute/path/to/project
-bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-global --merge
-bash scripts/install-ai-agent-skills.sh update --flavor opencode-agents-project --project /absolute/path/to/project --merge
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-global
-./scripts/install-ai-agent-skills.ps1 -Flavor opencode-agents-project -Project 'C:/path/to/project'
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-global -Merge
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-agents-project -Project 'C:/path/to/project' -Merge
-```
-
-| Host | Global agents | Project agents | Matching skill flavors |
-| --- | --- | --- | --- |
-| OpenCode v2 and connected OpenChamber | `~/.config/opencode/agents` | `.opencode/agents` | `opencode-global`, `opencode-project` |
-| Claude Code | `~/.claude/agents` or `$CLAUDE_CONFIG_DIR/agents` | `.claude/agents` | `claude-global`, `claude-project` (or the `claude` plugin) |
-| Codex | `~/.codex/agents` | `.codex/agents` | `codex-global`, `codex-skills` |
-| Cursor | `~/.cursor/agents` | `.cursor/agents` | `cursor-global`, `cursor` |
-| GitHub Copilot CLI personal / repository agents | `~/.copilot/agents` | `.github/agents` | `copilot-global`, `copilot-skills` |
-| Gemini CLI | `~/.gemini/agents` | `.gemini/agents` | `gemini-global`, `gemini-project` |
-| Antigravity app/IDE | `~/.gemini/config/agents` | `.agents/agents` | `antigravity-global`, `antigravity-project` |
-
-Agent-only installs touch only the selected `agents` directory. An existing
-directory requires explicit `--merge` / `-Merge` or `--replace` / `-Replace`,
-even on updates. Merge preserves unknown files but replaces the four same-named
-definitions. Compare locally modified definitions before consenting. Every
-replacement saves a backup. Do not use replace if the directory has unrelated
-agents. Plugin updates use the existing whole-plugin replacement and backup
-policy; native skills-only installs remain skills-only.
-
-Verify agent registration in the host after installation. In Gemini CLI, inspect
-`/agents` or invoke the agent with `@name`; in Antigravity, open `/agents`. Cursor
-shows subagents in its agent tools. In Copilot, select the profile from its agent
-picker or request delegation. In the project, run
-`opencode --standalone api get /api/agent`; check `@agent-` autocomplete and the
-delegation trace in Claude Code, or inspect Codex agent activity after an
-explicit request. For OpenChamber, use the OpenCode server's filesystem and
-location, especially for remote servers.
-Listing an agent establishes discovery; only a visible delegation establishes
-invocation. Neither proves skill use. See
-[host differences](host-compatibility.md#specialized-subagents).
-
-<details>
-<summary><strong>Codex project skills or a separate marketplace</strong></summary>
-
-**Project skills without a marketplace**
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor codex-skills --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor codex-skills -Project 'C:/path/to/project'
-```
-
-Start a new Codex session in that project and describe the task normally. To update, add
-`update` before `--flavor` in Bash, or `-Action Update` in PowerShell, plus
-`--merge` / `-Merge` to preserve unrelated skills.
-
-**A separate marketplace root**
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor codex-marketplace --marketplace-root "$HOME/codex-marketplace"
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor codex-marketplace -MarketplaceRoot "$env:USERPROFILE/codex-marketplace"
-```
-
-Add that full root path as a plugin marketplace source in the app, then install
-its plugin. Update with the same root using `update` / `-Action Update`, confirm
-replacement, and refresh/reinstall the host's cached plugin if needed.
-
-</details>
-
-<details>
-<summary><strong>Native skills for Cursor, Codex, and Claude Code</strong></summary>
-
-These flavors install only canonical skills to each host's own discovery path. They
-do not install a plugin or change host instructions/settings.
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor cursor-global
-bash scripts/install-ai-agent-skills.sh --flavor codex-global
-bash scripts/install-ai-agent-skills.sh --flavor claude-global
-bash scripts/install-ai-agent-skills.sh --flavor claude-project --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor cursor-global
-./scripts/install-ai-agent-skills.ps1 -Flavor codex-global
-./scripts/install-ai-agent-skills.ps1 -Flavor claude-global
-./scripts/install-ai-agent-skills.ps1 -Flavor claude-project -Project 'C:/path/to/project'
-```
-
-Cursor uses `~/.cursor/skills`, Codex uses `~/.agents/skills`, and Claude Code
-uses `~/.claude/skills` or the project's `.claude/skills`. Claude's global flavor
-honors an absolute `CLAUDE_CONFIG_DIR` when set. Codex's global directory is shared with other
-compatible agents. To update any flavor, use `update` /
-`-Action Update` and `--merge` / `-Merge` with the same target. Start a new session
-or reload skills according to the host's current instructions.
-
-</details>
-
-<details>
-<summary><strong>OpenCode in one project</strong></summary>
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor opencode-project --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor opencode-project -Project 'C:/path/to/project'
-```
-
-Start a new OpenCode session in that project and describe the task normally. To update, add
-`update` / `-Action Update` and `--merge` / `-Merge` to the same command.
-
-</details>
-
-<details>
-<summary><strong>Gemini CLI or Muse Code in one project</strong></summary>
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor gemini-project --project /absolute/path/to/project
-bash scripts/install-ai-agent-skills.sh --flavor muse-project --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor gemini-project -Project 'C:/path/to/project'
-./scripts/install-ai-agent-skills.ps1 -Flavor muse-project -Project 'C:/path/to/project'
-```
-
-Choose the command for your host. To update, use `update` / `-Action Update` and
-`--merge` / `-Merge` with the same project path. Gemini uses `.gemini/skills`;
-Muse uses `.agents/skills`, which is also read by other compatible agents.
-Muse and Codex project flavors share a destination; use explicit merge when one
-is already installed rather than trying a second ordinary install.
-
-In Gemini CLI, run `/skills reload` and `/skills list`. In Muse Code, reload with
-`/skills reload` and check `muse skills list --source project` in a workspace you
-have trusted through the host's prompt. The installer does not grant workspace
-trust. See [Gemini skill management](https://geminicli.com/docs/cli/using-agent-skills/)
-and [Muse skill discovery](https://meta-models.github.io/muse-code-sdk/next/guides/extend/skills/).
-
-Both hosts use the `ai-agent-skills-skills` release archive. Older releases that
-predate this archive cannot supply these flavors. Use a release that includes it,
-source mode with an available ref, or manual installation from a local checkout.
-Global flavors and their activation steps are in the
-[README](../README.md#native-shell-installer).
-
-</details>
-
-<details>
-<summary><strong>Google Antigravity in one project</strong></summary>
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor antigravity-project --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor antigravity-project -Project 'C:/path/to/project'
-```
-
-The app, standalone IDE, and CLI discover project skills in `.agents/skills`.
-This shares a destination with Codex and Muse project flavors. For an existing
-installation, use explicit `--merge` / `-Merge`; for updates, also use `update` /
-`-Action Update`. Start a new Antigravity session and describe the task normally;
-the agent selects matching skills when relevant.
-See [Antigravity skills](https://antigravity.google/docs/skills).
-
-Global installation differs by surface: `antigravity-global` targets the app/IDE,
-while `antigravity-cli-global` targets the CLI. See the
-[README](../README.md#native-shell-installer) for global install commands. Use
-`update` / `-Action Update` with the same flavor to update it.
-Antigravity skill flavors use the shared `ai-agent-skills-skills` archive; agent
-flavors use `ai-agent-skills-native-agents`. Use manual installation for an
-unpublished local checkout. Source mode builds a remote release tag or `main`.
-
-</details>
-
-<details>
-<summary><strong>GitHub Copilot project skills</strong></summary>
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor copilot-skills --project /absolute/path/to/project
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor copilot-skills -Project 'C:/path/to/project'
-```
-
-The project must exist. Skills are copied into `.github/skills` for that repository.
-For updates, add `update` / `-Action Update` and `--merge` / `-Merge`. Open the
-project in the Copilot app, start a new session, and check **Customize > Skills**.
-For use across projects, choose `copilot-global`, which installs to
-`~/.copilot/skills`. Personal skills are local; the cloud agent needs skills in
-its repository. See [Copilot skills](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills).
-
-</details>
-
-<details>
-<summary><strong>Copilot plugin staging</strong></summary>
-
-**macOS / Linux (Bash)**
-
-```sh
-bash scripts/install-ai-agent-skills.sh --flavor copilot-staging
-```
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor copilot-staging
-```
-
-This prepares files only. Copilot requires a configured marketplace under
-**Customize > Plugins**; this collection does not provide one yet. See
-[Copilot plugins](https://docs.github.com/en/copilot/concepts/agents/about-plugins).
-To refresh staged files, use `update` / `-Action Update` and confirm replacement.
-
-</details>
-
-## Options and Destinations
-
-The Bash and PowerShell installers use the same flavor names. Their command-line
-forms differ as follows:
-
-| Operation | Bash | PowerShell | Constraint |
-| --- | --- | --- | --- |
-| Choose a flavor | `--flavor NAME` | `-Flavor NAME` | Use `list` to print the supported flavors. |
-| Install or update | Optional `install` or `update` argument | `-Action Install` or `-Action Update` | Defaults to install. |
-| Select a release | `--version TAG` | `-Version TAG` | Use a published `vMAJOR.MINOR.PATCH` tag. |
-| Build from source | `--from-source` | `-FromSource` | Requires Git and stable Go 1.27.1 or newer. |
-| Select a source ref | `--ref REF` | `-Ref REF` | Requires source mode; accepts `main` or a release tag. |
-| Set a project | `--project PATH` | `-Project PATH` | Required for project flavors; path must be absolute and exist. |
-| Set marketplace root | `--marketplace-root PATH` | `-MarketplaceRoot PATH` | Required for `codex-marketplace`; path must be absolute. |
-| Replace destination | `--replace` | `-Replace` | Cannot be combined with merge. |
-| Merge skills or agents | `--merge` | `-Merge` | Skills-only and agents-only flavors. |
-| Confirm without prompt | `--yes` | `-Yes` | Confirms the selected replacement or merge. |
-| Print planned destination | `--dry-run` | `-DryRun` | Does not download or write files. |
-
-PowerShell also accepts `-HomeDirectory` to redirect user-level files for
-isolated staging or testing. Hosts will not automatically discover that alternate
-profile's personal marketplace. Bash accepts `--help` and `-h`; PowerShell accepts
-`-?` to print the current usage text.
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor cursor -Version v1.1.0
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor -DryRun
-```
-
-Default installs use the latest stable published release, excluding drafts.
-An older checkout can download a newer release; pull the repo for installer fixes.
-
-**macOS / Linux (Bash)**
+In PowerShell, use `Set-Location ai-agent-skills` for the second command.
+List the flavors without changing any files:
 
 ```sh
 bash scripts/install-ai-agent-skills.sh --flavor list
-bash scripts/install-ai-agent-skills.sh --flavor cursor --version v1.1.0
-bash scripts/install-ai-agent-skills.sh --flavor cursor --dry-run
 ```
 
-Choose a published tag for `--version`. Dry runs make no downloads or writes,
-but existing targets still need the appropriate update/mode. Without a flavor,
-an interactive terminal lists the choices and asks you to select one.
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor list
+```
+
+Default installation fetches the latest stable published release. It does not
+install unpublished content from your checkout. Git is needed for the checkout
+and source mode; release extraction itself does not require Go.
+
+## Activate an installation
+
+Use the activation steps in the [matching flavor section](../README.md#skills-and-plugins).
+Native skills normally require discovery in the appropriate session or workspace.
+Plugin files may also require app activation or refreshing a cached plugin.
+
+A list entry proves discovery. Confirm execution by making a relevant request,
+checking visible skill/tool activity, and assessing the result. Agent registration,
+delegation, and skill use are separate checks. The helper does not authenticate
+Jira/GitHub, publish a marketplace, or edit global instruction files.
+
+See [host compatibility](host-compatibility.md) for surface-specific discovery.
+
+## Updates and customizations
+
+1. In the installer checkout, run `git pull --ff-only` to get installer fixes.
+2. Compare locally customized skills or agents with incoming versions.
+3. Run the update command from the original flavor section, retaining the same project or marketplace root.
+4. Review the reported backup location, repeat activation, and verify the new session uses the intended copy.
+
+| Mode | Existing destination behavior |
+| --- | --- |
+| Ordinary install | Refuses an existing directory without an explicit merge/replace choice. |
+| Plugin update | Defaults to replacing the selected plugin directory and backing it up. |
+| Skills/agents merge | Preserves unrelated names; replaces incoming skill folders or agent files and backs up the old directory. |
+| Replace | Replaces the entire selected directory and backs up the previous contents. |
+
+Skills-only and agents-only updates still require `--merge` / `-Merge` or an
+explicit replace decision. Merge also works for first installs into a shared
+skills directory. It does not merge edits inside a same-named skill or agent.
+Do not use whole-directory replacement where unrelated content must survive.
+
+Existing destinations prompt for confirmation. `--yes` / `-Yes` confirms the
+selected operation in noninteractive scripts; it does not choose merge for you.
+Backups are stored under `.ai-agent-skills-backups` relative to the destination's
+parent hierarchy, and the installer prints the exact path. Preserve that output
+when you may need recovery.
+
+Global `codex-global` and `muse-global` share `.agents/skills`. Project Codex,
+Muse, and Antigravity flavors also share `.agents/skills`. A second flavor targeting
+an occupied shared directory needs an explicit merge decision, not a second
+ordinary install.
+
+## Specialized agent installations
+
+The four agents are `independent-reviewer`, `root-cause-investigator`,
+`dependency-investigator`, and `architecture-advisor`. Use one of the 14
+[agent flavors](../README.md#optional-subagents) alongside the matching skills.
+Claude and Cursor plugins already contain agents; the desktop portable plugin
+and Open Skills CLI installs do not.
+
+Agent flavors touch only the selected `agents` directory. They do not install
+skills or change primary-agent configuration. Each update replaces the four
+incoming names; preserve local edits before merging. Older releases without the
+required agent archive cannot supply these flavors.
+
+Use [host discovery and capability limits](host-compatibility.md#specialized-subagents)
+to verify registration and actual delegation. For remote clients, definitions
+must exist on the server filesystem where the agent runtime runs.
+
+## Options and destinations
+
+| Operation | Bash | PowerShell |
+| --- | --- | --- |
+| Choose flavor | `--flavor NAME` | `-Flavor NAME` |
+| Update | `update` before the flags | `-Action Update` |
+| Pin published release | `--version vMAJOR.MINOR.PATCH` | `-Version vMAJOR.MINOR.PATCH` |
+| Build remote source | `--from-source` | `-FromSource` |
+| Choose source ref | `--ref main` or release tag | `-Ref main` or release tag |
+| Existing project | `--project PATH` | `-Project PATH` |
+| Separate marketplace | `--marketplace-root PATH` | `-MarketplaceRoot PATH` |
+| Merge skills/agents | `--merge` | `-Merge` |
+| Replace directory | `--replace` | `-Replace` |
+| Confirm chosen mode | `--yes` | `-Yes` |
+| Preview without writes | `--dry-run` | `-DryRun` |
+| Help | `--help` or `-h` | `-?` |
+
+Merge and replace are mutually exclusive. Source ref requires source mode and
+accepts `main` or a version tag. If version and ref are both set, they must agree.
+Project paths must exist and be absolute; marketplace roots must be absolute.
+Symlink destinations and parents are rejected, as are Windows junctions.
+
+PowerShell also accepts `-HomeDirectory` for isolated staging. Hosts do not
+automatically discover that alternate profile. Bash uses its `HOME` environment.
+Dry runs resolve and validate destinations without downloads or writes; occupied
+targets still require the proper merge/replace decision.
+
+For example, preview an update to a native skill installation:
+
+```sh
+bash scripts/install-ai-agent-skills.sh update --flavor opencode-global --merge --dry-run
+```
+
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor opencode-global -Merge -DryRun
+```
+
+### Destination inventory
+
+`~` means the current user profile, `$PROJECT` is the selected project, and
+`$ROOT` is the chosen marketplace root. These are destination labels, not commands.
 
 | Flavor | Destination |
 | --- | --- |
-| `cursor` | `~/.cursor/plugins/local/ai-agent-skills` |
-| `cursor-global` | `~/.cursor/skills` |
-| `codex-desktop` | `~/.codex/plugins/ai-agent-skills` |
-| `codex-marketplace` | `$ROOT/plugins/ai-agent-skills` |
-| `codex-global` | `~/.agents/skills` |
-| `codex-agents-global` | `~/.codex/agents` |
-| `codex-agents-project` | `$PROJECT/.codex/agents` |
-| `cursor-agents-global` | `~/.cursor/agents` |
-| `cursor-agents-project` | `$PROJECT/.cursor/agents` |
-| `copilot-agents-global` | `~/.copilot/agents` |
-| `copilot-agents-project` | `$PROJECT/.github/agents` |
-| `gemini-agents-global` | `~/.gemini/agents` |
-| `gemini-agents-project` | `$PROJECT/.gemini/agents` |
 | `antigravity-agents-global` | `~/.gemini/config/agents` |
 | `antigravity-agents-project` | `$PROJECT/.agents/agents` |
+| `antigravity-cli-global` | `~/.gemini/antigravity-cli/skills` |
+| `antigravity-global` | `~/.gemini/config/skills` |
+| `antigravity-project` | `$PROJECT/.agents/skills` |
 | `claude` | `~/.local/share/ai-agent-skills/claude` |
-| `claude-global` | `~/.claude/skills` or `$CLAUDE_CONFIG_DIR/skills` |
-| `claude-project` | `$PROJECT/.claude/skills` |
-| `claude-agents-global` | `~/.claude/agents` or `$CLAUDE_CONFIG_DIR/agents` |
+| `claude-agents-global` | `~/.claude/agents` |
 | `claude-agents-project` | `$PROJECT/.claude/agents` |
-| `copilot-staging` | `~/.local/share/ai-agent-skills/copilot` |
-| `copilot-skills` | `$PROJECT/.github/skills` |
-| `copilot-global` | `~/.copilot/skills` |
+| `claude-global` | `~/.claude/skills` |
+| `claude-project` | `$PROJECT/.claude/skills` |
+| `codex-agents-global` | `~/.codex/agents` |
+| `codex-agents-project` | `$PROJECT/.codex/agents` |
+| `codex-desktop` | `~/.codex/plugins/ai-agent-skills` |
+| `codex-global` | `~/.agents/skills` |
+| `codex-marketplace` | `$ROOT/plugins/ai-agent-skills` |
 | `codex-skills` | `$PROJECT/.agents/skills` |
-| `opencode-project` | `$PROJECT/.opencode/skills` |
-| `opencode-global` | `~/.config/opencode/skills` |
+| `copilot-agents-global` | `~/.copilot/agents` |
+| `copilot-agents-project` | `$PROJECT/.github/agents` |
+| `copilot-global` | `~/.copilot/skills` |
+| `copilot-skills` | `$PROJECT/.github/skills` |
+| `copilot-staging` | `~/.local/share/ai-agent-skills/copilot` |
+| `cursor` | `~/.cursor/plugins/local/ai-agent-skills` |
+| `cursor-agents-global` | `~/.cursor/agents` |
+| `cursor-agents-project` | `$PROJECT/.cursor/agents` |
+| `cursor-global` | `~/.cursor/skills` |
+| `gemini-agents-global` | `~/.gemini/agents` |
+| `gemini-agents-project` | `$PROJECT/.gemini/agents` |
+| `gemini-global` | `~/.gemini/skills` |
+| `gemini-project` | `$PROJECT/.gemini/skills` |
+| `muse-global` | `~/.agents/skills` |
+| `muse-project` | `$PROJECT/.agents/skills` |
 | `opencode-agents-global` | `~/.config/opencode/agents` |
 | `opencode-agents-project` | `$PROJECT/.opencode/agents` |
-| `gemini-project` | `$PROJECT/.gemini/skills` |
-| `gemini-global` | `~/.gemini/skills` |
-| `muse-project` | `$PROJECT/.agents/skills` |
-| `muse-global` | `~/.agents/skills` |
-| `antigravity-project` | `$PROJECT/.agents/skills` |
-| `antigravity-global` | `~/.gemini/config/skills` (app/IDE) |
-| `antigravity-cli-global` | `~/.gemini/antigravity-cli/skills` (CLI) |
-| `list` | No installation |
+| `opencode-global` | `~/.config/opencode/skills` |
+| `opencode-project` | `$PROJECT/.opencode/skills` |
 
-Project paths must exist and be absolute; marketplace roots must be absolute.
-Symlink destinations and parents are refused. Windows also rejects junctions.
-Use physical paths.
-Codex desktop uses `~/.agents/plugins/marketplace.json`; custom marketplaces use
-`$ROOT/.agents/plugins/marketplace.json`. Neither flavor registers the CLI marketplace
-or edits Codex configuration.
+Claude global skills and agents use an absolute `CLAUDE_CONFIG_DIR` when set.
+Codex desktop writes a personal catalog at `~/.agents/plugins/marketplace.json`;
+a separate marketplace writes `$ROOT/.agents/plugins/marketplace.json`.
+The updater preserves unrelated catalog entries and refuses invalid existing JSON.
+Neither flavor registers a CLI marketplace or edits Codex configuration.
 
-Downloads are verified against release SHA256SUMS before extraction. Those checksums
-come from the same release source, not signed provenance. File installation does
-not establish that the host loaded or followed a skill.
+## Source builds and manual installation
 
-## Source Builds and Manual Installation
-
-Source mode requires Git and stable Go >= 1.27.1. It clones the selected release tag
-temporarily and uses the Go packager. Unreleased main must be selected explicitly:
-
-**Windows (PowerShell 7.4+)**
-
-```powershell
-./scripts/install-ai-agent-skills.ps1 -Flavor cursor -FromSource -Version v1.1.0
-./scripts/install-ai-agent-skills.ps1 -Action Update -Flavor cursor -FromSource -Ref main
-```
-
-**macOS / Linux (Bash)**
+Source mode requires Git and stable Go 1.27.1 or newer. It clones a remote release
+tag into a temporary directory and builds that revision. Select `main` explicitly
+to build remote main. Automatic Go toolchain downloads are disabled.
 
 ```sh
-bash scripts/install-ai-agent-skills.sh --flavor cursor --from-source --version v1.1.0
-bash scripts/install-ai-agent-skills.sh update --flavor cursor --from-source --ref main
+bash scripts/install-ai-agent-skills.sh --flavor opencode-global --from-source --ref main
 ```
 
-Automatic toolchain downloads are disabled. Missing/old Go produces an install hint.
-Use the same project and replacement controls. See [packaging reference](plugins.md)
-for maintainer builds.
+```powershell
+./scripts/install-ai-agent-skills.ps1 -Flavor opencode-global -FromSource -Ref main
+```
 
-For manual skills installation on any platform, copy
-all folders inside this checkout's `skills/` to your project's skills directory:
+For an existing destination, use the same update and merge controls as release
+mode. These commands do not build unpublished changes in the current checkout.
+For those changes, build a package locally with the [packager](plugins.md#validate-and-build),
+or copy the complete `skills/` contents into a supported native directory:
 
-| Host | Project directory |
+| Host | Project skills directory |
 | --- | --- |
-| Cursor or Codex | `.agents/skills/` |
-| Cursor | `.cursor/skills/` |
+| Antigravity, Codex, Muse Code | `.agents/skills/` |
 | Claude Code | `.claude/skills/` |
-| Copilot | `.github/skills/` |
-| OpenCode | `.opencode/skills/` |
+| GitHub Copilot | `.github/skills/` |
+| Cursor | `.cursor/skills/` |
 | Gemini CLI | `.gemini/skills/` |
-| Muse Code | `.agents/skills/` |
-| Antigravity app, IDE, or CLI | `.agents/skills/` |
+| OpenCode | `.opencode/skills/` |
 
-Keep sibling skills and supporting resources together, compare conflicts, and do
-not copy the repository's `AGENTS.md` as installation instructions. Manual copies
-use checkout content, do not sync updates, and omit plugin-specific rules/agents.
-See [Cursor skills](https://cursor.com/docs/skills) and
-[Codex skill locations](https://developers.openai.com/codex/skills/).
+Keep sibling skills and all supporting resources together. Compare same-named
+folders before replacing them, preserve unrelated files, and repeat discovery
+checks. Manual copies use checkout content and need explicit copying again to
+update. They do not install plugin rules, native agents, or repository instructions.
+Do not copy this repository's `AGENTS.md` into another project as generic setup.
 
-## Troubleshooting and Uninstall
+## Troubleshooting and uninstall
 
-| Problem | What to do |
+| Symptom | Next action |
 | --- | --- |
-| PowerShell version is too old | Open PowerShell 7.4+ (`pwsh`), rather than Windows PowerShell 5.1. |
-| Windows execution policy blocks the script | Check your device/organization policy. The helper does not change execution policy. |
-| jq is missing | Install it, for example with `brew install jq` on Mac, then retry. |
-| Destination exists | Use `update` / `-Action Update`. Skills-only and agents-only flavors also need `--merge` / `-Merge` or `--replace` / `-Replace`. |
-| Cursor plugin is missing | Reload and check local-import policy or marketplace precedence. |
-| Old skills are still loaded | Refresh/reinstall the cached plugin, reopen the app, and start a new session. |
-| Download fails | Check connectivity, rate limits, and published assets. Try a known `--version`. |
-| Invalid marketplace JSON | Repair/restore it; the helper refuses to replace an invalid catalog. |
-| Duplicate skills appear | Choose one active source; compare customized copies before retiring them. |
+| Destination exists | Inspect its contents; choose merge for skills/agents or deliberate plugin replacement. |
+| An update loses local edits | Compare with the printed backup. Merge replaces incoming names, including customized contents. |
+| Old skills remain active | Check duplicate sources, refresh/reinstall the cached plugin, and start a new session. |
+| Plugin absent | Follow activation for that flavor and check account/team policy. |
+| Download/checksum/archive error | Stop and inspect the selected release assets. Use a known published tag; do not bypass checks. |
+| Invalid marketplace JSON | Repair or restore the catalog before retrying. |
+| Windows script blocked | Use PowerShell 7.4+ and follow device policy; the installer does not change execution policy. |
+| Missing runtime/tool | Install the prerequisite listed above, then retry. |
 
-Configure authenticated Jira/GitHub connections separately. The helper does not
-publish listings or create a Copilot marketplace.
+Downloads verify the selected archive and `SOURCE_COMMIT` against release
+`SHA256SUMS`. Checksum data comes from the same release source, not signed
+provenance. Unsafe archive paths and unsupported entry types are rejected.
 
-To uninstall, disable/uninstall the host plugin, then remove only its destination
-from the table. For Codex, also remove its `ai-agent-skills` marketplace entry while
-preserving other plugins. For merged skills, remove only this collection's folders.
-For agent-only installs, remove only the four installed agent files. Preserve unrelated skills and agents
-in shared directories.
+For rollback, stop the affected host, inspect the printed backup and current
+contents, and restore only the selected installation. Preserve newer unrelated
+files in shared destinations. For a marketplace install, also reconcile its
+catalog entry with the restored plugin.
+
+To uninstall, disable/uninstall the host plugin first, then remove only its
+installation. Remove only this collection's skill folders or four agent files
+from shared directories. For Codex marketplaces, remove only `ai-agent-skills`
+from the catalog and preserve other entries. Keep backups until recovery is no
+longer needed.
+
+## Implementation map
+
+| Contract | Source |
+| --- | --- |
+| Bash flavors, paths, arguments, and activation messages | [Bash installer](../scripts/install-ai-agent-skills.sh) |
+| Windows flavors, paths, archive checks, and transaction | [PowerShell installer](../scripts/install-ai-agent-skills.ps1) |
+| Release selection, checksum checks, merge, backup, and catalog handling | [Bash library](../scripts/lib/install.sh) |
+| Isolated installation/update cases | [Bash smoke tests](../scripts/tests/install-smoke.sh), [Windows smoke tests](../scripts/tests/install-smoke.ps1) |
+| Published asset names | [Release workflow](../.github/workflows/release.yml) |

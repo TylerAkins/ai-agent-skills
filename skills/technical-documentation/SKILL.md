@@ -76,10 +76,24 @@ dates that make stable repository behavior look temporary.
 
 ## Choose the Document's Job
 
-Distinguish learning tutorials, task-oriented how-to guides, factual reference,
-conceptual explanation, and decision records. Use the form that answers the reader's
-question; link between forms instead of mixing every purpose into one long document.
-Do not create a documentation hierarchy or ADR for a trivial change.
+Use [Diátaxis](https://diataxis.fr/) to choose the page's primary purpose before
+drafting. Establish the document type, audience, reader goal, and scope from the
+request and repository evidence. Ask only for missing information that materially
+changes the document. For a substantial new document or restructure, establish an
+outline before drafting; request outline approval only when the user asks for it
+or unresolved choices require their decision.
+
+| Type | Reader need | Required shape |
+| --- | --- | --- |
+| Tutorial | Learn through a guided first success. | State prerequisites and the learning outcome; provide a reliable sequence with observable results. Keep alternatives and deep theory in linked pages. |
+| How-to guide | Complete a specific task with existing knowledge. | Name the task, prerequisites, ordered actions, expected result, and relevant recovery or alternatives. |
+| Reference | Look up exact technical facts. | Organize consistently around the interface or subject; specify verified identifiers, types, defaults, constraints, errors, and versions. Keep teaching and rationale in linked pages. |
+| Explanation | Understand a concept and its implications. | Explain context, relationships, reasons, and tradeoffs with supported examples or diagrams. Link to procedures and reference details. |
+
+Give each page a clear primary purpose and link to complementary pages. Do not
+force four sections onto every page or reorganize a whole documentation set for a
+small edit. Preserve specialized forms such as ADRs and release notes. Keep
+navigation centered on reader tasks even when authoring uses these categories.
 
 Organize the reader's complete technical task, not just individual files. Keep
 project overview and first-use navigation in the README; use
@@ -93,15 +107,29 @@ their purpose, and their commands should include prerequisites and a working
 directory. Avoid circular setup links, duplicate procedures, and maintainer detail
 in onboarding. Preserve supported alternatives, customization handling, and limits.
 
+## Format With GitHub Flavored Markdown
+
+Use GitHub Flavored Markdown (GFM) for Markdown documentation by default. Preserve
+an explicitly required destination format or an established documentation generator's
+syntax. Read [GFM guidance](references/github-flavored-markdown-mastery.md) when
+authoring or reviewing Markdown. Distinguish GFM syntax from GitHub-specific
+features and verify support on the intended surface.
+
+Make technical pages easy to scan without reducing precision. Use one descriptive
+page title, a logical heading hierarchy, short focused paragraphs, ordered steps
+for procedures, and fenced code blocks with language identifiers. Format technical
+identifiers as inline code, use descriptive links, and give informative images
+useful alt text. Use compact tables for comparable fields; move long examples or
+procedures out of table cells. Separate prerequisites, actions, expected output,
+and recovery so readers can follow a procedure without guessing.
+
 Choose formatting for the renderer. On GitHub, native `<details>` / `<summary>`
 sections can make independent host paths or long optional material easier to scan.
 Use descriptive labels, blank lines around Markdown inside HTML, and complete
 expanded paths. Keep shared prerequisites visible; avoid nested disclosure piles.
 Use a table of contents only when it materially improves navigation in a long page.
-Headings, tables, and lists should help readers navigate or compare. For GitHub
-destinations, apply
-[GitHub Flavored Markdown Mastery](references/github-flavored-markdown-mastery.md).
-Use only features that improve the technical reader's task and work on the target surface.
+Headings, tables, and lists should help readers navigate or compare. Use only
+features that improve the technical reader's task and work on the target surface.
 
 For task and user guides, show prerequisites, ordered actions, expected results,
 and relevant recovery. Use terms and depth that fit the audience while keeping
@@ -163,6 +191,8 @@ no secrets. Copy technical identifiers, units, paths, and contractual values acc
 | The project has API code, so an OpenAPI spec can be generated. | Verify an existing generator and its output contract; do not invent or promise API generation. |
 | All documentation should be regenerated after this edit. | Regenerate only affected outputs through maintained generators; preserve hand-authored docs. |
 | Every page needs a timestamp, version matrix, or table of contents. | Include maintenance metadata and navigation only when they help this reader and can be kept accurate. |
+| Diátaxis means every page needs four sections. | Choose a primary reader need and link to complementary pages; do not force a four-part template. |
+| Well-formatted Markdown means any extension will render. | Require GFM by default and verify destination support for HTML, alerts, diagrams, and other extensions. |
 | Markdown parses, so the page is ready. | Inspect the destination render for the reader's task and disclose renderer limits. |
 | The installer placed files, so the host uses them. | Verify discovery and invocation separately; do not infer model behavior from placement. |
 | Every technical detail makes a reference more complete. | Keep details that answer a reader's task; link to the source for incidental implementation. |

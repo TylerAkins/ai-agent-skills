@@ -9,105 +9,98 @@ description: >-
 
 # README Design
 
-Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting. A README is
-the project's public entrypoint. Help its intended reader understand what the
-project does, decide whether it fits, reach a first useful outcome, and find deeper
-detail. Do not turn it into a generic project template or a container for every
-technical procedure.
+Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting. Make the README
+human-readable, visually coherent, and useful from first glance to first use.
+Preserve project identity and accurate existing content. Review-only requests do
+not authorize edits; README work does not authorize publication.
 
-## Discover the project
+## Establish the reader and facts
 
-Inspect repository instructions, the current README, the top-level structure, and
-linked documentation. Use filenames and directory names to find likely sources,
-then read the relevant manifests, configuration, entrypoints, scripts, and source
-before stating what the project does.
+Inspect repository instructions, the current README, linked docs, and relevant
+source, manifests, configuration, and scripts. Establish the intended audience,
+project purpose, supported capabilities, and paths to first use. Trace commands,
+prerequisites, and feature claims to implementation or authoritative documentation.
+Do not infer behavior from filenames or dependency presence. Resolve missing facts
+before publishing dependent claims, or omit them and report the gap.
 
-Establish only facts that affect the reader's path:
+## Design the opening and reader path
 
-- Project type, intended users, primary languages, frameworks, and notable capabilities.
-- Supported install, build, launch, and test commands, with prerequisites and expected results.
-- Important configuration, dependency, and CI behavior that readers need to use or contribute.
-- Existing documentation, visual assets, license terms, and contribution instructions when relevant.
+Start with a clear title and a short description of what the project does and who
+it helps. Use existing branding where useful. Add a screenshot, demo, diagram, or
+representative output when it makes the result easier to understand. Do not force
+a banner or visual onto a project that needs only a small working example.
 
-Trace feature claims to implementation. Trace commands to scripts, package metadata,
-build files, or official host documentation. A manifest's presence does not prove
-that a dependency or feature is active. Preserve accurate existing content and
-replace claims only when the sources support the correction.
+Choose a few useful, current badges with consistent styling and meaningful link
+targets. Omit vanity metrics, redundant signals, and badges that overwhelm the
+introduction. Check visual assets for readability on light and dark backgrounds,
+provide useful alt text, and avoid essential information available only in images.
 
-## Choose content for this project
+Arrange content so readers can understand the project, decide whether it fits,
+choose a supported path, reach a first useful result, and find deeper documentation.
+Show commands in context with prerequisites and an expected outcome. Make install
+choices and first use easy to find without a long preamble. When presentation is
+weak or a redesign is requested, consult [design examples](references/design-examples.md)
+for specific patterns rather than copying another project's layout wholesale.
 
-There is no required section list. Choose sections from the reader's decisions and
-the project's actual capabilities. Usually establish a clear title and summary,
-then show installation and basic use when the project can be installed or run. Add
-features, prerequisites, development, testing, API, screenshots, or other material
-only when it answers a real reader question and can be supported by repository
-evidence.
+## Keep every section useful
 
-Do not add License or Contributing sections by default. GitHub already surfaces
-repository license and contribution affordances when the corresponding files are
-present. Include a short section only when it provides necessary information that
-those files and the GitHub interface do not. Add acknowledgments, roadmaps, badges,
-tool inventories, and TODO placeholders only when requested or supported and useful.
+Choose sections for this project's reader needs. Do not fill a fixed template.
+Features, architecture, FAQ, roadmap, acknowledgments, contribution, and license
+sections belong only when they add supported information the reader needs. Link
+to existing repository files rather than repeating their contents. Remove unused
+placeholders, repetitive summaries, and inventories that do not help first use.
 
-Organize the page around the reader's next decision:
+Keep shared prerequisites and navigation visible. Use clearly labeled collapsible
+sections for independent installation paths or optional detail, with each expanded
+path complete enough to follow. Preserve all supported alternatives and required
+install, activation, and update instructions; brevity does not justify deleting
+paths. Keep platform-specific commands clearly labeled and treat supported tools
+equally unless the project has a justified recommendation. Use generic examples
+unless a named tool is necessary for the actual project.
 
-1. State what the project is and who it helps.
-2. Show the shortest supported path to first use.
-3. Present meaningful alternatives when the reader must choose between them.
-4. Link to deeper task guides, references, and maintainer material when useful.
+Link long troubleshooting, exhaustive configuration, and maintainer procedures to
+focused documents. Use [technical-documentation](../technical-documentation/SKILL.md)
+for those guides. Follow repository requirements when procedures must remain in
+the README; do not replace required instructions with a link.
 
-Keep prerequisites and the first-use path visible. Group optional or audience-
-specific detail when it improves scanning, and label collapsed sections by their
-contents. Move long troubleshooting, exhaustive configuration, operational
-reference, and maintainer procedures to focused documents. Keep linked pages
-discoverable and avoid duplicating their procedures in the README.
+## Format with GitHub Flavored Markdown
 
-## Use GitHub Flavored Markdown Deliberately
+Use GFM for Markdown READMEs unless the destination explicitly requires another
+format. Apply [GFM guidance](references/github-flavored-markdown-mastery.md) when
+selecting or checking syntax. Distinguish GFM from GitHub-specific features and
+check support on the target surface.
 
-For GitHub-hosted READMEs, use the source set in
-[GitHub Flavored Markdown Mastery](references/github-flavored-markdown-mastery.md).
-Choose formatting to clarify hierarchy, actions, comparisons, or optional detail.
-Do not use every feature just because GitHub supports it. GFM rendering varies by
-surface, so check the actual destination for HTML, diagrams, math, and other
-extended features before depending on them.
+Use a logical heading hierarchy, focused paragraphs, descriptive links, inline
+code for identifiers, and language-tagged code fences. Use tables for compact
+comparisons, ordered lists for steps, and task lists only for actual tracked work.
+Avoid wide tables, nested disclosures, decorative separators, and repeated headings.
+Use a short navigation row or table of contents when it helps readers find their
+path. Keep spacing and visual styling consistent; add formatting only when it
+improves comprehension or navigation.
 
-Use descriptive headings, working relative links, language-tagged code fences,
-and concise examples. Use tables only for compact comparisons or structured
-facts. Use task lists for actionable progress tracking, not decoration. Use
-diagrams when relationships are hard to explain in prose. Use collapsed sections
-only when hiding secondary detail makes the main path easier to scan; keep the
-summary label informative and the essential path outside. Avoid wide tables,
-decorative badges without value, and repeated headings that bury the entrypoint.
+## Verify the result
 
-## Verify the Rendered Reader Path
+Check local links, heading anchors, referenced files, and commands. Follow one
+representative first-use path from the opening to the expected result, using safe
+commands where feasible. Check every required installation alternative for completeness.
+Change generated content at its maintained source; claim generation only when a
+verified generator exists.
 
-Check every local link, heading anchor, command, and referenced file. Follow the
-README from its opening through one representative first-use path and confirm the
-reader can reach the documented result. Inspect the rendered page on GitHub when
-available, including collapsed and expanded content, code fences, tables, images,
-and narrow layouts where they matter. If rendering cannot be checked, report that
-limit and perform structural checks instead.
-
-When the README needs technical instructions, verify them against the
-implementation and move details that need independent maintenance into
-[technical-documentation](../technical-documentation/SKILL.md). Change generated
-content at its source. Do not describe a README as generated unless a checked-in
-generation process actually produces it.
+Inspect the rendered destination when available: opening hierarchy, spacing,
+navigation, code, tables, images, and collapsed sections in both states. Check
+narrow layouts and light/dark readability when relevant. If rendering or commands
+cannot be checked, report the specific limit and perform available structural
+checks. Markdown parsing does not prove usability or working commands.
 
 ## Anti-Rationalization Guardrails
 
 | Rationalization | Rule |
 | --- | --- |
-| A README should contain every detail so readers do not need links. | Keep the entrypoint focused and link to maintained task guides or references for depth. |
-| A README generator has a required section list. | Select sections from this project's actual reader needs; do not fill a template mechanically. |
-| A standard License or Contributing section is expected. | Omit it by default when GitHub and the repository files already surface the information; add it only to answer a specific reader need or user request. |
-| A manifest or directory name proves what a feature does. | Trace feature claims to relevant source and configuration before describing them. |
-| Missing information should become a TODO section. | Omit unsupported content or resolve the missing fact; do not publish invented placeholders. |
-| CI exists, so a status badge belongs in the README. | Add badges only when they provide useful, current information to the intended reader. |
-| More GFM features make a README more polished. | Use a feature only when it improves the reader's task and renders on the target surface. |
-| A command appears in an old README, so it must still work. | Trace commands to current scripts, configuration, or authoritative host docs. |
-| Markdown source looks fine, so the page is finished. | Inspect the rendered page when available and follow a reader path to first use. |
-| If the README is accurate today, it's code-generated. | Claim generation only when a repository generation process exists and was verified. |
+| A professional README needs every standard section. | Include a section only when it answers a supported reader need. |
+| More badges and GFM features make it beautiful. | Use consistent visual hierarchy and only signals or formatting that help the reader. |
+| Shortening the README means removing alternative installers. | Preserve required paths and make them scannable with labeled disclosures. |
+| One familiar tool can stand in for all supported tools. | Verify each supported path and use generic examples outside tool-specific instructions. |
+| An old README or manifest proves the command works. | Trace commands and claims to current implementation or authoritative documentation. |
+| Markdown source looks fine, so the README is finished. | Inspect the render and reader path; disclose missing evidence. |
 
-Deliver the changed artifact, the reader path and links checked, rendering evidence,
-and any material limits. A local edit does not authorize external publication.
+Deliver the changed artifact, checks actually performed, and material limits.
