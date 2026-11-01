@@ -9,7 +9,7 @@ description: >-
 
 # Code Review
 
-## Scope and Intent
+## 1. Establish scope and intent
 
 Review without editing, staging, committing, or repairing the candidate. Run
 mutating checks in an isolated copy. Read
@@ -39,7 +39,7 @@ candidate, without author reasoning, self-review, or proposed findings. If no fr
 reviewer is available and permitted, disclose the independence limit. Treat agent
 findings as hypotheses and verify them against the candidate and contracts.
 
-## Three-Phase Review
+## 2. Review the candidate
 
 ### Phase 1: Candidate Issue Discovery
 
@@ -109,15 +109,7 @@ dates, counts, offsets, or boundaries; trace consumers affected by null returns,
 clamps, throws, or fallbacks. Show decisive worked values or named consumers in chat,
 or label the path unverified.
 
-### Phase 3: Calibrated Verdict and Report
-
-Choose `APPROVE` only with complete coverage, supported repository patterns,
-passing relevant checks, and no actionable feedback. Use `COMMENT` for actionable
-non-blocking feedback and `REQUEST_CHANGES` only for verified blockers. Incomplete
-coverage prevents approval. For GitHub, use the fixed review body, put the
-investigation report in chat, and put finding evidence and consequences inline.
-
-## Finding Bar and Verdict
+### Phase 3: Calibrate findings and choose a verdict
 
 Retain only supported failures, contract violations, or demonstrable maintenance
 risks introduced or exposed by the change. Maintenance risk alone is non-blocking.
@@ -143,7 +135,13 @@ sibling failures. Changed contracts or approach require expanded coverage. Mater
 candidate changes reopen affected review; aborted or empty independent review remains
 pending.
 
-## Deliver Concise Feedback
+Choose `APPROVE` only with complete coverage, supported repository patterns,
+passing relevant checks, and no actionable feedback. Use `COMMENT` for actionable
+non-blocking feedback and `REQUEST_CHANGES` only for verified blockers. Incomplete
+coverage prevents approval. For GitHub, use the fixed review body, put the
+investigation report in chat, and put finding evidence and consequences inline.
+
+## 3. Deliver concise feedback
 
 Write findings as one plain paragraph by default: defect, trigger, impact, evidence,
 and required behavior or correction. A test or documentation finding must name the
@@ -156,19 +154,3 @@ Questions; keep empty sections brief and omit routine CI recaps.
 For GitHub reviews, follow [GitHub review delivery](references/github-review.md)
 for event selection, inline comments, suggested changes, exact body, and publication
 approval. Review requests do not authorize unseen publication or pending uploads.
-
-## Anti-Rationalization Guardrails
-
-These rules govern phase transitions. Missing evidence leaves the gate incomplete;
-do not substitute a declaration of confidence or silently waive a requirement.
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| The linter passed, so no review comments are needed. | Trace changed behavior, contracts, consumers, and failure paths before issuing a verdict. Lint output cannot satisfy review coverage. |
-| A small PR needs no scrutiny. | Review the complete candidate against authoritative intent regardless of diff size. Report unavailable coverage as incomplete. |
-| The trace found nothing wrong. | Tracing establishes coverage, not correctness. Compute the dates, counts, offsets, or boundaries the clearance depends on and show them, or record the path as unverified. |
-| Style inconsistency is fine. | Check applicable repository conventions and address supported violations proportionally. Distinguish maintenance risks from optional preferences; do not invent blockers. |
-| The suspicious line looks wrong, so it must be a blocker. | Treat it as a hypothesis. Check the strongest author defense and actual macro/runtime path; require causal evidence before assigning blocker status. |
-| The happy path passed, so async behavior is covered. | Trace ownership and failure or completion order for affected state; verify high-risk interleavings with controlled tests and browser behavior where relevant. |
-| A plausible consumer might reject this value. | Verify the consumer and contract. If downstream behavior is unavailable or inferred, report a question or leave the path unverified, not a blocker. |
-| A confident explanation is enough to clear or confirm a concern. | Cite source behavior, trigger, and consequence. Confidence, reviewer instinct, and author intent do not satisfy the proof gate. |

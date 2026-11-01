@@ -14,13 +14,18 @@ Favor code a maintainer can understand, change, and debug with few hidden assump
 Judge simplicity by the concepts and dependencies needed to follow behavior, not
 line count, clever syntax, or compliance with a universal design pattern.
 
-## Understand the Task and Existing Design
+## 1. Understand the task and existing design
 
 Establish whether the request is new behavior, a bug repair, or behavior-preserving
 simplification. Read repository instructions, the actual execution path, callers,
 tests, dependency versions, and analogous code before editing. Preserve unrelated
 work. Use [agent-planning](../agent-planning/SKILL.md) when dependencies or uncertainty
 justify a plan, and [root-cause-debug](../root-cause-debug/SKILL.md) for unresolved bugs.
+
+Before editing, discover required checks from repository instructions, CI workflows,
+package scripts, and tool configuration. Identify affected packages, working directories,
+and configured tool versions. Include lint, formatter checks, type checks, and relevant
+tests; passing tests alone does not satisfy validation.
 
 Identify the relevant inputs, outputs, errors, side effects, ordering, identity,
 ownership, and security or tenant boundaries. Understand why compatibility code,
@@ -44,7 +49,7 @@ For new or changed shared boundaries, use [api-design](../api-design/SKILL.md).
 Use [safe-migrations](../safe-migrations/SKILL.md) when supported consumers or
 persisted state require a staged transition rather than a local refactor.
 
-## Choose the Simplest Adequate Design
+## 2. Choose the simplest adequate design
 
 - Keep responsibilities and ownership clear. Put policy in its owning layer and
   reuse existing canonical utilities instead of adding competing implementations.
@@ -70,7 +75,7 @@ Do not impose fixed limits on function length, file size, nesting, or duplicatio
 Use them as clues to inspect responsibility and comprehension. Preserve established
 patterns unless evidence shows they obstruct the requested work.
 
-## Make Small, Reviewable Changes
+## 3. Make small, reviewable changes
 
 For new behavior, use [test-authoring](../test-authoring/SKILL.md) to establish
 meaningful expected outcomes. Prefer a focused failing behavioral test before
@@ -97,12 +102,7 @@ comments that restate names, steps, or nearby code. Preserve required documentat
 Do not replace clear code with dense one-liners, nested ternaries, or elaborate
 fluent chains to make the diff shorter.
 
-## Verify Behavior and Comprehension
-
-Discover required checks from repository instructions, CI workflows, package scripts,
-and tool configuration before editing. Identify the affected packages, working
-directories, and configured tool versions. Include lint, formatter checks, type
-checks, and relevant tests; passing tests alone does not satisfy validation.
+## 4. Verify behavior and comprehension
 
 Run the applicable commands in their package directories after meaningful changes
 and against the final candidate before declaring completion. Record each command,
@@ -132,11 +132,3 @@ available, and authorized. Report the concrete change, meaningful verification,
 and material limits without claiming that clean style proves correctness. Commit,
 push, and publication require explicit authorization through
 [git-delivery](../git-delivery/SKILL.md).
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| Tests passed, so the change is validated. | Run configured lint, formatter, and type checks for affected packages as well as relevant tests. |
-| CI can catch formatting later. | Validate the final candidate locally before completion; report unavailable checks as incomplete. |
-| Checks passed before the last edit. | Rerun affected checks after edits or formatter fixes; earlier results do not cover changed files. |

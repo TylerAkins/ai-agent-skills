@@ -14,7 +14,7 @@ whether the request is assessment, repair, reply drafting, or approved publicati
 Preserve authorization already given; do not repeat approval for clear authorized
 repairs. A repair request does not authorize commits, pushes, or unseen external prose.
 
-## Collect the Candidate and Feedback
+## 1. Collect the candidate and feedback
 
 Resolve the repository, PR, remote head/base SHAs, local checkout, candidate, and
 working changes. Verify that the checkout represents the intended PR before editing.
@@ -26,7 +26,7 @@ summary-only findings and outdated or resolved discussions when relevant; open
 threads are not the complete inventory. Disclose missing pages or inaccessible
 context and continue with available evidence without claiming complete collection.
 
-## Verify Each Concern
+## 2. Verify each concern
 
 Deduplicate by underlying concern while preserving source links and thread identities.
 Check claims against source requirements, accepted decisions, and current execution
@@ -51,7 +51,7 @@ Record source/location, trigger, contract, candidate, evidence, and next action.
 Keep the record in local artifacts or chat, not a generic PR triage comment.
 Do not infer correctness from agreement, recency, resolution flags, or passing tests.
 
-## Repair and Verify
+## 3. Repair and verify
 
 For supported issues, make the smallest authorized change following repository
 instructions and existing utilities. Address a misunderstood design in the code
@@ -80,7 +80,7 @@ Reconcile every recorded concern with the final candidate. Do not call local fix
 pushed or unresolved intent settled. Commit and push only when authorized through
 [git-delivery](../git-delivery/SKILL.md).
 
-## Draft and Deliver Replies
+## 4. Draft and deliver replies
 
 Draft one direct reply per substantive thread, usually 1–3 sentences explaining
 the verified change, evidence-based disagreement, or specific clarification needed.
@@ -112,12 +112,17 @@ request for the unchanged, already-authorized action. Unstated dispositions leav
 the delivery incomplete. Never dismiss reviews or publish the chat report as an
 extra PR comment.
 
-## Anti-Rationalization Guardrails
+## Checks not to skip
 
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| A won't-fix reply resolves the thread. | A reply alone changes neither state nor reason. Include the intended disposition and supported reason in the pre-publication approval, then perform and verify the approved resolution mutation. |
-| Posting a reply completes the thread workflow. | Carry out the approved resolution in the same publication workflow after posting the reply; state whether it succeeded or why the thread stays open. |
-| All disagreements must stay open forever. | Keep unsettled decisions open; an approved decision not to fix can resolve as `WONT_FIX`, and a disproven concern can resolve as `INVALID`. |
-| The connector resolves threads, so it can select every reason. | Inspect its schema; use a verified reason-capable API when needed and report unsupported reasons instead of silently substituting one. |
-| A bare commit SHA is enough context in a reply. | Verify the remote commit and link its short SHA to the commit page on the repository's web host. |
+- A reply alone does not resolve a thread or set its reason. Include the intended
+  disposition and evidence-supported reason in the approval, then perform and verify
+  the approved resolution.
+- After posting a reply, carry out its approved resolution in the same publication
+  workflow. Report whether it succeeded or why the thread remains open.
+- Keep unsettled decisions open. An approved decision not to fix may resolve as
+  `WONT_FIX`; a disproven concern may resolve as `INVALID`.
+- Inspect the connector schema before relying on reason-specific resolution. Use a
+  verified reason-capable API when needed. Report unsupported reasons instead of
+  silently substituting another one.
+- Verify that a cited commit exists remotely and link its short SHA to the repository
+  commit page. Do not use a bare SHA or an unpushed local commit.

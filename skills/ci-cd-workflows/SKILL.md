@@ -21,18 +21,21 @@ or adopt a new provider without a requirement. For GitHub Actions, pin actions t
 commit SHAs on current supported majors and keep those pins updated; see
 [GitHub Actions guidance](references/github-actions.md).
 
-## Establish Pipeline Contracts
+## 1. Establish pipeline contracts
 
-Map triggers, checked-out revisions, job dependencies, artifacts, permissions,
-secrets, environments, and release destinations. Identify required check names and
-branch or merge-queue expectations before renaming, filtering, or splitting jobs.
-Separate workflow edits from authorized remote execution, environment changes,
-branch protection changes, auto-merge, and production deployment.
+Before renaming, filtering, or splitting jobs, map the affected pipeline:
+
+- Execution: triggers, checked-out revisions, job dependencies, and artifacts.
+- Trust: permissions, secrets, environments, and release destinations.
+- Merge gates: required check names and branch or merge-queue expectations.
+
+Establish authorization separately for workflow edits, remote execution, environment
+changes, branch protection changes, auto-merge, and production deployment.
 
 For GitHub Actions, read [GitHub Actions guidance](references/github-actions.md).
 For other providers, apply equivalent trust boundaries using their documented behavior.
 
-## Build Reliable Verification
+## 2. Build reliable verification
 
 Use repository commands and explicit working directories. Select lint, type checks,
 tests, builds, integration checks, and security analysis according to project contracts
@@ -66,7 +69,7 @@ For CI failures, use [root-cause-debug](../root-cause-debug/SKILL.md), distingui
 application defects, tooling/configuration, runner differences, and transient outages.
 Retries need a bounded, understood reason; rerunning until green does not repair flakiness.
 
-## Optimize Without Weakening Coverage
+## 3. Optimize without weakening coverage
 
 Measure job and queue duration before optimizing. Cache reusable dependencies with
 keys reflecting lockfiles, platform, and tool versions; verify cache misses still work.
@@ -79,7 +82,7 @@ Cancellation can discard obsolete CI runs, but do not interrupt a deployment or
 migration without understanding partial effects. Do not move required checks off
 the merge path merely to shorten reported CI duration.
 
-## Release and Deploy Deliberately
+## 4. Release and deploy deliberately
 
 Build an identified artifact and promote that tested artifact through environments
 instead of rebuilding a mutable branch for each stage. Record source revision,
@@ -93,7 +96,7 @@ and partial failures before claiming rollback is available. Prepare a rollback o
 recovery path and verify it in a safe environment when authorized. Do not assume
 redeploying an old binary reverses data changes.
 
-## Verify and Report Actual State
+## 5. Verify and report actual state
 
 Validate syntax with provider-aware tooling, inspect the complete job graph, and
 run relevant underlying commands. Exercise affected triggers and success/failure

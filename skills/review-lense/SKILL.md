@@ -14,7 +14,7 @@ Use this skill to anticipate feedback, not impersonate a reviewer or change tech
 judgment to match their tastes. Preserve the supplied reviewer handle and resolve
 the repository and candidate/base. Ask for a missing handle rather than guessing.
 
-## Collect Repository-Specific Evidence
+## 1. Collect repository-specific evidence
 
 Read [collection and profile guidance](references/profiles.md) before fetching or
 updating history. Use available GitHub tools or CLI with verified schemas and
@@ -27,25 +27,23 @@ and comments separately; boilerplate approvals do not establish a preference.
 Report actual sample size, search coverage, and stop reason. An underfilled sample
 can still inform a tentative prediction, but it is not complete history.
 
-## Derive and Test Predictions
+## 2. Derive and test predictions
 
-Cluster feedback by the technical concern and triggering conditions, not wording.
-Read thread replies, historical code, and outcomes. Distinguish recurring preferences,
-one-off concerns, and explicit scoped waivers. A resolved thread or merged PR does
-not by itself show that the reviewer accepted or withdrew a concern.
+1. Cluster historical feedback by technical concern and triggering conditions, not
+   wording. Read thread replies, historical code, and outcomes. Distinguish recurring
+   preferences, one-off concerns, and explicit scoped waivers. A resolved thread or
+   merged PR does not show by itself that the reviewer withdrew or accepted a concern.
+2. Test each plausible prediction against the current diff, surrounding code, and
+   actual consumers. Verify technical validity using the finding bar and rubric in
+   [code-review](../code-review/SKILL.md). Drop disproven concerns; label unverified
+   concerns as questions. Do not suppress defects absent from the reviewer's history.
+3. Record two separate judgments: historical support that this reviewer may comment,
+   and current evidence that the code has a defect. Use qualitative support such as
+   repeated, single-example, or tentative. Recurrence is not a calibrated probability
+   of correctness or a future comment. Do not promise approval or treat silence as
+   a waiver.
 
-Inspect the current diff, surrounding code, and actual consumers. For each plausible
-prediction, test whether its historical conditions apply. Use the finding bar and
-rubric in [code-review](../code-review/SKILL.md) to verify technical validity.
-Drop disproven concerns; label unverified concerns as questions. Do not suppress a
-defect because it is absent from the reviewer's history.
-
-Keep two judgments separate: evidence that this reviewer may comment, and evidence
-that the current code has a defect. Use qualitative support such as repeated,
-single-example, or tentative; recurrence is not a calibrated probability of either
-correctness or a future comment. Do not promise approval or treat silence as a waiver.
-
-## Report and Apply Only Requested Fixes
+## 3. Report and apply only requested fixes
 
 Lead with the few predictions that matter. For each, give the current location and
 trigger, likely concern, linked precedent, current validity, and a justified action.

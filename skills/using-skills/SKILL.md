@@ -8,23 +8,24 @@ description: >-
 
 # Using Skills
 
-## Choose the Workflow
+## 1. Choose the workflow
 
-Prefer the host's native skill selection. When one skill clearly matches the request,
-load that skill directly and follow its full instructions before acting. Do not load
-this router for a clear single-skill task, read every skill, or force a full lifecycle.
+Choose the applicable branch using the host's native skill selection:
 
-Use this router when the request spans multiple workflows or no single primary skill
-clearly applies. Select the primary workflow from the routing table, then load only
-the supporting procedures that materially apply. An explicit user skill selection
-takes precedence as the primary workflow.
+- If one skill clearly matches, load its full instructions and follow them before
+  acting. Do not use this router for a clear single-skill task, load every skill,
+  or force a full lifecycle.
+- If work spans workflows or no single primary skill clearly applies, choose the
+  primary procedure from the routing table, then load only supporting procedures
+  that materially apply. An explicit user skill selection takes precedence as the
+  primary workflow.
+- If the collection or a selected skill is unavailable, say so and use a scoped
+  fallback. Do not claim to have used a skill based only on its name, description,
+  or plan link.
 
-If the collection or a selected skill is unavailable, say so and use a scoped fallback.
-Do not claim to have used a skill based only on its name, description, or a link in a
-plan. Follow explicit user requests and repository instructions. Skill links route
-work; they do not install dependencies, authorize new actions, or spawn agents.
-
-Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting human-facing text.
+Follow user requests and repository instructions. Skill links route work; they do
+not install dependencies, authorize actions, or spawn agents. Read
+[anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting human-facing text.
 
 | Task | Primary skill |
 | --- | --- |
@@ -78,13 +79,3 @@ If a required skill or tool is unavailable, state the limitation and use a scope
 fallback when possible. Never claim a missing procedure, independent review, live
 check, or deployment occurred. Use delegation only when permitted and useful,
 with raw intent and the exact candidate; do not create personas merely to route tasks.
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| This request is ambiguous, so I can guess the workflow. | Use this router only when no single skill clearly applies or the request spans workflows. Select a primary skill from the table and load only material supporting procedures. |
-| I know what this skill says from its description or a past task. | Read the current full skill file before relying on its procedure. |
-| A skill name is enough for a later executor to find it. | In generated plans, link applicable skills from the plan's location, map each link to the task it supports, and instruct the executor to read it before starting. |
-| Every plan should list the full skill catalog. | Select only skills that materially apply to the request; omit unrelated skills and their procedures. |
-| The host will discover and activate every linked skill. | Treat links as explicit handoff paths, not proof of host discovery. Report unavailable skills and use a scoped fallback without claiming they were applied. |

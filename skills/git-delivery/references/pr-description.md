@@ -47,9 +47,14 @@ checks actually performed; expected behavior is not verification.
 
 Keep commands, file paths, line numbers, test counts, skipped-test totals, exit
 codes, and raw runner output out of routine validation bullets. Retain detailed
-evidence in the working record. Include a specific detail only when it explains
-a material coverage gap, failure, or limitation that affects review. Do not hide
-an important skipped check behind a general claim that tests passed.
+evidence in the working record.
+
+Include a validation caveat only when evidence shows it limits a claim made in
+this PR or requires reviewer action. State the affected claim or required action.
+A difference from the local environment or procedure is not, by itself, a
+limitation. Keep incidental verification details in the working record, not the
+PR description. Preserve explicitly required disclosures. Do not hide an important
+skipped check behind a general claim that tests passed.
 
 For example, use only the bullets supported by actual verification:
 
@@ -107,6 +112,8 @@ language-tagged fences. Check the rendered structure: template headings, blank
 lines around lists, and standard Markdown bullets. Confirm the required Validation
 or equivalent section contains concise, evidence-backed bullets. Remove routine
 runner statistics and details that repeat the checklist or another section.
+For each caveat, identify what the reviewer should conclude or do differently
+because of it. If there is no supported answer, remove it.
 Resolve any contradiction between prose and a checkbox before publication; do not guess which status is true. Follow the calling
 workflow's publication authorization; do not post a draft as a side effect of
 writing it.

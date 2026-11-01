@@ -15,7 +15,7 @@ Writing a query does not authorize executing it against a live database, changin
 isolation settings, creating indexes, resizing compute, or deploying schema changes.
 Preserve existing execution authorization and its database, tenant, and cost scope.
 
-## Establish the Engine and Contract
+## 1. Establish the engine and contract
 
 Before executable SQL, identify the engine/version, compatibility level or runtime,
 query purpose, schema and types, join keys and uniqueness, caller parameters,
@@ -50,7 +50,7 @@ Gate: record the engine, required behavior, permitted execution, and missing
 prerequisites. Unknown schema or dialect blocks executable output; provide a
 clearly labelled template or investigation steps instead of invented working SQL.
 
-## Write for Correctness and Readability
+## 2. Write for correctness and readability
 
 For join, filter, aggregation, or pagination rewrites, read
 [query patterns](references/query-patterns.md) for semantic traps and scoped templates.
@@ -65,6 +65,8 @@ before aggregation; do not hide fan-out with DISTINCT. Preserve duplicate counts
 NULL semantics, outer-join rows, numeric precision, collation, time-zone boundaries,
 and tie behavior. Use explicit ordering with a unique tie-breaker when deterministic
 pagination or ranking is required. Validate window frames and aggregation grain.
+Read-only intent alone does not permit inconsistent results. Use SQL Server `NOLOCK`
+only when the contract explicitly accepts dirty reads; see the SQL Server reference.
 
 Prefer typed parameters and predicates on stored/indexed or partition columns.
 Half-open date ranges can avoid wrapping a timestamp in a function, but derive
@@ -73,26 +75,29 @@ CTEs, temporary tables, or window functions are inherently faster than alternati
 For procedures and DML, preserve transaction ownership, retries, idempotency,
 constraints, error propagation, and affected-row contracts.
 
-## Diagnose Before Tuning
+## 3. Diagnose before tuning
 
 Read [verification and measurement](references/verification.md) before executing
 SQL or comparing candidates. Inspect estimated versus actual rows, access paths,
 join fan-out, spills, sorts, pruning, shuffle, blocking, and compilation as relevant
 to the engine. Distinguish compute execution from queueing, network/fetch time,
-result caching, and lock waits. An expensive operator is a hypothesis to test,
-not proof that its syntax is wrong.
+result caching, and lock waits. `EXPLAIN ANALYZE` executes SQL, so check its effects,
+scope, workload, and resource limits before running it. An expensive operator is a
+hypothesis to test, not proof that its syntax is wrong.
 
 Change one causally justified factor per comparison. Prefer query-local changes
 that retain semantics. Propose indexes, statistics maintenance, materialization,
 partitioning/clustering, isolation changes, or compute changes separately, with
-write/storage/cost implications. Use
+write/storage/cost implications. Verify the engine version and physical design before
+proposing an index or hint; warehouse pruning and distributed execution require
+engine-specific evidence. Use
 [safe-migrations](../safe-migrations/SKILL.md) for authorized schema or state changes;
 this skill does not grant that execution scope.
 
 Gate: connect each proposed change to observed evidence or label it a hypothesis.
 Do not call a query optimized solely because it is shorter or has an index hint.
 
-## Verify and Deliver
+## 4. Verify and deliver
 
 For new behavior or a bug repair, use
 [test-authoring](../test-authoring/SKILL.md) to establish expected results and
@@ -113,15 +118,3 @@ written, syntax-checked, correctness-tested, and benchmarked status. If executio
 representative data is unavailable, deliver a proposal plus exact validation steps;
 leave correctness/performance gates unverified rather than fabricating results.
 No database CLI, paid warehouse, or language runtime is universally required.
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| It is read-only, so SQL Server needs NOLOCK. | Read-only intent does not permit inconsistent results. Use NOLOCK only with an explicit accepted dirty-read contract; see the SQL Server reference. |
-| A faster sample query proves the rewrite is better. | Establish semantic equivalence and representative workload measurements before claiming improvement. |
-| DISTINCT will fix the duplicate rows. | Establish the join grain and multiplicity contract; repair unintended fan-out rather than concealing it. |
-| EXPLAIN ANALYZE is only inspection. | It executes SQL. Check effects, scope, workload, and resource limits before running it. |
-| Every database benefits from the same index or hint. | Verify engine/version and physical design. Warehouse pruning and distributed execution require different evidence. |
-| We can remove the tenant filter for speed. | Preserve authorization and tenant boundaries in every query and validation fixture. |
-| Passing lint is enough; plans and tests can wait. | Lint satisfies only syntax/style coverage. Required correctness and measurement gates remain incomplete. |

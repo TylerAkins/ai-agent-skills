@@ -17,7 +17,7 @@ Coordinate the release using existing project procedures. Keep checks proportion
 to the product and risk; do not impose web-only checks on libraries or fixed rollout
 percentages and waiting periods on every service.
 
-## Identify the Release and Authorization
+## 1. Identify the release and authorization
 
 Resolve the repository, source revision, artifact/version and digest when available,
 target environment, changes being released, and intended user exposure. Distinguish
@@ -31,7 +31,7 @@ approval, prepare the concrete candidate, destination, rollout, and recovery pla
 Do not treat a general launch request as permission to bypass protections, make
 unrelated infrastructure changes, or send unseen announcements.
 
-## Assess Readiness Against Evidence
+## 2. Assess readiness against evidence
 
 Identify applicable acceptance criteria, required checks and reviews, compatibility
 obligations, and operational prerequisites. Verify evidence belongs to the candidate
@@ -58,7 +58,7 @@ supported disposition: ready for the identified next stage, blocked by named
 requirements, or incomplete because evidence is unavailable. Keep readiness
 separate from permission to execute and from final production success.
 
-## Prepare Rollout and Recovery
+## 3. Prepare rollout and recovery
 
 Define ordered stages with the artifact, target cohort, responsible owner, verification,
 advance/hold/abort criteria, and recovery action. Follow configured SLO and error-budget
@@ -81,7 +81,7 @@ repair. Confirm prerequisites, permissions, expected recovery time when measured
 and irreversible boundaries. Rehearse safely when authorized; label untested procedures.
 Do not claim that reverting a commit or deploying an old binary reverses data changes.
 
-## Execute Only the Authorized Stages
+## 4. Execute only the authorized stages
 
 Immediately before execution, recheck candidate identity, current environment state,
 required evidence, protections, and authorization. Stop if changes invalidate the plan
@@ -98,7 +98,7 @@ authorization, report the concrete required action and continue safe diagnosis.
 Use [root-cause-debug](../root-cause-debug/SKILL.md) for investigation. Do not retry
 ambiguous deployment or publication results until checking whether the action succeeded.
 
-## Verify Outcomes and Close the Release
+## 5. Verify outcomes and close the release
 
 Check critical behavior, observability, relevant service metrics, and compatibility
 after exposure. A health endpoint alone cannot establish that the user flow works.
@@ -111,10 +111,3 @@ evidence and remaining limits. Keep required release notes proportional and accu
 External announcements require approved text and destinations. Git actions and PRs
 use authorized [git-delivery](../git-delivery/SKILL.md). Cleanup of flags or retired
 paths follows its own scope and readiness, not an arbitrary post-launch deadline.
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| CI passed, so the release is ready. | Tie required checks, reviews, compatibility, and operational evidence to the identified artifact and target stage before declaring readiness. |
-| The deployment job succeeded, so the rollout succeeded. | Verify user exposure and stage health against the agreed criteria before advancing or reporting success. |

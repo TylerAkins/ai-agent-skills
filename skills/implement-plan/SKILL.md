@@ -14,7 +14,7 @@ implementation authorization from the user's request or host Build handoff. Do n
 ask again for unchanged authorized work. A planning-only request does not authorize
 implementation, and Build does not automatically authorize commits or remote actions.
 
-## Establish Intent and Candidate
+## 1. Establish intent and candidate
 
 Read the accepted plan and its authoritative requirements, including accepted
 decisions and unresolved choices. Use [jira-tickets](../jira-tickets/SKILL.md) in
@@ -35,7 +35,28 @@ existing ancestry and changes. Follow repository branch conventions. Work on a
 protected/shared integration branch only when the user specifically requests it;
 resolve unsafe branch or isolation conditions before dependent edits.
 
-## Implement and Verify Tasks
+## 2. Establish each task's evidence before editing
+
+For each task, select its before-and-after checks before production edits:
+
+- For new behavior or a bug repair, prefer a focused behavioral test that fails on
+  the unchanged implementation. Confirm the failure is the intended assertion, then
+  run the same test and applicable checks after the change. If a pre-change test
+  cannot run safely or meaningfully, record why, establish the strongest available
+  baseline or reproduction, and choose the post-change check before editing. Do not
+  claim observed regression sensitivity from an unrun comparison.
+- For behavior-preserving refactoring, establish the relevant passing baseline and
+  check it again after the change. Follow [test-authoring](../test-authoring/SKILL.md)
+  for coverage and sensitivity choices rather than duplicating its procedure here.
+- For documentation-only work, select document checks. A reproduction-only request
+  does not authorize production repair.
+
+Confirm actual test selection and results; a successful command with zero selected
+tests is not verification. If a required check is unavailable, report the gap and
+pause only work that depends on it. Apply the selected checks during implementation
+and after repairs; this phase is not permission to defer pre-edit evidence.
+
+## 3. Implement and verify tasks
 
 Execute tasks in dependency order using
 [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md). Load domain
@@ -54,7 +75,7 @@ to select scenarios without expanding into unrelated combinations.
 
 Use [test-authoring](../test-authoring/SKILL.md) for independently justified behavioral
 coverage. Run focused checks in verified package directories and confirm actual test
-selection. Establish the relevant before/after evidence described below.
+selection. Run the before-and-after checks selected for the task.
 Investigate unexpected failures through [root-cause-debug](../root-cause-debug/SKILL.md), preserving
 evidence and distinguishing introduced failures from unrelated ones.
 
@@ -88,25 +109,7 @@ files, for omissions, accidental changes, and contract mismatches. Run applicabl
 integration/build checks and browser verification for affected UI behavior. A completed
 todo list or passing unrelated suite does not establish requirement coverage.
 
-## Establish Behavioral Evidence
-
-For new behavior or a bug repair, prefer a focused behavioral test that fails on
-the unchanged implementation before production edits. Confirm the failure is the
-intended assertion, then run the same test and applicable checks after the change.
-If a pre-change test cannot run safely or meaningfully, record why, establish the
-strongest available baseline or reproduction, and choose the post-change check
-before editing. Do not claim observed regression sensitivity from a test that was
-never run against the old behavior.
-
-For behavior-preserving refactoring, establish the relevant passing baseline and
-check it again after the change. Follow [test-authoring](../test-authoring/SKILL.md)
-for coverage and sensitivity choices rather than duplicating its procedure here.
-Confirm actual test selection and results; a successful command with zero selected
-tests is not verification. If a required check is unavailable, report the gap and
-pause only work that depends on it. Documentation-only work uses document checks;
-a reproduction-only request does not authorize production repair.
-
-## Independently Review the Complete Candidate
+## 4. Independently review the complete candidate
 
 Final independent [code-review](../code-review/SKILL.md) is a required step unless
 the user explicitly skips it. Use a fresh read-only reviewer when available and
@@ -128,7 +131,7 @@ findings explicitly. Rerun affected checks after repairs and independently re-re
 the complete final candidate after material changes. A clean review covers only the
 candidate and scope it actually assessed.
 
-## Deliver Actual State
+## 5. Deliver actual state
 
 Reconcile requirements, final diff, checks, and review coverage. Report implemented
 behavior, meaningful verification, remaining blockers, and unavailable checks/review.
@@ -141,15 +144,3 @@ pushes, or PR preparation. Do not hide unmet required steps behind a delivery re
 report limits if the user asks to proceed despite them. Preserve approvals and review
 history. Live deployment uses authorized
 [release-readiness](../release-readiness/SKILL.md), not an automatic consequence of Build.
-
-## Anti-Rationalization Guardrails
-
-These rules govern phase transitions. Missing evidence leaves the gate incomplete;
-do not substitute a declaration of confidence or silently waive a requirement.
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| Implementing all steps in one giant batch saves tokens. | Execute dependency-ordered, independently verifiable tasks. Complete each task's checks before advancing to dependent work. |
-| The fix is obvious, so verification can wait. | Choose pre-change and post-change evidence before editing; prefer an observed failing behavioral test when feasible and report any missing runner evidence. |
-| I can leave debug code and logs for later. | Remove temporary diagnostics and inspect the complete diff before final review. Do not advance with cleanup deferred. |
-| Local checkpoint commits require an immediate push. | Keep verified checkpoint commits local until pushing is separately authorized. |
