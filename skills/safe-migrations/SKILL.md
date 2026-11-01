@@ -14,7 +14,7 @@ or reports. Distinguish planning, implementation, live execution, and removal.
 Preserve authorization already given, but do not infer production writes, consumer
 notifications, destructive execution, or publication from a request to prepare a migration.
 
-## Establish the Contract and Consumers
+## 1. Establish the contract and consumers
 
 Read repository instructions, current implementation, supported versions, consumers,
 deployment topology, tests, and relevant operational evidence. Verify tool, database,
@@ -35,7 +35,7 @@ An additive field, new enum value, or changed default can still break a consumer
 Apply the project's versioning and support policy; use semantic versioning only
 where that is the established public version contract.
 
-## Plan Independently Verifiable Stages
+## 2. Plan independently verifiable stages
 
 Use [agent-planning](../agent-planning/SKILL.md) for consequential multi-stage work.
 Record phase order, compatible version combinations, success evidence, abort criteria,
@@ -43,6 +43,10 @@ recovery actions, and the point beyond which reverting code is insufficient.
 Keep the plan proportional; a local dependency upgrade does not need a service
 cutover ceremony. For persisted data, read
 [database and backfill guidance](references/database-migrations.md).
+For database operations, verify version-specific lock and rewrite behavior and record
+representative rehearsal evidence before advancing. Prepare actionable recovery for
+every cutover, not only database changes. When reversal is impossible, define the
+restoration or forward-repair path and identify the irreversible boundary.
 
 Choose a transition based on the actual boundary:
 
@@ -64,26 +68,34 @@ dates. Do not invent a notice period or announce an unapproved deadline. Provide
 tooling or examples proportional to consumer effort. Draft locally; publish or
 contact owners only under applicable authorization.
 
-## Implement and Verify the Transition
+## 3. Implement and verify the transition
 
 Preserve unrelated work and make stages reviewable. Confirm compatibility across
 old/new producers and consumers, rollout order, mixed versions, retries, and relevant
 failure paths. Use [test-authoring](../test-authoring/SKILL.md) for independently
 justified expectations. Verify migrations against representative existing state,
 not just clean installation. Reconcile new-install and upgraded-system behavior.
+Rehearse first with representative data in an isolated safe environment. Shared
+staging execution requires separate authorization and cannot replace that rehearsal.
 
 Tie operational evidence to the exact candidate, schema/data state, environment,
 and cohort. Define parity checks that detect missing records, altered identities,
 ordering, or unauthorized access rather than relying only on totals. Investigate
-differences before promoting a stage. Test recovery in a safe environment when
-feasible and distinguish rehearsed recovery from a documented but untested procedure.
+differences before promoting a stage.
+
+Before cutover, safely verify the recovery procedure against the candidate and
+representative state. Record the observed result, including restoration or forward
+repair when reversal is impossible. A documented but untested procedure does not
+satisfy this gate. If required verification fails or cannot be performed safely,
+report the missing evidence and hold cutover; continue only independent authorized
+preparation. Do not substitute confidence for recovery evidence.
 
 Use [ci-cd-workflows](../ci-cd-workflows/SKILL.md) for staged automation and
 [code-review](../code-review/SKILL.md) for consequential migration review when
 independence is available and authorized. A passing suite alone does not authorize
 live cutover or establish consumer readiness.
 
-## Remove Only After Readiness Is Supported
+## 4. Remove only after readiness is supported
 
 Before contracting or deleting, verify migrated consumers, disabled old writers,
 completed reconciliation, and support obligations. Choose a representative observation
@@ -100,14 +112,3 @@ Report implemented stages separately from executed migration, verified cutover,
 and completed retirement. State remaining dependencies, irreversible effects, and
 verification limits. Commit, push, and publication require authorization through
 [git-delivery](../git-delivery/SKILL.md).
-
-## Anti-Rationalization Guardrails
-
-These rules govern phase transitions. Missing evidence leaves the gate incomplete;
-do not substitute a declaration of confidence or silently waive a requirement.
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| Additive columns never cause table locks. | Verify locking and rewrite behavior for the actual database version and operation. Record representative rehearsal evidence before advancing. |
-| Rollback scripts are unnecessary. | Prepare and safely verify actionable recovery before cutover. If reversal is impossible, define restoration or forward repair and the irreversible boundary. |
-| Testing directly on staging is fine. | First rehearse against representative data in an isolated safe environment. Shared staging execution requires its own authorization and cannot replace that rehearsal. |

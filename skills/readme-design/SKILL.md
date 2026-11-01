@@ -14,7 +14,7 @@ human-readable, visually coherent, and useful from first glance to first use.
 Preserve project identity and accurate existing content. Review-only requests do
 not authorize edits; README work does not authorize publication.
 
-## Establish the reader and facts
+## 1. Establish the reader and facts
 
 Inspect repository instructions, the current README, linked docs, and relevant
 source, manifests, configuration, and scripts. Establish the intended audience,
@@ -23,7 +23,7 @@ prerequisites, and feature claims to implementation or authoritative documentati
 Do not infer behavior from filenames or dependency presence. Resolve missing facts
 before publishing dependent claims, or omit them and report the gap.
 
-## Design the opening and reader path
+## 2. Design the opening and reader path
 
 Start with a clear title and a short description of what the project does and who
 it helps. Use existing branding where useful. Add a screenshot, demo, diagram, or
@@ -42,7 +42,7 @@ choices and first use easy to find without a long preamble. When presentation is
 weak or a redesign is requested, consult [design examples](references/design-examples.md)
 for specific patterns rather than copying another project's layout wholesale.
 
-## Keep every section useful
+## 3. Keep every section useful
 
 Choose sections for this project's reader needs. Do not fill a fixed template.
 Features, architecture, FAQ, roadmap, acknowledgments, contribution, and license
@@ -63,7 +63,7 @@ focused documents. Use [technical-documentation](../technical-documentation/SKIL
 for those guides. Follow repository requirements when procedures must remain in
 the README; do not replace required instructions with a link.
 
-## Format with GitHub Flavored Markdown
+## 4. Format with GitHub Flavored Markdown
 
 Use GFM for Markdown READMEs unless the destination explicitly requires another
 format. Apply [GFM guidance](references/github-flavored-markdown-mastery.md) when
@@ -78,7 +78,7 @@ Use a short navigation row or table of contents when it helps readers find their
 path. Keep spacing and visual styling consistent; add formatting only when it
 improves comprehension or navigation.
 
-## Verify the result
+## 5. Verify the result
 
 Check local links, heading anchors, referenced files, and commands. Follow one
 representative first-use path from the opening to the expected result, using safe
@@ -91,16 +91,5 @@ navigation, code, tables, images, and collapsed sections in both states. Check
 narrow layouts and light/dark readability when relevant. If rendering or commands
 cannot be checked, report the specific limit and perform available structural
 checks. Markdown parsing does not prove usability or working commands.
-
-## Anti-Rationalization Guardrails
-
-| Rationalization | Rule |
-| --- | --- |
-| A professional README needs every standard section. | Include a section only when it answers a supported reader need. |
-| More badges and GFM features make it beautiful. | Use consistent visual hierarchy and only signals or formatting that help the reader. |
-| Shortening the README means removing alternative installers. | Preserve required paths and make them scannable with labeled disclosures. |
-| One familiar tool can stand in for all supported tools. | Verify each supported path and use generic examples outside tool-specific instructions. |
-| An old README or manifest proves the command works. | Trace commands and claims to current implementation or authoritative documentation. |
-| Markdown source looks fine, so the README is finished. | Inspect the render and reader path; disclose missing evidence. |
 
 Deliver the changed artifact, checks actually performed, and material limits.

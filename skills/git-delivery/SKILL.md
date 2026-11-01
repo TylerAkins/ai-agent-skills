@@ -17,7 +17,7 @@ descriptions. Follow repository instructions and templates directly; do not infe
 PR requirements from commit or branch naming. Do not require a ticket for fully
 specified ticketless work or invent one.
 
-## Establish Scope
+## 1. Establish scope and checks
 
 Identify the requested actions and preserve authorization already given. A message
 draft does not authorize staging; staging does not authorize committing; committing
@@ -28,9 +28,9 @@ Inspect status, unstaged and staged diffs, recent commit style, the active branc
 and relevant repository conventions. For a PR, verify the intended base, merge
 base, and full candidate diff, including relevant commits. Identify unrelated work
 before any mutation. Discover required checks from repository instructions, CI
-workflows, package scripts, and tool configuration. Include lint, formatter checks,
-type checks, and relevant tests for affected packages, using configured tool versions
-and working directories.
+workflows, package scripts, and tool configuration. Include lint, separate formatter
+checks, type checks, and relevant tests for affected packages, using configured tool
+versions and working directories.
 
 Before each commit or push, run the applicable checks against the exact candidate
 and record commands, working directories, actual results, and exit codes. Reuse
@@ -40,7 +40,7 @@ If a required check is unavailable or an unrelated failure prevents it from pass
 report the concrete limitation and leave delivery blocked unless the user explicitly
 authorizes proceeding with that unmet check. Do not defer local validation to CI.
 
-## Prepare and Commit
+## 2. Prepare and commit
 
 Stage specific paths or hunks belonging to the request. Inspect the complete staged
 diff immediately before committing; selecting paths does not exclude files already
@@ -62,7 +62,7 @@ succeeded or amend an earlier commit to recover from a failed attempt.
 After committing, verify the commit contents and working state. Report the actual
 result without implying unrelated working changes were included or removed.
 
-## Verify the Delivery Candidate
+## 3. Verify the delivery candidate
 
 Before opening a PR or creating a release tag, identify the exact candidate revision
 and intended destination. Confirm that the candidate contains the intended changes;
@@ -80,7 +80,7 @@ working tree when unrelated changes can be safely excluded. Preserve unrelated w
 use a verified isolated checkout when needed to establish the candidate. This
 verification does not authorize a commit, push, PR, tag, or release.
 
-## PR Descriptions and Remote Actions
+## 4. Prepare PRs and remote actions
 
 For titles, descriptions, or PR creation, read
 [PR description guidance](references/pr-description.md). Draft from the final
@@ -110,14 +110,3 @@ checks or a request to open or publish a PR does not imply ready-for-review stat
 Do not change Git configuration, discard unrelated changes, skip checks or hooks,
 or perform destructive operations to finish delivery. These require specific user
 authorization. Never force-push a protected branch without a specific request.
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| GitHub shows passing checks, so I can omit Validation. | Every PR description needs concise validation results or an honest reason validation was not performed. |
-| Detailed test totals make the PR more credible. | Summarize verified behavior and results; include specifics only to explain a material limitation or failure. |
-| The PR already exists, so the validation gate no longer applies. | Validate each commit and push, including updates to existing PRs. |
-| Ruff lint passed, so formatting is covered. | Run the configured formatter check separately when the repository requires it. |
-| The commit hook fixed files, so I can retry immediately. | Inspect hook changes and rerun affected checks before retrying. |
-| The user asked to open a PR, so it should be ready for review. | Create it as a draft unless the user explicitly requests otherwise; verify remote state. |

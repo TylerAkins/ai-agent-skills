@@ -14,20 +14,23 @@ examples, or reports. Inspect existing interfaces, consumers, schemas, transport
 framework versions, and repository conventions. Verify protocol and library semantics
 against official documentation. Design-only requests do not authorize implementation.
 
-## Establish the Consumer Contract
+## 1. Establish the consumer contract
 
 Identify the caller's task, boundary owner, trusted inputs, supported consumers,
 and accepted requirements. Use [decision-partner](../decision-partner/SKILL.md)
-only for consequential unresolved choices. Define inputs, outputs, required/optional
-fields, absent versus null semantics, defaults, units, identifiers, and constraints.
-Keep internal storage shapes and privileged fields out of public inputs unless required.
+only for consequential unresolved choices. Before implementation, define the relevant
+parts of the contract:
 
-Specify observable behavior before implementation: errors, side effects, ordering,
-atomicity, concurrency, cancellation, retry behavior, and compatibility where relevant.
+- Data: inputs, outputs, required/optional fields, absent versus null semantics,
+  defaults, units, identifiers, and constraints. Keep internal storage shapes and
+  privileged fields out of public inputs unless required.
+- Behavior: errors, side effects, ordering, atomicity, concurrency, cancellation,
+  retry behavior, and compatibility.
+
 Use existing naming and error conventions; do not standardize the entire repository
 as a side effect. Keep the contract proportional to the interface's risk and reach.
 
-## Make Misuse and Failure Explicit
+## 2. Define misuse and failure behavior
 
 Use types and schemas that distinguish valid variants without a bag of contradictory
 optional fields. Validate at actual trust boundaries, including external responses,
@@ -44,12 +47,16 @@ Distinguish validation, authorization, missing resources, conflicts, transient f
 and unknown outcomes. Follow the transport's semantics and established disclosure
 policy; do not expose raw internals or assume every endpoint uses identical status codes.
 
-For HTTP, preserve method, status, caching, conditional-request, and update semantics.
-Specify omission/null handling for partial updates and distinguish replacement from
-patching. For GraphQL, consider nullability, resolver authorization, query cost, and
-schema evolution. For events, specify delivery, ordering, schema, and replay contracts.
+Apply only the relevant transport rules:
 
-## Design Retries and Collections Deliberately
+- For HTTP, preserve method, status, caching, conditional-request, and update semantics.
+  Specify omission/null handling for partial updates and distinguish replacement
+  from patching.
+- For GraphQL, consider nullability, resolver authorization, query cost, and schema
+  evolution.
+- For events, specify delivery, ordering, schema, and replay contracts.
+
+## 3. Define retries and collections
 
 For retryable effects, define an intent-stable idempotency key, caller/tenant scope,
 payload mismatch handling, atomic claiming, in-flight responses, retention, and replay.
@@ -63,7 +70,7 @@ to relevant query and scope without treating them as authorization. State partia
 results explicitly; counts and pagination metadata must not imply stronger consistency
 than the system provides.
 
-## Evolve and Verify
+## 4. Evolve and verify
 
 Trace all supported producers and consumers, including generated clients, dynamic
 references, and deployed versions. Additive fields, enum values, and changed defaults

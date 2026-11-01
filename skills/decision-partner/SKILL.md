@@ -15,7 +15,7 @@ Clarify intent and test assumptions without claiming to know the user's hidden m
 Do not turn clear instructions, mechanical changes, or simple information requests
 into an interview. This skill does not replace correctness review or authorize implementation.
 
-## Choose the Useful Conversation
+## 1. Choose the useful conversation
 
 Read the request, accepted decisions, and available context first. Inspect relevant
 artifacts or repository facts when authorized instead of asking the user for facts
@@ -32,7 +32,7 @@ Keep these as modes of one conversation, not mandatory sequential phases. Use on
 the questions relevant to the decision. State your current understanding briefly
 when it helps the user correct it; omit ceremonial hypothesis/confidence labels.
 
-## Ask Questions That Change the Decision
+## 2. Ask questions that affect the decision
 
 Start with the highest-impact uncertainty. Usually ask one focused question at a
 time, waiting when the next question depends on the answer. Bundle two or three
@@ -55,7 +55,7 @@ requirement before useful work can begin. Ask about irreversible or costly choic
 before cosmetic preferences. Continue independent authorized work while a blocking
 decision remains pending; elapsed time is not an answer or approval.
 
-## Challenge the Approach With Evidence
+## 3. Challenge the approach with evidence
 
 Select the assumptions whose failure would materially change the outcome. Look
 for contradictory requirements, unsupported dependencies, missing users or states,
@@ -77,7 +77,7 @@ intent and evidence without your preferred conclusions. Verify reviewer claims;
 do not require agents or cross-model offers for every decision, and do not label
 self-questioning independent review.
 
-## Converge and Continue
+## 4. Converge and continue
 
 Update your understanding when evidence or the user's answer contradicts it.
 Respect ordinary agreement such as "sounds good" in context and explicit delegation

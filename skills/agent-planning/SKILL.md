@@ -22,7 +22,7 @@ location, or present it in chat when no saved artifact is needed. Do not overwri
 unrelated incomplete plans or edit user-protected plans; present proposed changes
 separately.
 
-## Investigate Before Planning
+## 1. Investigate before planning
 
 Read the routing table in [using-skills](../using-skills/SKILL.md) to select relevant
 planning and task workflows. Read selected skills before relying on their procedures.
@@ -54,7 +54,7 @@ supporting procedures, not mandatory stages; retain established intent and evide
    that requires user input, mark it as needing a decision and identify dependent
    tasks. Continue independent investigation without treating silence as acceptance.
 
-## Break Work Into Verifiable Tasks
+## 2. Break work into verifiable tasks
 
 5. Describe the proposed approach and why it satisfies the requirements. Record
    consequential decisions, alternatives when useful, risks, and open questions.
@@ -113,7 +113,7 @@ Acceptance criteria:
 Verification: [Command and working directory, or manual check, with expected result]
 ```
 
-## Reconcile and Deliver
+## 3. Reconcile and deliver
 
 9. Check the plan against source requirements and the inspected execution path.
    Look for omissions, conflicting values, mismatched producer/consumer contracts,
@@ -130,11 +130,3 @@ Verification: [Command and working directory, or manual check, with expected res
     again. This skill remains planning-only. An unresolved
     decision blocks only dependent work. Creating a plan does not itself authorize
     implementation, commits, pushes, or publication.
-
-## Anti-Rationalization Guardrails
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| The executor can infer which skill to use from the task. | Link each materially relevant skill to the task or decision it governs, and tell the executor to read it before starting. |
-| Listing every skill prevents omissions. | Select only skills supported by the task and repository evidence; do not turn the plan into a catalog or require unrelated procedures. |
-| A skill alias works in every host. | Include the canonical skill name and a path that resolves from the plan location. If the skill is unavailable, report that limit and use a scoped fallback. |

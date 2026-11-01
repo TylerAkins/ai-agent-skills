@@ -14,7 +14,7 @@ Simplify language while preserving the facts, causal relationships, and limits
 that matter to the question. Explanation does not authorize code changes,
 publication, or action in an external system.
 
-## Resolve the Subject and Reader
+## 1. Resolve the subject and reader
 
 Identify what the user wants explained and why: understanding a concept, following
 code, interpreting a document, or assessing a decision. Use their stated audience,
@@ -31,7 +31,7 @@ missing, ask one focused question and explain only the settled context. Do not
 invent what an unseen document, screenshot, or codebase says. Missing intent blocks
 only the explanation that depends on it.
 
-## Build the Explanation
+## 2. Build the explanation
 
 Lead with a short TL;DR, usually one or two sentences, stating the main answer and
 its practical meaning. Follow an explicit request for a single sentence or a longer
@@ -57,7 +57,7 @@ Gate: every material claim must follow from the source or be labelled as an
 illustration, inference, or uncertainty. A shorter explanation cannot omit a
 condition that makes its main answer false.
 
-## Match Depth and Deliver
+## 3. Match depth and deliver
 
 For a TL;DR-only request, stop after the requested summary. For a beginner walkthrough,
 introduce concepts in dependency order. For an experienced reader, skip background
@@ -83,13 +83,15 @@ artifact is a maintained guide, reference, or decision record. Use
 [root-cause-debug](../root-cause-debug/SKILL.md) for diagnosis or repair. Explaining
 code does not silently expand into reviewing, debugging, or implementing it.
 
-## Anti-Rationalization Guardrails
+## Checks not to skip
 
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| Simple language means I can remove the caveats. | Retain conditions and uncertainty that change the answer or its practical consequence. |
-| The user wants an explanation, so I can guess what this refers to. | Resolve and inspect the subject first; ask for missing context without inventing source contents. |
-| More detail will make the explanation better. | Follow requested depth and include only what supports understanding the actual question. |
-| An analogy is close enough to be the explanation. | Explain the actual mechanism and identify where the analogy stops applying. |
-| It sounds obvious, so I do not need to check the source. | Verify source-specific and uncertain claims; confidence cannot satisfy the evidence gate. |
-| Plain English means talking down to the reader. | Assume a capable reader and reduce jargon, not precision or respect. |
+- Retain conditions and uncertainty that could change the answer or its practical
+  consequence, even when simplifying the language.
+- Resolve and inspect the subject before explaining it. Ask for missing context
+  rather than guessing what an unseen source contains.
+- Match the requested depth. Extra detail is not useful unless it supports the
+  reader's actual question.
+- Explain the real mechanism when using an analogy, and state where the analogy stops
+  applying.
+- Verify source-specific and uncertain claims. Confidence does not satisfy this check.
+- Write for a capable reader. Reduce jargon without reducing precision or respect.

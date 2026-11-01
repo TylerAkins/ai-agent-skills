@@ -18,7 +18,7 @@ use [readme-design](../readme-design/SKILL.md) for the project README and
 instructions, the project structure, existing docs, code, schemas, configuration,
 and actual decisions. Preserve useful content and local conventions.
 
-## Discover and Scope the Work
+## 1. Discover and scope the work
 
 Follow the paths relevant to the reader instead of inventorying the whole codebase.
 Identify the project or component, its entrypoints, important dependencies and
@@ -37,7 +37,7 @@ maintained source and regenerate only affected outputs with the repository's doc
 generator. If no generator exists, maintain the document directly; do not imply that
 all docs or the README can be regenerated automatically.
 
-## Trace the Implementation
+## 2. Trace the implementation
 
 Start from the reader's technical question and identify the relevant execution
 path. Inspect entrypoints, callers, configuration, schemas, tests, and error paths
@@ -74,7 +74,7 @@ surface, and version when known, and recheck the primary source when editing tha
 claim. Add review dates only when they help maintain a changing inventory; avoid
 dates that make stable repository behavior look temporary.
 
-## Choose the Document's Job
+## 3. Choose the document's job
 
 Use [Diátaxis](https://diataxis.fr/) to choose the page's primary purpose before
 drafting. Establish the document type, audience, reader goal, and scope from the
@@ -107,7 +107,7 @@ their purpose, and their commands should include prerequisites and a working
 directory. Avoid circular setup links, duplicate procedures, and maintainer detail
 in onboarding. Preserve supported alternatives, customization handling, and limits.
 
-## Format With GitHub Flavored Markdown
+## 4. Format with GitHub Flavored Markdown
 
 Use GitHub Flavored Markdown (GFM) for Markdown documentation by default. Preserve
 an explicitly required destination format or an established documentation generator's
@@ -156,7 +156,7 @@ or run them safely. Build diagrams from inspected relationships and use formats 
 destination supports. Do not add visuals as decoration or imply a diagram is complete
 when dependencies were not traced.
 
-## Record Decisions Without Rewriting History
+## 5. Record decisions without rewriting history
 
 For consequential architectural choices, inspect existing ADR location, numbering,
 status, and templates before adding a record. If none exist, use a short Markdown
@@ -169,7 +169,7 @@ records; supersede them with a linked new decision rather than rewriting the pas
 Correct factual errors transparently and distinguish present implementation from
 the reasoning known at decision time.
 
-## Draft From Verified Behavior
+## 6. Draft from verified behavior
 
 Lead with the information needed to act. Use complete sentences, consistent terms,
 descriptive headings, and small examples. Use tables for genuine comparisons and
@@ -181,23 +181,7 @@ Use [safe-migrations](../safe-migrations/SKILL.md) for transition instructions w
 relevant. Keep examples realistic and safe, with placeholders clearly identified and
 no secrets. Copy technical identifiers, units, paths, and contractual values accurately.
 
-## Anti-Rationalization Guardrails
-
-| Rationalization | Rule |
-| --- | --- |
-| The existing document already explains the behavior. | Trace changed claims to current implementation or primary sources before preserving them. |
-| A test name or passing test proves the whole documented contract. | Inspect the assertion and implementation; describe only the behavior each establishes. |
-| A manually maintained table is quicker than finding its source. | Map it to a canonical source, or generate it when a maintained generation path exists. |
-| The project has API code, so an OpenAPI spec can be generated. | Verify an existing generator and its output contract; do not invent or promise API generation. |
-| All documentation should be regenerated after this edit. | Regenerate only affected outputs through maintained generators; preserve hand-authored docs. |
-| Every page needs a timestamp, version matrix, or table of contents. | Include maintenance metadata and navigation only when they help this reader and can be kept accurate. |
-| Diátaxis means every page needs four sections. | Choose a primary reader need and link to complementary pages; do not force a four-part template. |
-| Well-formatted Markdown means any extension will render. | Require GFM by default and verify destination support for HTML, alerts, diagrams, and other extensions. |
-| Markdown parses, so the page is ready. | Inspect the destination render for the reader's task and disclose renderer limits. |
-| The installer placed files, so the host uses them. | Verify discovery and invocation separately; do not infer model behavior from placement. |
-| Every technical detail makes a reference more complete. | Keep details that answer a reader's task; link to the source for incidental implementation. |
-
-## Verify With the Reader's Task
+## 7. Verify with the reader's task
 
 Check every local link and referenced file. Verify external facts against primary
 sources when unfamiliar or subject to change. Run examples and documented commands

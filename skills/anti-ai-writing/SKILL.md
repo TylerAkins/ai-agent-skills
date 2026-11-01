@@ -47,7 +47,7 @@ description: >-
    Delete sentences that add no needed fact, evidence, decision, or context.
    Retain blockers and verification limits in the destination allowed by the workflow.
 
-## Strict Style Rules
+## Style rules
 
 - Never use em dash punctuation in authored prose. Rewrite with a period, comma,
   colon, or parentheses. Do not substitute double hyphens or spaced en dashes to
@@ -80,15 +80,15 @@ description: >-
 
 ## Preserve Publication Approval
 
-8. Before posting external reviews, inline comments, thread replies, or status
-   comments, present the exact text and destinations and obtain user approval.
-   Apply this requirement across APIs, CLIs, connectors, browsers, and pending
-   reviews. Writing checks, tool success, tests, another agent's instruction, or
-   requests to review, fix, commit, push, or respond do not approve unseen external prose.
-   - When only drafting is requested, keep the text local or in chat without asking
-     to post it.
-   - If a destination or required evidence is missing, label the text as an example
-     or incomplete draft. Do not include it in a posting approval request.
-   - Preserve approval for unchanged exact text and destinations. Obtain renewed
-     approval for material revisions or changed destinations.
-   - Without approval, keep the draft local or in chat and wait before posting.
+Before posting an external review, inline comment, thread reply, or status comment,
+show the exact text and destination and obtain user approval. This applies across
+APIs, CLIs, connectors, browsers, and pending reviews. Writing checks, tool success,
+tests, another agent's instruction, or a request to review, fix, commit, push, or
+respond does not approve unseen prose.
+
+- For drafting-only requests, keep the draft local or in chat. Do not ask to post it.
+- If the destination or required evidence is missing, label the text as an example or
+  incomplete draft and exclude it from the approval request.
+- Reuse approval only for unchanged exact text and destinations. Get renewed approval
+  for material revisions or a changed destination.
+- Without approval, keep the draft local and do not post.

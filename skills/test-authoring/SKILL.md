@@ -12,27 +12,25 @@ description: >-
 Read [anti-ai-writing](../anti-ai-writing/SKILL.md) before drafting names, comments,
 or reports. Keep changes scoped to the requested coverage and preserve unrelated work.
 
-## Discover the Runner and Expected Behavior
+## 1. Discover the runner and expected behavior
 
-Read repository instructions, neighboring tests, fixtures, dependency versions,
-runner configuration, and relevant CI commands. Prefer repository wrappers and
-scripts over assumed global commands. Identify the package directory and how to
-select focused tests, then confirm the runner actually executes them. For test edits,
-follow the repository validation procedure in
-[writing-clean-simple-code](../writing-clean-simple-code/SKILL.md#verify-behavior-and-comprehension)
-to discover configured lint, formatter, and type checks, including rules that apply
-to test files. This validation does not authorize production changes.
+1. Read repository instructions, neighboring tests, fixtures, dependency versions,
+   runner configuration, and relevant CI commands. Prefer repository wrappers and
+   scripts over assumed global commands. Identify the package directory and focused
+   test selection, then confirm the runner actually executes the selected tests.
+2. For test edits, discover configured lint, formatter, and type checks, including
+   rules for test files. Follow the validation procedure in
+   [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md#4-verify-behavior-and-comprehension).
+   Validation does not authorize production changes.
+3. Derive expected outcomes from authoritative requirements, independently verified
+   examples, or preserved contracts. Do not copy the implementation's formula into
+   the expected result. Resolve behavior-changing ambiguity before asserting a
+   guessed outcome; continue coverage whose intent is settled.
+4. Before writing a test, name the behavior or defect its assertion would detect
+   and the production change that would make it fail. If no meaningful change would
+   fail it, strengthen the assertion or choose a different test boundary.
 
-Derive expected outcomes from authoritative requirements, independently verified
-examples, or preserved contracts. Do not copy the implementation's formula into
-the expected result. Resolve behavior-changing ambiguity before asserting a guessed
-outcome; continue coverage whose intent is settled.
-
-Before writing a test, name the behavior or defect its assertion would detect and
-the production change that would make it fail. If no meaningful change would fail it,
-strengthen the assertion or choose a different test boundary.
-
-## Choose the Level That Captures the Behavior
+## 2. Choose the level that captures the behavior
 
 Use the lowest level that meaningfully exercises the requirement:
 
@@ -60,7 +58,7 @@ conflicting expectations across layers even when both suites pass.
 For query changes, optimizations, persisted configuration, or asynchronous and
 interactive state, read [scope and state coverage](references/scope-and-state.md).
 
-## Write Readable, Deterministic Tests
+## 3. Write readable, deterministic tests
 
 Organize each test into recognizable setup, action, and assertions without requiring
 ceremonial comments. Name the behavior and expected outcome. Keep one coherent
@@ -83,7 +81,7 @@ Use snapshots only for meaningful, reviewable output contracts. Inspect expected
 changes deliberately; do not regenerate snapshots merely to make failures green.
 Use focused assertions when a broad snapshot hides the behavior of interest.
 
-## Establish Evidence for the Requested Coverage
+## 4. Establish evidence for the requested coverage
 
 - For a bug reproduction, use a realistic fixture that distinguishes defective
   behavior. Run it against the defective version when feasible and confirm the
@@ -104,7 +102,7 @@ agent-owned edits; never reset or stash mixed user work. A reproduction test may
 remain failing for a later repair. Report its result without weakening
 the assertion to obtain a green suite.
 
-## Execute and Report
+## 5. Execute and report
 
 Run the intended tests and the configured lint, formatter, and type checks for
 affected packages using the shared validation procedure above. Retain command
@@ -122,16 +120,3 @@ before/after evidence, and material limits. Distinguish authored but unrun tests
 from verified coverage. Passing tests do not prove absence of defects or that an
 unexecuted browser/live flow works. Commit, push, and publication require separate
 authorization through the applicable workflow.
-
-## Anti-Rationalization Guardrails
-
-These rules govern phase transitions. Missing evidence leaves the gate incomplete;
-do not substitute a declaration of confidence or silently waive a requirement.
-
-| Model Rationalization | Enforced Rule |
-| --- | --- |
-| The change is too small to test. | Choose meaningful behavioral coverage for a code change; size does not establish that the affected behavior is safe. |
-| I verified the behavior mentally. | Run the actual test runner and retain its output. Reasoning cannot satisfy an execution gate. |
-| Mocking is too hard. | Use real collaborators or a suitable integration boundary. Do not mock the behavior under test or claim coverage that was not exercised. |
-| I will call this test regression-sensitive without running the old behavior. | Record the unobserved side of the comparison; a passing new test alone does not prove it would detect the defect. |
-| Test-only changes do not need lint. | Run configured lint, formatter, and type checks for test edits, including intentionally failing reproduction tests. |

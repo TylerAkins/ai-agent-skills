@@ -15,7 +15,7 @@ tokens, framework/dependency versions, routing, data contracts, and test convent
 Use the existing stack and utilities; verify unfamiliar APIs against that version's
 official documentation. Preserve unrelated work and established product behavior.
 
-## Establish the Screen's Job and Design
+## 1. Establish the screen's job and design
 
 Identify the audience, user task, primary action, content hierarchy, required states,
 and acceptance criteria. Use supplied designs and existing product patterns first.
@@ -37,7 +37,7 @@ Use realistic content, including long labels and sparse/dense data. Remove unrel
 implementation details from product copy. Keep all exposed controls functional or
 clearly identified as unavailable; never disguise a placeholder as a working feature.
 
-## Implement Clear Components and State
+## 2. Implement components and state
 
 For changed frontend/backend contracts, use [api-design](../api-design/SKILL.md)
 and preserve supported consumers. Do not infer a backend contract from UI fixtures.
@@ -48,20 +48,26 @@ component APIs over a large matrix of unrelated flags. Split by responsibility,
 not arbitrary line counts. Keep data and presentation ownership clear without
 forcing a separate container or hook for every component.
 
-Place state where it is owned: local interaction state, shared state, URL state
-for navigable/shareable views, and existing server-state tooling for remote data.
-Avoid duplicated derived state and contradictory booleans. Do not introduce a
-global store merely to avoid a few props. Preserve stable item identity, history
-navigation, deep links, and framework rendering/hydration contracts where relevant.
+Resolve state ownership before wiring interactions:
 
-Handle applicable loading, empty, success, error, disabled, pending, and permission
-states. Distinguish no data from filtered-out results. Preserve entered data after
-recoverable errors, explain how to proceed, and prevent duplicate submissions.
-For optimistic updates, account for failure, concurrent changes, stale responses,
-and reconciliation. Trace cancellation ownership before cancelling shared requests.
-Do not use hidden controls as authorization; server-side enforcement remains required.
+- Keep local interaction state local and shared state with its shared owner. Use
+  URL state for navigable/shareable views and existing server-state tooling for
+  remote data. Do not introduce a global store merely to avoid a few props.
+- Avoid duplicated derived state and contradictory booleans. Preserve stable item
+  identity, history navigation, deep links, and framework rendering/hydration contracts
+  where relevant.
 
-## Make Layout and Interaction Inclusive
+Implement the applicable interaction paths:
+
+- Handle loading, empty, success, error, disabled, pending, and permission states.
+  Distinguish no data from filtered-out results.
+- After recoverable errors, preserve entered data and explain how to proceed.
+  Prevent duplicate submissions.
+- For optimistic updates, account for failure, concurrent changes, stale responses,
+  and reconciliation. Trace cancellation ownership before cancelling shared requests.
+- Keep authorization enforced on the server; hidden controls are not authorization.
+
+## 3. Make layout and interaction inclusive
 
 Read [accessibility and responsive checks](references/accessibility-and-layout.md).
 Prefer native semantic HTML and tested accessible primitives. Custom interaction
@@ -73,7 +79,7 @@ Use flexible layouts, appropriate width limits, and responsive assets. Check nar
 and wide views, zoom, long text, empty states, and overflow. Preserve meaningful
 content and actions on small screens rather than hiding them to fit a screenshot.
 
-## Preserve Security and Performance
+## 4. Preserve security and performance
 
 Treat remote content and URLs as untrusted. Use framework-safe rendering; sanitize
 only through vetted mechanisms when rich HTML is required. Do not expose secrets
@@ -86,7 +92,7 @@ Optimize from measured evidence and product budgets; do not add memoization,
 virtualization, or code splitting mechanically. Lab results and field performance
 are different evidence and should be reported separately.
 
-## Verify the Rendered Result
+## 5. Verify the rendered result
 
 Use [test-authoring](../test-authoring/SKILL.md) for behavioral coverage. Run relevant
 repository checks and inspect the application in an available browser with realistic
