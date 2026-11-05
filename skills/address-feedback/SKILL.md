@@ -50,6 +50,10 @@ Keep one compact record per substantive concern:
 Record source/location, trigger, contract, candidate, evidence, and next action.
 Keep the record in local artifacts or chat, not a generic PR triage comment.
 Do not infer correctness from agreement, recency, resolution flags, or passing tests.
+For each substantive thread, also track its destination, reply draft and publication
+state, intended disposition and reason, resolution state, and any blocker. Update
+the record from remote read-back after writes. Deduplicated concerns still need
+separate thread records so no destination is lost.
 
 ## 3. Repair and verify
 
@@ -94,8 +98,14 @@ Do not leave a bare SHA or link a local, unpushed commit.
 Show exact replies with PR/thread destinations. Keep incomplete examples out of
 posting approval requests. For each thread, include the intended disposition
 (resolve or leave open) and, when resolving, the exact reason and evidence-based
-rationale alongside the reply. Ask once whether to publish the listed replies and
-perform their listed resolutions. That approval covers both actions; after approval,
+rationale alongside the reply. When commit and push are also needed, present their
+authorization together with the complete reply and disposition batch when possible.
+A push approval alone does not approve unseen replies or resolutions. If a reply
+needs a remote commit link that does not yet exist, omit the link if the reply is
+otherwise accurate, or request publication approval after the push.
+
+Ask once whether to publish the listed replies and perform their listed resolutions.
+That approval covers both actions; after approval,
 post each reply and carry out its approved resolution in the same publication
 workflow without a second approval prompt. The API may require sequential writes,
 but do not pause for another approval between them. For a thread left open, state
@@ -111,6 +121,25 @@ verify the remote state and report the partial result; do not repeat an approval
 request for the unchanged, already-authorized action. Unstated dispositions leave
 the delivery incomplete. Never dismiss reviews or publish the chat report as an
 extra PR comment.
+
+## 5. Repeated feedback goals
+
+When asked to monitor or repeatedly address feedback, establish a cycle or time
+limit and the stopping condition before continuing. Honor a user-provided limit;
+otherwise use at most three feedback cycles per invocation. Each cycle collects
+and verifies current feedback, reconciles every thread record, carries out authorized
+repairs and delivery, and reads back remote state. Check for new feedback and the
+requested review or check status after delivery. Process new concerns in a new
+cycle under the same verification and approval rules; authorization to push or a
+green status does not approve future unseen replies or resolutions.
+
+Stop when the requested status is confirmed and all in-scope concerns and approved
+actions are reconciled, or when a limit, pending approval, unresolved decision,
+failed action, or unavailable evidence prevents progress. Do not resolve an unsettled
+thread to meet a green goal. Report the current status, per-thread pending work, and
+what is needed to resume. Do not claim completion merely because a review or check
+is green; a pending review or feedback that has not arrived is not a successful
+result. Re-request review only when separately authorized.
 
 ## Checks not to skip
 
