@@ -670,8 +670,8 @@ After updating, repeat the discovery check in a fresh session.
 
 #### Optional subagents
 
-Four investigation agents are available: `independent-reviewer`,
-`root-cause-investigator`, `dependency-investigator`, and `architecture-advisor`.
+Seven specialists cover product scoping, retail category analysis, data accuracy,
+architecture, dependencies, code review, and debugging.
 Native agent flavors install agent definitions only; install matching skills
 separately. The Claude and Cursor plugins already include the agents. The Codex
 desktop plugin does not. See [host capabilities and read-only limits](docs/host-compatibility.md#specialized-subagents).

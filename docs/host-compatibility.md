@@ -94,7 +94,7 @@ that staging step.
 
 The [official skills guide](https://cursor.com/docs/skills) documents native
 selection and **Customize > Skills** discovery. The `cursor` plugin includes
-skills, a routing rule, and four agents. The `cursor-global` flavor installs
+skills, a routing rule, and the specialized agents. The `cursor-global` flavor installs
 skills only. Local plugin loading depends on host/account policy.
 
 For this repository's CLI plugin path, use `--plugin-dir` as described in the
@@ -149,7 +149,7 @@ Use the target host's current official documentation to verify discovery and act
 
 ## Specialized subagents
 
-The canonical prompts in `agents/` define four specialists:
+The canonical prompts in `agents/` define seven specialists:
 
 | Agent | Responsibility |
 | --- | --- |
@@ -157,6 +157,9 @@ The canonical prompts in `agents/` define four specialists:
 | `root-cause-investigator` | Investigate failure causes and verification criteria. |
 | `dependency-investigator` | Verify dependency versions and integration contracts. |
 | `architecture-advisor` | Compare consequential design options before implementation. |
+| [`product-scoper`](../agents/product-scoper.md) | Turn product ideas into prioritized stories, acceptance criteria, and edge cases. |
+| [`retail-category-analyst`](../agents/retail-category-analyst.md) | Judge whether supplier analytics support a buyer-meeting decision. |
+| [`data-sanity-checker`](../agents/data-sanity-checker.md) | Audit SQL, metric definitions, and generated insights for silent errors. |
 
 They return findings or advice; they do not implement changes or publish results.
 No prompt pins a model. Native agent flavors install definitions only, so install
