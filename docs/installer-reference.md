@@ -81,14 +81,14 @@ ordinary install.
 
 ## Specialized agent installations
 
-The four agents are `independent-reviewer`, `root-cause-investigator`,
-`dependency-investigator`, and `architecture-advisor`. Use one of the 14
-[agent flavors](../README.md#optional-subagents) alongside the matching skills.
+Use one of the 14 [agent flavors](../README.md#optional-subagents) to install the
+[specialized agents](host-compatibility.md#specialized-subagents). Install any
+skills they require separately.
 Claude and Cursor plugins already contain agents; the desktop portable plugin
 and Open Skills CLI installs do not.
 
 Agent flavors touch only the selected `agents` directory. They do not install
-skills or change primary-agent configuration. Each update replaces the four
+skills or change primary-agent configuration. Updates replace files with matching
 incoming names; preserve local edits before merging. Older releases without the
 required agent archive cannot supply these flavors.
 
@@ -239,7 +239,7 @@ files in shared destinations. For a marketplace install, also reconcile its
 catalog entry with the restored plugin.
 
 To uninstall, disable/uninstall the host plugin first, then remove only its
-installation. Remove only this collection's skill folders or four agent files
+installation. Remove only this collection's skill folders or agent files
 from shared directories. For Codex marketplaces, remove only `ai-agent-skills`
 from the catalog and preserve other entries. Keep backups until recovery is no
 longer needed.

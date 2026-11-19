@@ -196,7 +196,10 @@ try {
             }
             & $installer @options
             $extension = if ($hostName -eq 'codex') { 'toml' } elseif ($hostName -eq 'copilot') { 'agent.md' } else { 'md' }
-            foreach ($agentName in @('architecture-advisor', 'dependency-investigator', 'independent-reviewer', 'root-cause-investigator')) {
+            foreach ($agentName in @(
+                'architecture-advisor', 'data-sanity-checker', 'dependency-investigator', 'independent-reviewer',
+                'product-scoper', 'retail-category-analyst', 'root-cause-investigator'
+            )) {
                 Test-Condition (Test-Path -LiteralPath (Join-Path $root "$agentName.$extension")) "Agent missing: $flavor $agentName"
             }
             Set-Content -LiteralPath (Join-Path $root "custom.$extension") -Value 'Keep unrelated agent' -Encoding utf8NoBOM

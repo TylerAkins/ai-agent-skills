@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+agent_names=(architecture-advisor data-sanity-checker dependency-investigator independent-reviewer
+  product-scoper retail-category-analyst root-cause-investigator)
 tree_snapshot() {
   local root=$1 file
   find "$root" -type f -print | LC_ALL=C sort | while IFS= read -r file; do
@@ -162,7 +164,7 @@ for host in opencode claude codex; do
     bash "$installer" "${args[@]}"
     extension=md
     if [ "$host" = codex ]; then extension=toml; fi
-    for agent in architecture-advisor dependency-investigator independent-reviewer root-cause-investigator; do test -f "$root/$agent.$extension"; done
+    for agent in "${agent_names[@]}"; do test -f "$root/$agent.$extension"; done
     test ! -e "$root/skills"
     printf 'Keep unrelated agent\n' > "$root/custom.$extension"
     printf 'User modification\n' > "$root/independent-reviewer.$extension"
@@ -195,7 +197,7 @@ for host in cursor copilot gemini antigravity; do
     bash "$installer" "${args[@]}"
     extension=md
     [ "$host" != copilot ] || extension=agent.md
-    for agent in architecture-advisor dependency-investigator independent-reviewer root-cause-investigator; do test -f "$root/$agent.$extension"; done
+    for agent in "${agent_names[@]}"; do test -f "$root/$agent.$extension"; done
     test ! -e "$root/skills"
     printf 'Keep unrelated agent\n' > "$root/custom.$extension"
     bash "$installer" update "${args[@]}" --merge

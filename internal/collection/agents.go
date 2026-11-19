@@ -12,7 +12,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var agentNames = []string{"architecture-advisor", "dependency-investigator", "independent-reviewer", "root-cause-investigator"}
+var agentNames = []string{
+	"architecture-advisor",
+	"data-sanity-checker",
+	"dependency-investigator",
+	"independent-reviewer",
+	"product-scoper",
+	"retail-category-analyst",
+	"root-cause-investigator",
+}
 
 type agentDefinition struct {
 	Name        string   `yaml:"name"`
@@ -28,7 +36,7 @@ func readAgents(root string) ([]agentDefinition, error) {
 		return nil, err
 	}
 	if len(entries) != len(agentNames) {
-		return nil, fmt.Errorf("expected four canonical agents, got %d", len(entries))
+		return nil, fmt.Errorf("expected %d canonical agents, got %d", len(agentNames), len(entries))
 	}
 	var agents []agentDefinition
 	for _, name := range agentNames {
@@ -126,7 +134,7 @@ func validateNativeAgentDir(dir, format string) error {
 		return err
 	}
 	if len(entries) != len(agentNames) {
-		return fmt.Errorf("expected four %s agents", format)
+		return fmt.Errorf("expected %d %s agents, got %d", len(agentNames), format, len(entries))
 	}
 	for _, name := range agentNames {
 		ext := ".md"
@@ -174,7 +182,7 @@ func validateAdaptedAgents(root, target string) error {
 		return err
 	}
 	if len(entries) != len(agentNames) {
-		return fmt.Errorf("expected four %s agents", target)
+		return fmt.Errorf("expected %d %s agents, got %d", len(agentNames), target, len(entries))
 	}
 	for _, name := range agentNames {
 		ext := ".md"
