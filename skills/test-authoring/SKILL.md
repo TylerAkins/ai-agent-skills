@@ -23,12 +23,31 @@ or reports. Keep changes scoped to the requested coverage and preserve unrelated
    [writing-clean-simple-code](../writing-clean-simple-code/SKILL.md#4-verify-behavior-and-comprehension).
    Validation does not authorize production changes.
 3. Derive expected outcomes from authoritative requirements, independently verified
-   examples, or preserved contracts. Do not copy the implementation's formula into
-   the expected result. Resolve behavior-changing ambiguity before asserting a
-   guessed outcome; continue coverage whose intent is settled.
+   examples, or preserved contracts. Resolve behavior-changing ambiguity before
+   asserting a guessed outcome; continue coverage whose intent is settled.
 4. Before writing a test, name the behavior or defect its assertion would detect
    and the production change that would make it fail. If no meaningful change would
    fail it, strengthen the assertion or choose a different test boundary.
+
+Each behavioral test needs three properties:
+
+- Independent expectation. Derive it from the requirement, a specification, a
+  reference implementation, or a hand-worked example. Do not copy the
+  implementation's expression or a sibling test's formula.
+- Distinguishing input. Name an input the implementation could plausibly get
+  wrong, such as duplicate source rows, an empty result, a boundary value, a
+  retry, or overlapping updates.
+- Vacuity guard. Make the test fail when it examined nothing, such as zero selected
+  rows, an empty join, or no cases, unless empty is the asserted behavior.
+
+Where the project generates fixtures, snapshots, or seed data, produce them with
+that generator. Hand-editing generated data is a defect, not a shortcut.
+
+| Test kind | Distinguishing input to try |
+| --- | --- |
+| Aggregation or report | Duplicate source key, zero rows, NULL group |
+| Service or API | Retried or concurrent request, missing reference row |
+| Interface state | Out-of-order response, empty result, repeated action |
 
 ## 2. Choose the level that captures the behavior
 

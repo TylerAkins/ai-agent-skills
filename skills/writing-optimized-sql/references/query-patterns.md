@@ -45,6 +45,40 @@ preaggregating children by tenant and parent is another option only when it
 preserves required filters and aggregate semantics. Validate the output for zero,
 one, and multiple matching children before claiming equivalence.
 
+## Aggregating to a Coarser Grain
+
+When the source key has more columns than the output grain, one output row can
+represent several source rows. Decide per measure whether to sum or collapse first.
+
+```sql
+WITH store_day AS (
+    SELECT
+        tenant_id,
+        store_id,
+        week_start,
+        business_date,
+        SUM(on_hand_quantity) AS on_hand_quantity,
+        MAX(traited_flag) AS traited_flag
+    FROM source_day
+    GROUP BY tenant_id, store_id, week_start, business_date
+)
+SELECT
+    tenant_id,
+    store_id,
+    week_start,
+    SUM(on_hand_quantity) AS on_hand_quantity,
+    MAX(traited_flag) AS traited_flag
+FROM store_day
+GROUP BY tenant_id, store_id, week_start;
+```
+
+Here a store can appear under several regions, so the first grouping collapses it
+to one row per day: the additive quantity is summed and the flag is reduced with
+`MAX`. The second grouping rolls days into a week and applies the same split rule
+per measure. The rule belongs to the measure's contract, not to the query shape.
+Test with a store that has more than one source row; a fixture with unique keys
+cannot detect the wrong choice.
+
 ## NULLs, Outer Joins, and Set Operations
 
 A NOT IN subquery containing NULL can change the result through UNKNOWN. NOT EXISTS
