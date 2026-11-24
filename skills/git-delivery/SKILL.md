@@ -42,6 +42,18 @@ authorizes proceeding with that unmet check. Do not defer local validation to CI
 
 ## 2. Prepare and commit
 
+Before staging, plan the commits. Prefer one commit per coherent change: the
+smallest unit a reviewer could accept or revert without the others. A behavior
+change normally includes its tests and documentation. Keep unrelated changes,
+mechanical or formatting-only edits, generated artifacts, dependency updates, and
+version bumps in their own commits. Use path or hunk staging to separate them, and
+do not split by file count or arbitrary size. Follow an explicit request for a
+single commit or a specific split.
+
+Order dependent commits so each one leaves a coherent state. Do not create an
+intermediate commit that breaks the build or misleads the history just to make the
+series smaller. When a candidate is one coherent change, one commit is correct.
+
 Stage specific paths or hunks belonging to the request. Inspect the complete staged
 diff immediately before committing; selecting paths does not exclude files already
 staged. Check for secrets and accidental generated artifacts. Preserve unrelated

@@ -50,6 +50,12 @@ Keep one compact record per substantive concern:
 Record source/location, trigger, contract, candidate, evidence, and next action.
 Keep the record in local artifacts or chat, not a generic PR triage comment.
 Do not infer correctness from agreement, recency, resolution flags, or passing tests.
+
+Every concern ends in exactly one state. A non-blocking label is a severity
+judgment, not permission to drop the concern. A finding that identifies an
+unproven premise or missing coverage stays open until the check exists, the caller
+runs a named check, or the accepted risk and owner are recorded.
+
 For each substantive thread, also track its destination, reply draft and publication
 state, intended disposition and reason, resolution state, and any blocker. Update
 the record from remote read-back after writes. Deduplicated concerns still need

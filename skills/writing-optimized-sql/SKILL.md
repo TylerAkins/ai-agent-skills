@@ -63,7 +63,14 @@ that enforce tenant scope, authorization, soft deletion, and row-level security.
 Keep joins at the intended grain. Establish many-to-one versus many-to-many keys
 before aggregation; do not hide fan-out with DISTINCT. Preserve duplicate counts,
 NULL semantics, outer-join rows, numeric precision, collation, time-zone boundaries,
-and tie behavior. Use explicit ordering with a unique tie-breaker when deterministic
+and tie behavior.
+
+When the source key has more columns than the output grain, decide each measure
+separately: an additive quantity sums, while a flag, level, or entity count must
+first collapse to the entity with `MAX`, `MIN`, or a keyed distinct. A sibling query
+is not evidence when its grain differs.
+
+Use explicit ordering with a unique tie-breaker when deterministic
 pagination or ranking is required. Validate window frames and aggregation grain.
 Read-only intent alone does not permit inconsistent results. Use SQL Server `NOLOCK`
 only when the contract explicitly accepts dirty reads; see the SQL Server reference.

@@ -17,7 +17,10 @@ mutating checks in an isolated copy. Read
 
 Establish authoritative requirements, accepted decisions, and repository contracts.
 Verify claims in plans, tests, comments, author explanations, and earlier reviews.
-Do not invent intent where uncertainty matters.
+Do not invent intent where uncertainty matters. Accepted decisions establish intent,
+not the truth of their technical premises. Verify any premise that determines failure
+behavior, data semantics, or an external contract against the repository and primary
+sources, and record an unverified premise as an open finding.
 
 Pin the target before judging it:
 
@@ -57,6 +60,9 @@ do not announce blockers yet.
 Use separate reviewers only when available and permitted, with the same raw
 requirements and candidate; otherwise disclose that the passes were not independent.
 
+Identify the intent each changed behavior must satisfy. The verification pass below
+constructs the counterexample that would violate it.
+
 For stateful, asynchronous, or interactive behavior, read
 [scope and state coverage](../test-authoring/references/scope-and-state.md). Identify
 owners of values and operations. Trace failure, retry, overlap, rollback, identity
@@ -86,6 +92,9 @@ establish feedback coverage.
 
 ### Phase 2: Mandatory Adversarial Verification
 
+Read [adversarial review](references/adversarial-review.md) when the change adds a
+guard, computation, metric, failure path, or new tests.
+
 For each possible blocker, make a separate verification pass. State the strongest
 plausible author defense, then check the source that could confirm or refute it:
 macro expansion, runtime path, schema, contract, tests, or peer implementation as
@@ -104,6 +113,25 @@ Demote useful but unproved concerns to questions or non-blocking notes with the
 missing evidence; drop those with no useful action. An unverified material path
 prevents a clean approval.
 
+### Settle counterexamples
+
+For every changed computation, guard, branch, or contract, write one counterexample:
+the smallest input that violates the intent and is allowed by the schema, the data,
+or the documented contract. Derive it from the repository, not from assumption, and
+state why it is plausible for this change. Do not enumerate exotic or theoretical
+states. Examples include a duplicate source row, an empty or deleted period, a
+boundary value, a retried or concurrent operation, a missing reference row, and a
+partial batch.
+
+A counterexample is settled by a test or executed check that exercises it, a
+documented contract that excludes it, or evidence that an enforced constraint makes
+it impossible. If it remains unsettled, it is a Required finding even when you
+cannot execute it yourself. It is a concrete coverage gap, not a speculative
+effect, so the demotion rule above does not apply. When only execution can settle
+it, name the exact command or check and report the review as incomplete until its
+result is available. Do not demote it to a note because you cannot prove failure.
+The missing check is the defect.
+
 Apply the same evidence bar to cleared paths and corrections. Compute relevant
 dates, counts, offsets, or boundaries; trace consumers affected by null returns,
 clamps, throws, or fallbacks. Show decisive worked values or named consumers in chat,
@@ -120,7 +148,8 @@ a minimal correction when known; do not invent an implementation.
 Use impact to distinguish feedback:
 
 - **Critical:** A material security, data loss, or operational failure blocks merge.
-- **Required:** A supported contract violation or regression must be addressed.
+- **Required:** A supported contract violation, regression, or coverage gap that
+  leaves a changed contract unverified must be addressed.
 - **Optional:** A justified improvement that does not block shipping.
 - **Nit:** A minor preference, only when useful or requested.
 - **Question:** Intent or evidence is missing; do not present it as a confirmed defect.
@@ -129,17 +158,21 @@ Order feedback by consequence; do not manufacture nits or enforce a finding coun
 Repository conventions and facts outrank personal preferences. File size,
 conditional count, and abstraction choices are clues, not automatic blockers.
 
-Report incomplete coverage even without findings. After repairs, verify earlier
-triggers, inspect the repair delta, and search the wider candidate and callers for
-sibling failures. Changed contracts or approach require expanded coverage. Material
-candidate changes reopen affected review; aborted or empty independent review remains
-pending.
+Report incomplete coverage even without findings. Coverage includes the
+counterexamples for changed behavior and the checks needed to settle them. A test
+that cannot fail for the behavior it guards is a coverage defect; when it is the
+only coverage for a changed contract, report it as Required. After repairs, verify
+earlier triggers, inspect the repair delta, and search the wider candidate and
+callers for sibling failures. Changed contracts or approach require expanded
+coverage. Material candidate changes reopen affected review; aborted or empty
+independent review remains pending.
 
 Choose `APPROVE` only with complete coverage, supported repository patterns,
 passing relevant checks, and no actionable feedback. Use `COMMENT` for actionable
-non-blocking feedback and `REQUEST_CHANGES` only for verified blockers. Incomplete
-coverage prevents approval. For GitHub, use the fixed review body, put the
-investigation report in chat, and put finding evidence and consequences inline.
+non-blocking feedback. A Required finding prevents approval even when the review
+event is `COMMENT`; use `REQUEST_CHANGES` only when a verified blocker also exists.
+Incomplete coverage prevents approval. For GitHub, use the fixed review body, put
+the investigation report in chat, and put finding evidence and consequences inline.
 
 ## 3. Deliver concise feedback
 

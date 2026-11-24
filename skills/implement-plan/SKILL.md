@@ -21,8 +21,9 @@ decisions and unresolved choices. Use [jira-tickets](../jira-tickets/SKILL.md) i
 intake mode when necessary issue context is missing. Inspect repository instructions,
 branch/base, working changes, relevant execution paths, and dependency versions.
 Read task skills linked by the plan and applicable repository-local skills or
-instructions. Preserve unrelated work and reuse suitable task context rather than
-restarting intake.
+instructions. Discover the repository's own skill catalog or routing table and load
+the procedures that govern the affected layer, even when no one names them. Preserve
+unrelated work and reuse suitable task context rather than restarting intake.
 
 Verify plan paths, interfaces, contractual values, dependencies, and check commands
 against the repository. Treat the plan as a proposal to reconcile, not proof of
@@ -123,6 +124,11 @@ is unavailable or prohibited, perform a separate evidence-based assessment when 
 disclose the limit, and leave independent review incomplete. An aborted, empty, or
 partial attempt remains pending; do not reinterpret it as approval. Retry a failed
 attempt when feasible without spawning redundant reviews of unchanged clean work.
+
+When the reviewer could not run a settling check, run the named check, in an
+isolated copy when it writes, report the actual result, and give it to the reviewer
+before treating the review as complete. A review that remains incomplete is not
+approval; report the gap before delivery.
 
 Verify findings against actual triggers, consumers, and source contracts before
 repairing. Make supported repairs within existing authorization. Resolve consequential
