@@ -84,10 +84,10 @@ verification does not authorize a commit, push, PR, tag, or release.
 
 For titles, descriptions, or PR creation, read
 [PR description guidance](references/pr-description.md). Draft from the final
-candidate and observed verification. Include a concise Validation section, or the
-repository template's equivalent, summarizing checks and manual flows actually
-verified. Keep detailed runner output in the working record. Drafting alone does
-not authorize publication.
+candidate and observed verification. Include a concise Purpose section explaining why
+the change exists, and a Validation section, or the repository template's equivalents,
+summarizing checks and manual flows actually verified. Keep detailed runner output in
+the working record. Drafting alone does not authorize publication.
 
 Before an authorized push, verify the branch, remote, destination, and outgoing
 commits. Use a normal push. If rejected, inspect divergence and report the conflict;

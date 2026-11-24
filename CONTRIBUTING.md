@@ -88,11 +88,11 @@ or instruction following. Do not claim checks that were unavailable or unperform
 ## Submit a pull request
 
 Use a clear title and the [PR template](.github/pull_request_template.md). Explain
-the concrete problem and resulting behavior. Link a real issue when relevant;
-do not invent one. Include a concise Validation section describing checks and
-manual flows actually verified. Leave detailed runner output out of routine
-bullets and disclose material gaps or failures. Screenshots help when appearance
-is part of the change.
+why the change exists in Purpose and its resulting behavior in TL;DR. Link a real
+issue when relevant; do not invent one. Include a concise Validation section
+describing checks and manual flows actually verified. Leave detailed runner output
+out of routine bullets and disclose material gaps or failures. Screenshots help
+when appearance is part of the change.
 
 AI-assisted contributions are welcome. Review the complete diff and verify its
 claims before submitting. At the bottom of the PR, name the tool and known model;
